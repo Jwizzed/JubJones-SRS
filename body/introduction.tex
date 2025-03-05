@@ -18,128 +18,113 @@
 \section{Background}
 \label{section:background}
 
-In universities and campuses, cafeteria food is a staple for students' lifestyles.
-It is important that a university cafeteria has various cuisines and food choices to choose from in order to accommodate
-any diet a student prefers. However, the abundance of options paves way for students to spend their valuable time in choosing
-their meal within their budget and time constraints. The result of students choosing can lead to mixed responses;
-while some feel satisfied with their meal choices, others feel regretful for their order.
-Causes such as taste, value and personal bias can be the reasons for dissatisfaction in cafeteria food. \cite{marquisetal:2018}
+In modern surveillance systems, the ability to track individuals across multiple camera views is crucial for security and analytics applications.
+Traditional surveillance methods rely heavily on human operators monitoring multiple screens simultaneously, which is both labor-intensive and prone to error.
+As the number of cameras in surveillance networks increases, the challenge of effectively monitoring and tracking individuals becomes exponentially more difficult.
+The limitations of manual surveillance include operator fatigue, inconsistent identification, and the inability to quickly locate specific individuals across diverse environments. \cite{surveillanceetal:2023}
 
-During Kasetsart University's lunch hours,
-most of the cafeteria will be full of students and taking too long to choose their meal is not a viable option
-since some students have only an hour of lunch time before their studies. The motivation of this project is to simplify
-the decision-making process for students in choosing meals from various food stalls within
-the cafeterias at Kasetsart University so they can save time and enjoy their meal.
+In commercial and industrial settings such as retail stores, office buildings, cafes, industrial facilities, and lobbies,
+the need for intelligent surveillance systems that can automatically identify and track individuals of interest is significant.
+Current systems often struggle with maintaining consistent identification when subjects move between camera views,
+especially in crowded scenes or when individuals change appearance or direction. This creates substantial gaps in surveillance coverage
+and reduces the effectiveness of security measures in these environments.
 
-% Consider switching paragraph 2 and 3.
-
-Students get guidance on what they should get for their meals by asking their friends or other students on campus.
-This kind of conversation can happen anywhere---in the cafeteria, in a classroom, on the campus grounds or on an online messaging application etc.
-However, this is not always reliable for each students' own preferences, as each individual can have different perspectives
-and experiences on meal choices. Additionally, Kasetsart University does not have a publicized, centralized data source
-for food stalls in cafeterias. As a result, no food guide application tailored to Kasetsart University's students
-has been made due to lack of information on the aforementioned food stalls.
+The advancement of artificial intelligence, particularly in computer vision and machine learning,
+has opened new possibilities for addressing these challenges. Technologies such as real-time object detection,
+person re-identification, and large language models can be integrated to create more intelligent and responsive surveillance systems.
+However, these technologies have not yet been fully leveraged in a cohesive, user-friendly system that meets the needs of security professionals
+monitoring diverse indoor environments like those represented in the MMPTrack dataset.
 
 \section{Problem Statement}
 \label{section:problem-statement}
 
-The problem statement for KU Eater addresses the challenge that Kasetsart University students face
-when it comes to daily meal selection. With a myriad of dining options on campus, students often struggle to make choices
-that align with their dietary preferences, nutritional needs, and time constraints. The complexity of this decision-making
-process can lead to meal dissatisfaction and a negative impact on their academic performance and overall campus experience.
-Moreover, there are currently no solution that is tailored to simplification and personalization of
-KU students' processes of choosing meals.
+The Intelligent Multi-Camera Person Tracking and Analytics System addresses several critical technical challenges in modern surveillance systems. First, detecting and identifying the same individual across multiple cameras with varying angles, lighting conditions, and occlusions remains highly complex. Current systems struggle with consistent re-identification when subjects appear in different camera views, particularly when individuals share similar physical attributes or clothing. Second, while Large Language Models show promise for natural language-based person filtering, their application in real-world surveillance scenarios lacks robust validation and standardized implementation approaches. Third, perspective transformation—mapping individuals from different camera views onto a unified coordinate system—presents significant technical hurdles due to varying camera positions, lens distortions, and environmental factors. Fourth, the integration of these technologies into a cohesive, real-time system that security personnel can effectively utilize requires overcoming substantial engineering challenges in data synchronization, processing latency, and user interface design. These challenges are particularly evident in diverse indoor environments such as retail spaces, offices, industrial facilities, cafes, and lobbies, where existing solutions fail to provide the seamless, intuitive tracking capabilities required by security professionals.
 
 \section{Solution Overview}
 \label{section:solution-overview}
 
-KU Eater proposes a solution by being a web-based food guide application that is usable on any platform that is connected to the internet and,
-is tailored to Kasetsart University students with four prominent features and additional features to solve the problem,
+The Intelligent Multi-Camera Person Tracking and Analytics System proposes a solution by being an AI-powered surveillance platform
+that is designed for security professionals with four prominent features and additional capabilities to solve the problem,
 
 \subsection{Prominent Features}
 \label{subsection:main-features}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Portable menu and stalls guidebook:} A collection of menu items and stalls offering them right at the fingertips,
-    it boasts in user accessibility and speed of data retrieval.
-    \item \textbf{Keyword-based search for menus:} A machine learning-based search system that can classify keywords
-    in the search term to find accurate food stalls that can serve meals according to user input.
-    \item \textbf{Personalized food recommendation:} A system with pre-trained machine learning model to predict
-    dietary preferences based on past attendances to Kasetsart University's cafeterias. As well as,
-    showing trending meal choices by the other students using this application.
-    \item \textbf{Food stall reviews and rating:} A system that allows students to open discussions on their opinions
-    of food stalls and the food choices they have. With written reviews, students can gain more context.
-    The reviews also help with their consideration of ordering a meal.
+    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals
+    based on descriptive prompts (e.g., "Find the person wearing a red shirt and carrying a backpack"), enhancing the speed
+    and accuracy of subject identification in diverse indoor environments.
+    \item \textbf{Real-Time Person Detection and Re-Identification:} An advanced object detection system that maintains
+    consistent identification of individuals across multiple camera views in retail, office, industrial, cafe, and lobby settings,
+    even when they temporarily leave one camera's field of view and appear in another.
+    \item \textbf{Path Tracking and Visualization:} A dynamic mapping system that plots the movement of tracked individuals
+    across multiple camera views within indoor environments, providing clear visualization of their paths with timestamps and key locations.
+    \item \textbf{Zoom and Focus Capabilities:} A system that allows users to click on a person or object in the video feed
+    to zoom in and focus on them in real time, enhancing visibility and detail for critical observations in various indoor settings.
 \end{enumerate}
 
-\subsection{Data Acquisition}
-\label{subsection:data-acquisition}
+\subsection{Technical Implementation}
+\label{subsection:technical-implementation}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Data acquisition for food stalls in Kasetsart University} \\%
-        Due to lack of existing data of food stalls in cafeterias on KU, an employment of data acquisition method is required.
+    \item \textbf{Object Detection and Tracking} \\%
+        The system employs state-of-the-art detection and tracking technologies:
         \begin{enumerate}
-            \item Interviewing with information holder---interviews and surveys with stall owners is our
-            primary source of data, as it is the most accurate method to acquire data.
-            \item Optical character recognition on menu items---all stalls have menu of food items at in front of the stall.
-            We can use an character recognition technique to extract information such as, menu item and price.
+            \item YOLOv11 for real-time object detection—providing optimal speed and efficiency for surveillance applications in indoor environments.
+            \item ByteTrack for robust tracking—handling occlusions and maintaining identity consistency in crowded indoor scenes.
         \end{enumerate}
-    \item \textbf{Data acquisition for food information (e.g. ingredients, cooking method)} \\%
-        Another plan to employ data acquisition for food information is also required. Below is an overview of our methodology:
+    \item \textbf{Re-Identification and LLM Integration} \\%
+        Advanced technologies ensure accurate subject identification across camera views:
         \begin{enumerate}
-            \item Interviewing with information holder---interviews and surveys with stall owners is our
-            primary source of data, as it is the most accurate method to acquire data.
-            \item Predicting food information using menu name with Large Language Models---in case of missing data,
-            we can use LLMs to infer from dish names and its ability to retrieve from online sources to fill the gaps.
+            \item FastReID for person re-identification—maintaining consistent identity across different camera perspectives in varied indoor settings.
+            \item OpenCLIP for natural language processing—enabling description-based person selection through intuitive prompts tailored to retail, office, industrial, cafe, and lobby environments.
         \end{enumerate}
 \end{enumerate}
 
-\subsection{Stretch Goals}
-\label{subsection:stretch-goals}
+\subsection{Optional Features}
+\label{subsection:optional-features}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Sentiment analysis for user reviews:} KU Eater can automatically analyze review context and score
-    the menu items and food stalls based on the intents in review text.
-    \item \textbf{Food stalls layout map for cafeterias:} With KU Eater, users will know where food stalls are located
-    in the cafeterias at all times.
+    \item \textbf{Multi-Object Tracking:} Capability to simultaneously track multiple individuals or objects across the surveillance network in diverse indoor environments.
+    \item \textbf{Behavior Prediction:} AI-powered analysis to predict movement patterns and provide early warnings for unusual behavior in specific contexts like retail theft prevention or industrial safety monitoring.
+    \item \textbf{Dynamic Analytics:} Real-time metrics including walking speed, time spent in specific areas, and movement pattern heatmaps customized for retail, office, industrial, cafe, and lobby settings.
+    \item \textbf{Automatic Map Generation:} System that creates maps based on observed movement patterns in indoor environments, eliminating the need for manual mapping.
 \end{enumerate}
 
 \section{Target User}
 \label{section:target-user}
 
-The overarching goal for KU Eater is to provide comprehensive and accurate information about the food options available in
-Kasetsart University's cafeterias. This enables users to make well-informed decisions for their meals,
-aligning with their preferences, dietary restrictions, and time constraints. By doing so, KU Eater aims to enhance
-the dining experience, making it more efficient, enjoyable, and personalized for every user on campus.
+The overarching goal for the Intelligent Multi-Camera Person Tracking and Analytics System is to provide security professionals
+with a powerful, intuitive tool for monitoring and analyzing surveillance footage across multiple camera views in diverse indoor environments.
+By leveraging advanced AI technologies, the system aims to enhance security operations, reduce response times,
+and provide actionable insights that improve overall safety and security in retail, office, industrial, cafe, and lobby settings.
 
-The primary users of KU Eater are Kasetsart University students who normally dine in KU cafeteria.
-However, the application is designed for anyone who want to have a meal in the cafeteria and,
-below are examples of the diverse users who can benefit from our app.
+The primary users of the system are security professionals responsible for surveillance monitoring and response in these environments.
+Below are examples of the diverse users who can benefit from our system.
 
 \begin{table}[p]
     \centering
     \noindent\begin{tabular}{| p{2.65in} | p{2.65in} |}
         \hline & \\[-10pt]
-        \persona{The Selective Student}
-        {Enjoys exploring new tastes but has a long list of disliked ingredients such as onion, celery, tomato, egg noodles.}
-        {Struggles to find dishes that accommodate her specific dislikes amidst a hectic class schedule.}
-        {To quickly find dishes that align with her preferences and share her meal with peers.} &
-        \persona{Adventurous Exchange Student}
-        {Interested in trying local Thai cuisines but not too spicy, food stalls with English menus with English speaking vendor.}
-        {Language barrier; unfamiliarity with local food options.}
-        {To explore a variety of local dishes, understand ingredients, and find stalls that cater to international tastes.} \\[10pt]
+        \persona{Retail Security Manager}
+        {Real-time tracking capabilities, intuitive interfaces, theft prevention tools specific to retail environments.}
+        {Overwhelmed by multiple CCTV feeds, difficulty identifying suspicious behavior in crowded stores.}
+        {To quickly locate and track persons of interest across retail spaces and coordinate rapid response to potential theft or security incidents.} &
+        \persona{Office Building Security Officer}
+        {Access control integration, visitor tracking, minimal disruption to professional environments.}
+        {Managing security across multiple floors and office spaces, identifying unauthorized visitors.}
+        {To efficiently monitor building access points and common areas while maintaining a professional, unobtrusive security presence.} \\[10pt]
         \hline & \\[-10pt]
-        \persona{The Health-Conscious Student}
-        {High-protein meals, low-calorie foods.}
-        {Difficulty finding meals that fit his dietary restrictions; concerns about nutritional information.}
-        {To quickly identify healthy eating options in KU cafeteria, and discover new meals that align with his fitness goals.} &
-        \persona{The University Staff Member}
-        {Quick meals like sandwiches and coffee.}
-        {Limited time for meals due to a busy schedule; struggles with crowded cafeterias during peak hours.}
-        {Seeks efficient dining options that fit into a tight schedule, with the ability to quickly identify less crowded stalls then just grab and go.} \\[10pt]
+        \persona{Industrial Safety Supervisor}
+        {Safety protocol monitoring, hazard zone tracking, integration with industrial safety systems.}
+        {Ensuring worker compliance with safety protocols, monitoring restricted areas in industrial settings.}
+        {To identify safety violations, track personnel in hazardous areas, and improve overall workplace safety through data-driven insights.} &
+        \persona{Commercial Property Manager}
+        {System reliability, comprehensive dashboard views, multi-environment monitoring capabilities.}
+        {Coordinating security across diverse spaces (lobbies, cafes, offices), balancing security with customer experience.}
+        {To improve operational efficiency, reduce security incidents, and maintain comprehensive situational awareness across all monitored areas.} \\[10pt]
         \hline
     \end{tabular}
-    \caption{Personas from User Analysis for KU Eater}
+    \caption{Personas from User Analysis for Intelligent Multi-Camera Person Tracking System}
 \end{table}
 
 \newpage
@@ -147,36 +132,41 @@ below are examples of the diverse users who can benefit from our app.
 \section{Benefit}
 \label{section:benefit}
 
-The benefits of KU Eater include enhanced decision-making efficiency with tailored meal suggestions,
-higher meal satisfaction rates, a more enjoyable dining experience.
+The benefits of the Intelligent Multi-Camera Person Tracking and Analytics System include enhanced security operations
+with faster subject identification and tracking in diverse indoor environments, reduced response times through real-time alerts and path visualization,
+and more efficient resource allocation for security personnel.
 
-The application also offers convenience for users to navigate quickly through diverse food options offered in KU cafeterias,
-the entire menu at their fingertips and an improvement to campus life quality.
+The system also offers improved investigative capabilities with comprehensive movement tracking and analytics tailored to specific environments,
+reduced operator fatigue through AI-assisted monitoring, and scalable surveillance coverage that can adapt to
+retail, office, industrial, cafe, and lobby settings of varying sizes and complexities.
 
 \section{Timeline}
 \label{section:timeline}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{kueater/timeline.png}
-    \caption{Timeline for KU Eater Project}
+    % \includegraphics[width=\textwidth,height=0.5\textheight,keepaspectratio]{tracking/timeline.png}
+    \caption{Timeline for Intelligent Multi-Camera Person Tracking System Project}
     \label{fig:timeline}
 \end{figure}
 
 As shown in figure \ref{fig:timeline}, it represents the timeline of the project.
-KU Eater started with user interface design at the end of March 2024, and our data acquisition process is on April-May 2024 and later again during Nov-Dec 2024.
-Starting from Dec 2024, we develop the recommendation engine and other artificial intelligence components;
-along with implementing the application based on the design.
+The project began with system architecture design in January 2025, followed by the development of core detection
+and tracking modules in February 2025. The re-identification and LLM integration components are scheduled for
+completion by mid-March 2025.
 
-Our first test is on March 2025, and continuously take feedback from users for later improvement during that time.
-The final project will be published on April 2025.
+System integration testing will commence in late March 2025, with user acceptance testing planned for early April 2025.
+The final deployment and handover are scheduled for completion by the end of April 2025, with ongoing support
+and maintenance to follow.
 
 \section{Terminology}
 \label{section:terminology}
 
 \begin{itemize}[leftmargin=40pt]
-    \item \textbf{\textit{Artificial Intelligence (AI)}}---a technology that enables computers and machines to imitate complex human skills.
-    \item \textbf{\textit{Machine Learning (ML)}}---a process involving training computers with sets of data to develop an ability to learn without explicit instructions. It involves uses of complex mathematical algorithms and statistical models to draw inferences from patterns in data.
-    \item \textbf{\textit{Personalization}}---a feature or an ability of software to allow users to customize their experience with variables or context given by the users.
-    \item \textbf{\textit{Sentiment Analysis}}---a process of analyzing digital text to determine if the emotional tone of the message is positive, negative, or neutral.
+    \item \textbf{\textit{Object Detection}}---a computer vision technique that identifies and locates objects within digital images or video frames.
+    \item \textbf{\textit{Re-Identification (Re-ID)}}---the process of matching individuals across different camera views based on their appearance and other characteristics.
+    \item \textbf{\textit{Large Language Model (LLM)}}---an advanced AI system trained on vast amounts of text data that can understand and generate human-like text, enabling natural language interactions.
+    \item \textbf{\textit{Perspective Transformation}}---a technique that converts camera views to a standardized perspective, typically a top-down view, to enable accurate mapping and tracking.
+    \item \textbf{\textit{Multi-Object Tracking (MOT)}}---a computer vision task that involves detecting multiple objects in video frames and tracking them over time while maintaining their identities.
+    \item \textbf{\textit{MMPTrack Dataset}}---a multi-camera tracking dataset featuring synchronized video from diverse indoor environments including retail spaces, offices, industrial facilities, cafes, and lobbies.
 \end{itemize}
