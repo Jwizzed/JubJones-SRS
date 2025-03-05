@@ -78,12 +78,17 @@
     \include{body/softwaredevelopment}
     \include{body/deliverable}
     \include{body/conclusion}
+    
+    % Reference section
+    \clearpage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Reference}
     \include{body/reference}
+    
+    % Appendix section
+    \clearpage
+    \phantomsection
+    \addcontentsline{toc}{chapter}{Appendix}
     \include{body/appendix}
-
-    \input{common/onetextpage.tex}
-    \onetextpage{Reference}
-    \bibliographystyle{IEEEtran}
-    \bibliography{bibliography}
 
 \end{document}
