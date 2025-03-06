@@ -1,10 +1,14 @@
-% Remove the \chapter command to avoid duplicate numbering
+% First page with just the word "Reference"
 \begin{center}
-    \vspace*{2cm}
-    \huge\textbf{Reference}
-    \vspace*{2cm}
+    \vspace*{\fill}
+    \Huge\textbf{Reference}
+    \vspace*{\fill}
 \end{center}
 
+% Force a page break
+\clearpage
+
+% Second page with bibliography
 % Bibliography content here
 \bibliographystyle{IEEEtran}
 \bibliography{bibliography}
