@@ -4,203 +4,203 @@
 \section{Domain Model}
 \label{section:domain-model}
 
-\begin{figure}[h!]
-    \centering
-    % \includesvg[width=1\textwidth]{kueater/domain_model.svg}
-    \caption{Domain Model of KU Eater}
-    \label{fig:domain-model}
-\end{figure}
+% \begin{figure}[h!]
+%     \centering
+%     % \includesvg[width=1\textwidth]{kueater/domain_model.svg}
+%     \caption{Domain Model of KU Eater}
+%     \label{fig:domain-model}
+% \end{figure}
 
-The domain model of KU Eater (Figure \ref{fig:domain-model}) shows the business knowledge, any technicalities are abstracted into their most simplest form. (Recommendation Engine for example)
+% The domain model of KU Eater (Figure \ref{fig:domain-model}) shows the business knowledge, any technicalities are abstracted into their most simplest form. (Recommendation Engine for example)
 
-However, some clarification may be needed as to help readers understand:
+% However, some clarification may be needed as to help readers understand:
 
-\begin{itemize}
-    \item Stall can aggregate reviews from MenuItem directly, so no need to associate Review with Stall.
-    \item DietaryRestriction is considered separated from UserProfile. The benefit is that DietaryRestriction can be reused for other users
-    and we can specify common personal diets like: Vegetarian, Halal etc.
-\end{itemize}
+% \begin{itemize}
+%     \item Stall can aggregate reviews from MenuItem directly, so no need to associate Review with Stall.
+%     \item DietaryRestriction is considered separated from UserProfile. The benefit is that DietaryRestriction can be reused for other users
+%     and we can specify common personal diets like: Vegetarian, Halal etc.
+% \end{itemize}
 
-\section{Design Class Diagram}
-\label{section:design-class-diagram}
+% \section{Design Class Diagram}
+% \label{section:design-class-diagram}
 
-\begin{figure}[h!]
-    \centering
-    % \includesvg[width=\textwidth,height=0.7\textheight,keepaspectratio]{kueater/class_diagram.svg}
-    \caption{Class Diagram of KU Eater}
-    \label{fig:class-diagram}
-\end{figure}
+% \begin{figure}[h!]
+%     \centering
+%     % \includesvg[width=\textwidth,height=0.7\textheight,keepaspectratio]{kueater/class_diagram.svg}
+%     \caption{Class Diagram of KU Eater}
+%     \label{fig:class-diagram}
+% \end{figure}
 
-Class diagram (Figure \ref{fig:class-diagram}) represents a structure of application that relates closely to real implementation. The diagram
-shows mainly the Data Objects that KU Eater must keep track of. Class Diagram is also expanded upon the Domain Model (see Figure \ref{fig:domain-model})
-making sure that the integrity of business knowledge is intact.
+% Class diagram (Figure \ref{fig:class-diagram}) represents a structure of application that relates closely to real implementation. The diagram
+% shows mainly the Data Objects that KU Eater must keep track of. Class Diagram is also expanded upon the Domain Model (see Figure \ref{fig:domain-model})
+% making sure that the integrity of business knowledge is intact.
 
 \section{Sequence Diagram}
 \label{section:sequence-diagram}
 
-Sequence diagrams visualize interaction between the user and the system. The figures below show how components in the system will interact with
-each other and the end-user, while the users can dispatch messages or inputs into KU Eater.
+% % Sequence diagrams visualize interaction between the user and the system. The figures below show how components in the system will interact with
+% % each other and the end-user, while the users can dispatch messages or inputs into KU Eater.
 
-\subsection{Default Recommendation Process}
-\begin{figure}[h!]
-    \centering
-    % \includesvg[width=\textwidth,height=0.4\textheight,keepaspectratio]{kueater/sequence_diagram_anonymous_recommendations.svg}
-    \caption{Sequence Diagram for Default Recommendation Process}
-    \label{fig:seq-default-recommendation-process}
-\end{figure}
+% \subsection{Default Recommendation Process}
+% \begin{figure}[h!]
+%     \centering
+%     % \includesvg[width=\textwidth,height=0.4\textheight,keepaspectratio]{kueater/sequence_diagram_anonymous_recommendations.svg}
+%     \caption{Sequence Diagram for Default Recommendation Process}
+%     \label{fig:seq-default-recommendation-process}
+% \end{figure}
 
-Figure \ref{fig:seq-default-recommendation-process} represents a sequence diagram for a process when a guest user is browsing KU Eater. When a user
-starts to use KU Eater, the controller in the application layer will invoke the machine learning layer without specific parameters and generate new recommendations.
+% Figure \ref{fig:seq-default-recommendation-process} represents a sequence diagram for a process when a guest user is browsing KU Eater. When a user
+% starts to use KU Eater, the controller in the application layer will invoke the machine learning layer without specific parameters and generate new recommendations.
 
-Once the recommendations are finished generating, the application requests list of recommendations and renders them back to user.
+% Once the recommendations are finished generating, the application requests list of recommendations and renders them back to user.
 
-\subsection{User Recommendation Process}
-\begin{figure}[h!]
-    \centering
-    % \includesvg[width=\textwidth,height=0.4\textheight,keepaspectratio]{kueater/sequence_diagram_user_recommendations.svg}
-    \caption{Sequence Diagram for Authenticated User Recommendation Process}
-    \label{fig:seq-user-recommendation-process}
-\end{figure}
+% \subsection{User Recommendation Process}
+% \begin{figure}[h!]
+%     \centering
+%     % \includesvg[width=\textwidth,height=0.4\textheight,keepaspectratio]{kueater/sequence_diagram_user_recommendations.svg}
+%     \caption{Sequence Diagram for Authenticated User Recommendation Process}
+%     \label{fig:seq-user-recommendation-process}
+% \end{figure}
 
-Figure \ref{fig:seq-user-recommendation-process} represents a sequence diagram for a process when authenticated user logs on to browse on KU Eater.
-When a user, starts to use KU Eater, the controller in the application layer will fetch the user profile from the domain layer and pass the attributes in the profile to
-the machine learning layer with user profile as the parameters. The recommendation engine will generate a list of possible recommendations.
+% Figure \ref{fig:seq-user-recommendation-process} represents a sequence diagram for a process when authenticated user logs on to browse on KU Eater.
+% When a user, starts to use KU Eater, the controller in the application layer will fetch the user profile from the domain layer and pass the attributes in the profile to
+% the machine learning layer with user profile as the parameters. The recommendation engine will generate a list of possible recommendations.
 
-Once the recommendations are finished generating, it is re-ranked, filtered and evaluated by considering the properties in user profile: Liked menu items, reviewed menu items, disliked menu items and dietary restrictions. The final set of recommendations is rendered back to user.
+% Once the recommendations are finished generating, it is re-ranked, filtered and evaluated by considering the properties in user profile: Liked menu items, reviewed menu items, disliked menu items and dietary restrictions. The final set of recommendations is rendered back to user.
 
-%\section{Algorithm}
-%\label{section:algorithm}
-%<TIP: Optional, If you are working on a research project that proposes a new
-%algorithm, you can describe your algorithm here. It can be in the form of
-%pseudocode or any diagram that you deem appropriate./>
+% %\section{Algorithm}
+% %\label{section:algorithm}
+% %<TIP: Optional, If you are working on a research project that proposes a new
+% %algorithm, you can describe your algorithm here. It can be in the form of
+% %pseudocode or any diagram that you deem appropriate./>
 
-\newpage
+% \newpage
 
 \section{Pipeline}
 \label{section:pipeline}
 
-\subsection{Modelling the Recommendation Engine}
-\begin{figure}[h!]
-    \centering
-    % \includesvg[height=0.3\textheight,keepaspectratio]{kueater/algo_modelling.svg}
-    \caption{Pipeline for Modelling the Recommendation Engine}
-    \label{fig:pipeline-for-modelling}
-\end{figure}
+% \subsection{Modelling the Recommendation Engine}
+% \begin{figure}[h!]
+%     \centering
+%     % \includesvg[height=0.3\textheight,keepaspectratio]{kueater/algo_modelling.svg}
+%     \caption{Pipeline for Modelling the Recommendation Engine}
+%     \label{fig:pipeline-for-modelling}
+% \end{figure}
 
-Our recommendation engine uses content-based filtering and item-based collaborative filtering
-with K-nearest neighbor (kNN) as the backbone of the engine. \cite{singhanddwivedi:2023}
-The model needs to be fed relevant data such as Menu Categories, Menu Items and Stalls in which they exist in
-the database. As shown in, figure \ref{fig:pipeline-for-modelling}.
+% Our recommendation engine uses content-based filtering and item-based collaborative filtering
+% with K-nearest neighbor (kNN) as the backbone of the engine. \cite{singhanddwivedi:2023}
+% The model needs to be fed relevant data such as Menu Categories, Menu Items and Stalls in which they exist in
+% the database. As shown in, figure \ref{fig:pipeline-for-modelling}.
 
-The following data types are used in the modelling process:
+% The following data types are used in the modelling process:
 
-\begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Menu items:} A structured data type containing menu name, ingredients and cooking method.
-    \item \textbf{Menu categories:} A set of keywords that corresponds to menu item types, cuisines, cooking method etc.
-    The categories are used to tag the menu items to further enhance decision making for model and simplify its
-    similarity calculation.
-    \item \textbf{Stalls:} A structured data type containing stall name, menu items a stall offers etc.
-    It is used to multiply menu entries to a number of stalls, so that we can further score specific item from reviews.
-\end{enumerate}
+% \begin{enumerate}[leftmargin=80pt]
+%     \item \textbf{Menu items:} A structured data type containing menu name, ingredients and cooking method.
+%     \item \textbf{Menu categories:} A set of keywords that corresponds to menu item types, cuisines, cooking method etc.
+%     The categories are used to tag the menu items to further enhance decision making for model and simplify its
+%     similarity calculation.
+%     \item \textbf{Stalls:} A structured data type containing stall name, menu items a stall offers etc.
+%     It is used to multiply menu entries to a number of stalls, so that we can further score specific item from reviews.
+% \end{enumerate}
 
-The main objective of this recommendation system is to figure out what food items are relevant with inputted food items that user interacted with.
-In order to build the proper system, we must start with finding relevance between menu items by using \textit{Content-Based Filtering}.
+% The main objective of this recommendation system is to figure out what food items are relevant with inputted food items that user interacted with.
+% In order to build the proper system, we must start with finding relevance between menu items by using \textit{Content-Based Filtering}.
 
-\begin{enumerate}[leftmargin=80pt]
-    \item We compile a table of menu items which has the following attributes, menu name, a list of ingredients and cooking method as a string.
-    \item The tags from Menu categories will automatically populate within each menu item.
-    \item We use cosine similarity technique to match any string-based attributes.
-    \item We turn ingredients feature into binary (Exists, Non-exists), in that way we can score the similarity of food items with existence of each ingredients.
-    \item Finally, we can then use cosine similarity measure to find distances between all food items.
-\end{enumerate}
+% \begin{enumerate}[leftmargin=80pt]
+%     \item We compile a table of menu items which has the following attributes, menu name, a list of ingredients and cooking method as a string.
+%     \item The tags from Menu categories will automatically populate within each menu item.
+%     \item We use cosine similarity technique to match any string-based attributes.
+%     \item We turn ingredients feature into binary (Exists, Non-exists), in that way we can score the similarity of food items with existence of each ingredients.
+%     \item Finally, we can then use cosine similarity measure to find distances between all food items.
+% \end{enumerate}
 
-After having a precomputed similarity vectors of each food item, we can use them to determine recommendations for a user;
-by using \textit{Item-Based Collaborative Filtering}.
+% After having a precomputed similarity vectors of each food item, we can use them to determine recommendations for a user;
+% by using \textit{Item-Based Collaborative Filtering}.
 
-\begin{enumerate}[leftmargin=80pt]
-    \item Once a user required new recommendations, a list of food items and stall is used to generate all possible recommendations.
-    \item Using the list of similarity scores from CBF, we can determine the most similar menu items from user preferences with cosine similarity.
-    \item We can take ratings of observed menu items and construct a user-item correlation set.
-    \item Using cosine similarity, we can determine the nearest neighbors which are other users with similar preferences.
-    \item We can use those other users' profile to see what menu item they're most likely to interact with, and use those as recommendations.
-\end{enumerate}
+% \begin{enumerate}[leftmargin=80pt]
+%     \item Once a user required new recommendations, a list of food items and stall is used to generate all possible recommendations.
+%     \item Using the list of similarity scores from CBF, we can determine the most similar menu items from user preferences with cosine similarity.
+%     \item We can take ratings of observed menu items and construct a user-item correlation set.
+%     \item Using cosine similarity, we can determine the nearest neighbors which are other users with similar preferences.
+%     \item We can use those other users' profile to see what menu item they're most likely to interact with, and use those as recommendations.
+% \end{enumerate}
 
-\subsection{Predicting the Recommendations}
-\begin{figure}[h!]
-    \centering
-    % \includesvg[width=\textwidth,height=0.2\textheight,keepaspectratio]{kueater/algo_prediction.svg}
-    \caption{Pipeline for Predicting Recommendations}
-    \label{fig:pipeline-for-predicting}
-\end{figure}
+% \subsection{Predicting the Recommendations}
+% \begin{figure}[h!]
+%     \centering
+%     % \includesvg[width=\textwidth,height=0.2\textheight,keepaspectratio]{kueater/algo_prediction.svg}
+%     \caption{Pipeline for Predicting Recommendations}
+%     \label{fig:pipeline-for-predicting}
+% \end{figure}
 
-User profile contains information that can be used to predict their preferences: Items that user recently looked, items reviewed by user, items liked by user.
-These properties are used in the recommendation engine to predict an unordered list of possible recommendations.
+% User profile contains information that can be used to predict their preferences: Items that user recently looked, items reviewed by user, items liked by user.
+% These properties are used in the recommendation engine to predict an unordered list of possible recommendations.
 
-However, the recommendations are not refined towards user, so additional properties are used externally: Disliked items and dietary restrictions.
-"Disliked items" is used to reduce the appearance of disliked items, while "Dietary restrictions" is used to remove items from the list that users
-cannot have. As shown in, figure \ref{fig:pipeline-for-predicting}.
+% However, the recommendations are not refined towards user, so additional properties are used externally: Disliked items and dietary restrictions.
+% "Disliked items" is used to reduce the appearance of disliked items, while "Dietary restrictions" is used to remove items from the list that users
+% cannot have. As shown in, figure \ref{fig:pipeline-for-predicting}.
 
 \section{Schemas}
 \label{section:data-schema}
 
-KU Eater requires a lot of data from many sources as mentioned in \ref{subsection:data-acquisition}. In order to standardize and streamline the
-data acquisition and processing phases, schemas for each important data type must be clear. The following are the schemas for specific data types:
+% KU Eater requires a lot of data from many sources as mentioned in \ref{subsection:data-acquisition}. In order to standardize and streamline the
+% data acquisition and processing phases, schemas for each important data type must be clear. The following are the schemas for specific data types:
 
-\subsection{Menu Item}
-\label{schema:menu-item}
-\begin{verbatim}
-    menu_id: uid,
+% \subsection{Menu Item}
+% \label{schema:menu-item}
+% \begin{verbatim}
+%     menu_id: uid,
     
-    menu_name: string,
+%     menu_name: string,
 
-    price: double,
+%     price: double,
     
-    ingredients: int<Ingredient>[],
-    # refers to ingredients in database.
+%     ingredients: int<Ingredient>[],
+%     # refers to ingredients in database.
     
-    tags: int[]
-    # refers to menu categories in database.
-\end{verbatim}
+%     tags: int[]
+%     # refers to menu categories in database.
+% \end{verbatim}
 
-\subsection{Ingredient}
-\label{schema:ingredient}
-\begin{verbatim}
-    ingredient_id: uid,
+% \subsection{Ingredient}
+% \label{schema:ingredient}
+% \begin{verbatim}
+%     ingredient_id: uid,
     
-    ingredient_name: string
-\end{verbatim}
+%     ingredient_name: string
+% \end{verbatim}
 
-\subsection{Stall}
-\label{schema:stall}
-\begin{verbatim}
-    stall_id: uid,
+% \subsection{Stall}
+% \label{schema:stall}
+% \begin{verbatim}
+%     stall_id: uid,
 
-    stall_name: string,
+%     stall_name: string,
 
-    items: uid<MenuItem>[]
-    # refers to what items they are selling.
-\end{verbatim}
+%     items: uid<MenuItem>[]
+%     # refers to what items they are selling.
+% \end{verbatim}
 
-\subsection{User Profile}
-\label{schema:user-profile}
-\begin{verbatim}
-    profile_id: uid,
+% \subsection{User Profile}
+% \label{schema:user-profile}
+% \begin{verbatim}
+%     profile_id: uid,
     
-    name: string,
+%     name: string,
     
-    liked: uid<MenuItem>[],
-    # refers to liked menu items.
+%     liked: uid<MenuItem>[],
+%     # refers to liked menu items.
 
-    disliked: uid<MenuItem>[],
-    # refers to disliked menu items.
+%     disliked: uid<MenuItem>[],
+%     # refers to disliked menu items.
 
-    restrictions: DietaryRestriction
-\end{verbatim}
+%     restrictions: DietaryRestriction
+% \end{verbatim}
 
-\subsection{Dietary Restriction}
-\label{schema:dietary-restriction}
-\begin{verbatim}
-    blacklist: uid<Ingredient>[]
-    # refers to ingredients prohibited
-    for consumption.
-\end{verbatim}
+% \subsection{Dietary Restriction}
+% \label{schema:dietary-restriction}
+% \begin{verbatim}
+%     blacklist: uid<Ingredient>[]
+%     # refers to ingredients prohibited
+%     for consumption.
+% \end{verbatim}
