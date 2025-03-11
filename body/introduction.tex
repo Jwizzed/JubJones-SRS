@@ -38,7 +38,8 @@ monitoring diverse indoor environments like those represented in the MMPTrack da
 \section{Problem Statement}
 \label{section:problem-statement}
 
-The Intelligent Multi-Camera Person Tracking and Analytics System addresses several critical technical challenges in modern surveillance systems. First, detecting and identifying the same individual across multiple cameras with varying angles, lighting conditions, and occlusions remains highly complex. Current systems struggle with consistent re-identification when subjects appear in different camera views, particularly when individuals share similar physical attributes or clothing. Second, while Large Language Models show promise for natural language-based person filtering, their application in real-world surveillance scenarios lacks robust validation and standardized implementation approaches. Third, perspective transformation—mapping individuals from different camera views onto a unified coordinate system—presents significant technical hurdles due to varying camera positions, lens distortions, and environmental factors. Fourth, the integration of these technologies into a cohesive, real-time system that security personnel can effectively utilize requires overcoming substantial engineering challenges in data synchronization, processing latency, and user interface design. These challenges are particularly evident in diverse indoor environments such as retail spaces, offices, industrial facilities, cafes, and lobbies, where existing solutions fail to provide the seamless, intuitive tracking capabilities required by security professionals.
+% The Intelligent Multi-Camera Person Tracking and Analytics System addresses several critical technical challenges in modern surveillance systems. First, detecting and identifying the same individual across multiple cameras with varying angles, lighting conditions, and occlusions remains highly complex. Current systems struggle with consistent re-identification when subjects appear in different camera views, particularly when individuals share similar physical attributes or clothing. Second, while Large Language Models show promise for natural language-based person filtering, their application in real-world surveillance scenarios lacks robust validation and standardized implementation approaches. Third, perspective transformation—mapping individuals from different camera views onto a unified coordinate system—presents significant technical hurdles due to varying camera positions, lens distortions, and environmental factors. Fourth, the integration of these technologies into a cohesive, real-time system that security personnel can effectively utilize requires overcoming substantial engineering challenges in data synchronization, processing latency, and user interface design. These challenges are particularly evident in diverse indoor environments such as retail spaces, offices, industrial facilities, cafes, and lobbies, where existing solutions fail to provide the seamless, intuitive tracking capabilities required by security professionals.
+The problem statement for the Intelligent Multi-Camera Person Tracking and Analytics System addresses the challenges faced in modern surveillance environments. With multiple cameras deployed across diverse indoor spaces, security personnel struggle to maintain consistent tracking of individuals as they move between different camera views due to varying angles, lighting conditions, and occlusions. Existing solutions fail to reliably re-identify the same person across cameras, especially when individuals share similar appearances or temporarily disappear from view. Additionally, the lack of intuitive visualization abilities that can transform multiple camera perspectives into a unified coordinate system makes it difficult for operators to comprehend spatial relationships and movement patterns. These limitations significantly reduce the effectiveness of surveillance systems in retail spaces, offices, industrial facilities, and other indoor environments where seamless tracking capabilities are essential for security operations and spatial analytics.
 
 \section{Solution Overview}
 \label{section:solution-overview}
@@ -52,35 +53,16 @@ that is designed for security professionals with four prominent features and add
 \begin{enumerate}[leftmargin=80pt]
     \item \textbf{Multi-View Person Detection:} An advanced detection system that identifies individuals across multiple camera views in diverse indoor environments, maintaining consistent tracking even with varying angles and lighting conditions.
     
-    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals based on descriptive prompts (e.g., "Find the person wearing a red shirt and carrying a backpack"), with an interactive confirmation step where users click to select the correct person from highlighted candidates.
-    
     \item \textbf{Person Re-Identification:} A robust re-identification system that maintains consistent identity tracking across different camera views, even when individuals share similar physical attributes or temporarily disappear from view.
     
     \item \textbf{Path Tracking and Perspective Transformation:} A dynamic mapping system that transforms multiple camera perspectives into a unified coordinate system, plotting the movement of tracked individuals on a cohesive map with timestamps and location data.
-\end{enumerate}
-
-\subsection{Technical Implementation}
-\label{subsection:technical-implementation}
-
-\begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Object Detection and Tracking} \\%
-        The system employs state-of-the-art detection and tracking technologies:
-        \begin{enumerate}
-            \item YOLOv11 for real-time object detection—providing optimal speed and efficiency for surveillance applications in indoor environments.
-            \item ByteTrack for robust tracking—handling occlusions and maintaining identity consistency in crowded indoor scenes.
-        \end{enumerate}
-    \item \textbf{Re-Identification and LLM Integration} \\%
-        Advanced technologies ensure accurate subject identification across camera views:
-        \begin{enumerate}
-            \item FastReID for person re-identification—maintaining consistent identity across different camera perspectives in varied indoor settings.
-            \item OpenCLIP for natural language processing—enabling description-based person selection through intuitive prompts tailored to retail, office, industrial, cafe, and lobby environments.
-        \end{enumerate}
 \end{enumerate}
 
 \subsection{Optional Features}
 \label{subsection:optional-features}
 
 \begin{enumerate}[leftmargin=80pt]
+    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals based on descriptive prompts (e.g., "Find the person wearing a red shirt and carrying a backpack"), with an interactive confirmation step where users click to select the correct person from highlighted candidates.
     \item \textbf{Multi-Object Tracking:} Capability to simultaneously track multiple individuals or objects across the surveillance network in diverse indoor environments.
     \item \textbf{Behavior Prediction:} AI-powered analysis to predict movement patterns and provide early warnings for unusual behavior in specific contexts like retail theft prevention or industrial safety monitoring.
     \item \textbf{Dynamic Analytics:} Real-time metrics including walking speed, time spent in specific areas, and movement pattern heatmaps customized for retail, office, industrial, cafe, and lobby settings.
