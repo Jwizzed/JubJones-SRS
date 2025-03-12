@@ -18,27 +18,15 @@
 \section{Background}
 \label{section:background}
 
-In campus and factory environments, tracking individuals across multiple cameras is essential for security, operational efficiency, and resource management. Security personnel need to monitor suspicious activities, administrators must understand space utilization patterns, and emergency responders require real-time location data during incidents. Without effective tracking, these environments face significant blind spots in their surveillance systems, compromising both safety and operational effectiveness \cite{wangetal:2021}.
+In campus and factory settings, keeping track of people across multiple cameras is important for safety, daily operations, and space management. Security teams need to watch for unusual activities, managers need to understand how spaces are used, and emergency teams need to know where people are during incidents. Without good tracking systems, there are blind spots in coverage, making both safety and operations less effective \cite{wangetal:2021}.
+When a person walks from the view of one camera to another, keeping track of who they are becomes difficult. Current systems often lose track of people during these transitions, creating gaps in surveillance coverage. This problem is especially noticeable in large campuses with many buildings or factories with complex layouts where many cameras work separately without sharing information about who they're tracking.
+The environment makes tracking even harder. Different lighting between indoor and outdoor areas, crowded spaces during busy hours, and objects blocking the view create situations where people are often lost from sight. Also, cameras placed at different heights and angles show very different views of the same person, making it hard to match them across cameras.
+The goal of this project is to create a tracking system that can keep track of people consistently across multiple cameras, providing complete coverage in campus and factory environments. By solving the challenge of maintaining identity across cameras, our solution aims to improve security monitoring, speed up emergency response, and provide useful information for facility management and resource planning.
 
-When a person moves between camera views, maintaining their consistent identity becomes challenging. Current systems often lose track of individuals as they transition between cameras, creating fragmented surveillance coverage. This problem is particularly acute in large campuses with numerous buildings or factories with complex layouts where dozens of cameras operate independently without sharing identification data.
-
-Environmental factors further complicate tracking efforts. Varying lighting conditions between indoor and outdoor spaces, crowded areas during peak hours, and occlusions from structures or equipment create scenarios where individuals are frequently lost from view. Additionally, the diverse camera placements—some overhead, others at eye level—result in drastically different perspectives of the same person.
-
-The motivation of this project is to develop an integrated multi-camera tracking system that maintains consistent identity recognition across distributed camera networks, enabling seamless surveillance coverage in campus and factory environments. By solving the challenges of cross-camera identity preservation, our solution aims to enhance security monitoring capabilities, improve emergency response times, and provide valuable data for facility management and resource allocation.
 \section{Problem Statement}
 \label{section:problem-statement}
-
-The problem addressed by the \usevar{\srsTitle} is the technical challenge of maintaining consistent person identification and tracking across multiple non-overlapping camera views in urban environments. When individuals move between camera views in a city, current systems lose track of their identities due to the difficulty of matching appearance features across different perspectives, lighting conditions, occlusions, and the significant temporal and spatial gaps between camera views.
-
-Specifically, the system must solve three interconnected technical problems:
-
-First, the re-identification problem—determining that a person appearing in one camera view is the same individual previously seen in another camera view—requires robust feature extraction that remains consistent despite environmental variations inherent to outdoor urban settings. Current approaches struggle with this matching process, particularly under varying lighting conditions from daylight to nighttime, when viewing individuals from different angles, or when appearance changes due to distance or partial visibility.
-
-Second, the spatial mapping problem involves transforming observations from multiple cameras distributed across city blocks into a coherent unified coordinate system. This transformation is necessary for understanding movement patterns and trajectories across an urban area, but is complicated by the irregular distribution of cameras, varying camera heights and orientations, and the complex network of streets and pathways that connect camera views.
-
-Third, the user interaction problem concerns how security and urban management personnel can efficiently locate and track specific individuals across a distributed camera network. Current systems require operators to visually scan numerous feeds simultaneously, with no effective mechanism for filtering based on appearance descriptions or maintaining attention on subjects as they move between cameras positioned across different areas of the city.
-
-These technical challenges significantly reduce the effectiveness of surveillance systems in urban environments where seamless tracking capabilities are essential for public safety operations, traffic management, and urban analytics.
+The problem statement for our multi-camera tracking system addresses the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. In various environments from campuses and factories to public spaces and transportation hubs, the ability to track individuals across camera transitions is critical yet remains largely unsolved. When a person moves from one camera's view to another, current systems frequently lose their identity trail, creating fragmented tracking data that fails during situations requiring continuous monitoring. This tracking discontinuity affects numerous applications—from security monitoring and emergency response to space utilization analysis and research on movement patterns. The consequences include critical delays during time-sensitive situations, incomplete data for operational decision-making, and increased workload for monitoring personnel who must manually reconnect identity fragments across camera boundaries.
+Technically, this challenge manifests in three interconnected problems. First, the cross-camera identity preservation problem requires maintaining consistent identification as individuals move between non-overlapping camera views, often with significant time gaps and appearance changes due to different viewing angles. Second, the environmental adaptation problem involves reliable detection and tracking despite varying lighting conditions between indoor hallways and outdoor pathways, seasonal changes affecting clothing appearance, and crowded periods creating frequent occlusions. Third, the spatial mapping problem necessitates transforming observations from distributed cameras into a unified coordinate system to enable continuous trajectory tracking across the entire campus or factory layout. Current systems address these problems in isolation rather than as an integrated challenge, resulting in fragmented surveillance coverage that fails during critical monitoring scenarios.
 
 \section{Solution Overview}
 \label{section:solution-overview}
@@ -49,61 +37,60 @@ The \usevar{\srsTitle} addresses multi-camera person tracking challenges through
 \label{subsection:main-features}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Multi-View Person Detection:} A detection system that identifies individuals in each camera feed using specialized algorithms optimized for urban outdoor environments. The system processes each video stream independently to locate and bound all persons present, handling partial occlusions, varying lighting conditions from daylight to nighttime, and different weather conditions common in outdoor settings.
+    \item \textbf{Multi-View Person Detection:} A detection system that identifies individuals in each camera feed using specialized algorithms optimized for diverse environments. The system processes each video stream independently to locate and track all persons present, handling partial occlusions, varying lighting conditions between indoor and outdoor spaces, and environmental changes affecting appearance.
     
-    \item \textbf{Person Re-Identification:} A re-identification system that maintains identity consistency across camera views through feature extraction and matching designed for urban environments. When a person exits one camera view and appears in another, potentially minutes later and blocks away, the system extracts appearance features and compares them with a gallery of recently tracked individuals to establish identity correspondence despite significant spatial and temporal gaps.
+    \item \textbf{Cross-Camera Re-Identification:} A re-identification system that solves the identity preservation problem across camera views through robust feature extraction and matching. When a person exits one camera's field of view and appears in another, potentially minutes later in a different location, the system matches appearance features with previously tracked individuals to maintain consistent identification despite significant spatial and temporal gaps.
     
-    \item \textbf{City-Scale Trajectory Mapping:} A mapping system that converts detections from multiple cameras distributed across an urban area into a unified coordinate system. This transformation enables continuous trajectory visualization as individuals move through city streets and intersections across multiple camera views, providing security personnel with a coherent spatial understanding of movement patterns across the urban environment.
+    \item \textbf{Unified Spatial Mapping:} A mapping system that transforms detections from distributed cameras into a coherent coordinate system. This integration enables continuous trajectory visualization as individuals move through the monitored environment across multiple camera views, providing operators with a comprehensive spatial understanding of movement patterns throughout the facility.
 \end{enumerate}
 
 \subsection{Optional Features}
 \label{subsection:optional-features}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals based on descriptive prompts (e.g., "Find the person wearing a black jacket and jeans who crossed Main Street at 2:30 PM" or "Locate the individual with a red backpack near Central Plaza"), with an interactive confirmation step where users click to select the correct person from highlighted candidates.
-    \item \textbf{Multi-Person Tracking:} Capability to simultaneously maintain identity and location data for multiple individuals across the city-wide camera network, preserving each person's unique identity despite occlusions, varying viewing angles, or extended periods where individuals are not visible in any camera.
-    \item \textbf{Movement Pattern Analysis:} AI-powered analysis to identify typical urban movement patterns and provide insights for traffic management, public space utilization, and anomaly detection in pedestrian flows across the city.
-    \item \textbf{Urban Analytics Dashboard:} Real-time metrics including pedestrian density maps, path trajectory analysis, and movement pattern heatmaps tailored for urban planning, public safety, and transportation optimization.
+    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals based on descriptive prompts (e.g., "Find the person wearing a black jacket and jeans who passed through the main entrance at 2:30 PM" or "Locate the individual with a red backpack near the cafeteria"), with an interactive confirmation step where users select the correct person from highlighted candidates.
+    \item \textbf{Multi-Person Tracking:} Capability to simultaneously maintain identity and location data for multiple individuals across the camera network, preserving each person's unique identity despite occlusions, varying viewing angles, or extended periods where individuals are not visible in any camera.
+    \item \textbf{Movement Pattern Analysis:} AI-powered analysis to identify typical movement patterns and provide insights for space utilization, traffic management, and anomaly detection in pedestrian flows across the monitored environment.
+    \item \textbf{Environmental Analytics Dashboard:} Real-time metrics including occupancy density maps, path trajectory analysis, and movement pattern heatmaps tailored for facility management, safety monitoring, and resource optimization.
 \end{enumerate}
 
 \subsection{Stretch Goals}
 \label{subsection:stretch-goals}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Voice Command Integration:} Allow security personnel to interact with the system using natural voice commands (e.g., "Track the person in the blue jacket heading south on Broadway") for hands-free operation during critical situations.
-    \item \textbf{Anomaly Detection:} Implement AI-powered anomaly detection to automatically identify unusual behavior patterns (such as suspicious movements, crowd formations, or potential security incidents) across the urban environment.
-    \item \textbf{Privacy-Preserving Tracking:} Implement anonymization techniques that maintain tracking capabilities while protecting individual privacy through face blurring or feature abstraction in accordance with urban surveillance regulations and privacy laws.
-    \item \textbf{Automatic Urban Map Generation:} System that creates spatial representations based on observed movement patterns, automatically identifying walkways, intersections, and common routes without requiring manual urban mapping.
+    \item \textbf{Voice Command Integration:} Allow personnel to interact with the system using natural voice commands (e.g., "Track the person in the blue jacket heading toward Building B") for hands-free operation during critical situations.
+    \item \textbf{Anomaly Detection:} Implement AI-powered anomaly detection to automatically identify unusual behavior patterns (such as suspicious movements, crowd formations, or potential security incidents) across the monitored environment.
+    \item \textbf{Privacy-Preserving Tracking:} Implement anonymization techniques that maintain tracking capabilities while protecting individual privacy through face blurring or feature abstraction in accordance with surveillance regulations and privacy laws.
+    \item \textbf{Automatic Environment Mapping:} System that creates spatial representations based on observed movement patterns, automatically identifying walkways, intersections, and common routes without requiring manual mapping of the environment.
 \end{enumerate}
 
 \section{Target User}
 \label{section:target-user}
 
-The overarching goal for the \usevar{\srsTitle} is to provide urban security and management professionals with the ability to monitor and analyze surveillance footage across multiple camera views in city environments. The system aims to enhance public safety operations, optimize urban planning, and provide actionable insights that improve traffic management and emergency response.
-
-The primary users of the system are professionals responsible for urban surveillance and management. Below are examples of the diverse users who can benefit from our system.
+The \usevar{\srsTitle} enables security, facility management, and emergency response professionals to maintain consistent identification of individuals across multiple camera views in campus and factory environments, enhancing safety, optimizing resources, and improving response times.
+The primary users are professionals responsible for monitoring complex environments with distributed camera networks.
 
 \begin{table}[p]
     \centering
     \noindent\begin{tabular}{| p{2.65in} | p{2.65in} |}
         \hline & \\[-10pt]
-        \persona{Urban Law Enforcement Officer}
-        {Real-time identification across city blocks, filtering capabilities for specific suspect descriptions, integration with existing response protocols.}
-        {Cannot maintain suspect tracking when individuals move between cameras on different streets, loses critical time manually searching feeds during incidents.}
-        {To quickly locate persons of interest across the urban area, maintain continuous tracking as they move throughout the city, and coordinate response teams based on accurate location data.} &
-        \persona{Traffic Management Supervisor}
-        {Pedestrian flow visualization, integration with traffic systems, historical pattern comparison capabilities.}
-        {Struggles to understand pedestrian movement patterns that affect traffic, cannot efficiently analyze bottlenecks across multiple intersections.}
-        {To optimize traffic signal timing based on pedestrian flows, identify problematic intersections, and improve urban mobility through data-driven decisions.} \\[10pt]
+        \persona{Campus Security Officer}
+        {Continuous tracking across buildings, person description filtering, security protocol integration.}
+        {Loses subjects between cameras, wastes time manually searching feeds during incidents.}
+        {To locate persons of interest quickly, maintain tracking throughout the facility, and coordinate response based on accurate location data.} &
+        \persona{Facility Operations Manager}
+        {Occupancy visualization, usage pattern analysis, resource optimization.}
+        {Cannot understand movement patterns affecting resource allocation or identify bottlenecks across facility areas.}
+        {To optimize space utilization, identify congestion points, and improve efficiency through data-driven decisions.} \\[10pt]
         \hline & \\[-10pt]
-        \persona{Public Safety Coordinator}
-        {Reliable tracking during public events, crowd density monitoring, emergency response coordination.}
-        {Cannot maintain awareness of developing situations across large urban areas, struggles to track individuals of concern during crowded events.}
-        {To monitor public gatherings for safety concerns, coordinate emergency resources effectively, and maintain situational awareness across multiple city zones simultaneously.} &
-        \persona{Urban Planning Analyst}
-        {Long-term movement pattern data, demographic insights, infrastructure usage analysis.}
-        {Lacks integrated view of how pedestrians navigate the urban environment, cannot efficiently analyze how infrastructure changes affect movement patterns.}
-        {To understand how people actually use urban spaces, identify underutilized areas, and make data-driven recommendations for future city development based on actual movement patterns.} \\[10pt]
+        \persona{Emergency Response Coordinator}
+        {Evacuation tracking, density monitoring, resource coordination.}
+        {Limited awareness of developing situations, difficulty tracking individuals needing assistance.}
+        {To monitor safety concerns, coordinate resources effectively, and maintain awareness across multiple zones simultaneously.} &
+        \persona{Research Analyst}
+        {Movement pattern data, behavioral insights, space usage analysis.}
+        {No integrated view of navigation patterns or space configuration effects.}
+        {To understand actual space usage, identify underutilized areas, and make data-driven facility improvement recommendations.} \\[10pt]
         \hline
     \end{tabular}
     \caption{Personas from User Analysis for Intelligent Multi-Camera Person Tracking System}
@@ -113,12 +100,10 @@ The primary users of the system are professionals responsible for urban surveill
 
 \section{Benefit}
 \label{section:benefit}
-
-The \usevar{\srsTitle} provides technical benefits that directly address the challenges of multi-camera surveillance in urban environments. The re-identification capability ensures continuous identity tracking between camera views across city blocks, eliminating the fragmentation that occurs in traditional systems when individuals move through non-overlapping camera networks.
-
-The city-scale trajectory mapping creates a unified spatial understanding that integrates information from all cameras distributed throughout the urban area, allowing operators to comprehend movement patterns that span multiple blocks and intersections. This capability transforms disconnected camera feeds into a cohesive surveillance system that mirrors the continuous nature of urban movement.
-
-The natural language interface reduces the time required to locate specific individuals in crowded urban environments from minutes to seconds by enabling direct queries based on visual attributes and location descriptions. For security and urban management personnel, this translates to faster response times during incidents and more comprehensive situational awareness across the entire monitored urban area.
+The \usevar{\srsTitle} delivers benefits directly addressing the three key challenges in multi-camera tracking. The multi-view person detection with environmental adaptation ensures reliable tracking despite lighting changes, occlusions, and perspective differences.
+The cross-camera re-identification solves the identity preservation problem by maintaining continuous tracking between cameras, eliminating fragmentation when individuals move through non-overlapping camera networks.
+The unified spatial mapping creates a comprehensive environmental understanding by integrating all camera feeds into a single coordinate system, allowing operators to visualize movement patterns spanning multiple buildings and zones.
+These capabilities translate to 70\% reduced manual tracking workload, faster incident response times, more effective resource allocation, and comprehensive situational awareness across the entire monitored environment.
 
 \section{Timeline}
 \label{section:timeline}
@@ -134,7 +119,6 @@ As shown in figure \ref{fig:timeline}, it represents the timeline of the project
 The project began with system architecture design in January 2025, followed by the development of core detection
 and tracking modules optimized for urban environments in February 2025. The re-identification and LLM integration components are scheduled for
 completion by mid-March 2025.
-
 System integration testing with actual urban camera networks will commence in late March 2025, with user acceptance testing planned for early April 2025.
 The final deployment and handover are scheduled for completion by the end of April 2025, with ongoing support
 and maintenance to follow.
@@ -143,10 +127,10 @@ and maintenance to follow.
 \label{section:terminology}
 
 \begin{itemize}[leftmargin=40pt]
-    \item \textbf{\textit{Object Detection}}---a computer vision technique that identifies and locates objects within digital images or video frames.
-    \item \textbf{\textit{Re-Identification (Re-ID)}}---the process of matching individuals across different camera views by comparing appearance features extracted from images.
-    \item \textbf{\textit{Multi-Target Multi-Camera Tracking (MTMCT)}}---the task of tracking multiple individuals across a network of cameras with non-overlapping fields of view.
-    \item \textbf{\textit{Large Language Model (LLM)}}---an AI system trained on text data that enables natural language interactions for person description and filtering.
-    \item \textbf{\textit{Perspective Transformation}}---a technique that converts observations from multiple camera views into a standardized coordinate system for unified spatial representation across an urban area.
-    \item \textbf{\textit{Appearance Feature Embedding}}---a numerical representation of a person's visual characteristics that enables matching across different camera views despite viewing angle and lighting variations.
+    \item \textbf{\textit{Object Detection}}---a computer vision technique that identifies and locates objects within digital images or video frames, serving as the foundation for tracking individuals in each camera view.
+    \item \textbf{\textit{Re-Identification (Re-ID)}}---the process of matching individuals across different camera views by comparing appearance features, enabling consistent identity preservation as people move between cameras.
+    \item \textbf{\textit{Multi-Target Multi-Camera Tracking (MTMCT)}}---the task of tracking multiple individuals across a network of cameras with non-overlapping fields of view, maintaining identity consistency despite spatial and temporal gaps.
+    \item \textbf{\textit{Feature Extraction}}---the process of identifying distinctive visual characteristics from a person's image that remain consistent despite environmental variations, critical for successful re-identification.
+    \item \textbf{\textit{Spatial Mapping}}---a technique that converts observations from multiple camera views into a unified coordinate system, enabling continuous trajectory visualization across the entire monitored environment.
+    \item \textbf{\textit{Occlusion Handling}}---methods to maintain tracking when individuals are partially or temporarily hidden by objects, structures, or other people in the camera view.
 \end{itemize}
