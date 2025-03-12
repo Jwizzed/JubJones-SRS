@@ -4,61 +4,49 @@
 \section{Competitor Analysis}
 \label{section:competitor-analysis}
 
-% \begin{table}[h!]
-%     \begin{adjustwidth}{-.85in}{-.85in}
-%         \noindent
-%         \centering
-%         \small\begin{tabularx}{1.3\textwidth}{|X|>{\columncolor{green!20}}X|X|X|X|}
-%             \hline & \textbf{KU Eater} & \textbf{Wongnai} & \textbf{Retty} & \textbf{OpenRice} \\\hline
-%             \textbf{Target Audience} & Kasetsart University students and staffs & General public in Thailand & General public in Japan & General public in Southeast Asia \\\hline
-%             \textbf{Platform} & Web browsers \& Mobile app & Web browsers \& Mobile app & Web browsers \& Mobile app & Web browsers \& Mobile app \\\hline
-%             \textbf{Personalization} & AI-driven recommendations based on user preferences & Restaurant search \& discovery, user reviews & Curated restaurant lists, user reviews & Restaurant reviews and recommendations \\\hline
-%             \textbf{Menu Variety} & Focused on Kasetsart University cafeterias' menu; developers provide data & Local eateries, the developers provide data & Local restaurants, the users provide most data & Extensive restaurant listings, the users can provide data \\\hline
-%             \textbf{Dietary Filters} & Dietary restrictions available & Many filters but not AI-driven & No dietary filters & Filters based on cuisine, broad dish type \\\hline
-%             \textbf{User Generated Content} & Reviews and photos of food from stalls in cafeteria & User reviews and photos & Can add new locations to platform, reviews and photos & Able to add locations but moderated, reviews, pictures \\\hline
-%             \textbf{User Reviews} & User review stalls and dishes offered at the stall & User ratings and popularity scores & User ratings based on satisfaction & User ratings and comments \\\hline
-%             \textbf{User Rating} & Manual rating and calculated from sentimental analysis & User ratings and popularity scores & User ratings based on satisfaction & User ratings and comments \\\hline
-%             \textbf{Pricing} & Free for all users & Free with gamification features & Free & Free but with paid services \\\hline
-%         \end{tabularx}
-%     \end{adjustwidth}
-%     \caption{Competitor Analysis of KU Eater}
-% \end{table}
+\begin{table}[htbp!]
+    \begin{adjustwidth}{-.85in}{-.85in}
+        \noindent
+        \centering
+        \small\begin{tabularx}{1.3\textwidth}{|X|>{\columncolor{green!20}}X|X|X|X|}
+            \hline & \textbf{\usevar{\srsTitle}} & \textbf{Hikvision} & \textbf{YOLORe-IDNet} & \textbf{JARVIS-MoCap} \\\hline
+            \textbf{Primary Focus} & Campus-optimized tracking with persistent identity & General surveillance with limited identity tracking & Tracking without historical context & Research-focused motion capture \\\hline
+            \textbf{Core Technology} & Multi-model fusion with adaptive learning & Proprietary algorithms with fixed parameters & Single detection model with re-ID & Research-oriented pose estimation \\\hline
+            \textbf{Identity Preservation} & Continuous tracking across blind spots & Limited to overlapping camera views & Struggles with extended disappearances & Requires continuous visibility \\\hline
+            \textbf{Environmental Adaptation} & Self-calibrating for any lighting/weather & Pre-configured environmental settings & Limited adaptation capabilities & Controlled environment only \\\hline
+            \textbf{Spatial Integration} & 3D mapping with interactive UI & 2D mapping with fixed views & Limited spatial representation & Lab-specific spatial modeling \\\hline
+            \textbf{Integration API} & Open REST API with event streaming & Closed ecosystem with limited exports & No documented API & Research code only \\\hline
+            \textbf{Tech Stack} & FastAPI backend, Next.js frontend, Docker/NGINX deployment & Proprietary software stack & Research implementation only & Python libraries without web interface \\\hline
+            \textbf{Cross-Platform Support} & Web-based interface accessible from any device & Dedicated monitoring stations & Command-line interface & Desktop application only \\\hline
+        \end{tabularx}
+    \end{adjustwidth}
+    \caption{Competitor Analysis of Intelligent Multi-Camera Person Tracking System}
+\end{table}
 
-% In order to acknowledge the existing technology with similar functionalities, a competitor analysis is conducted.
-% There are various applications in the market that can recommend restaurants, we hand picked 3 of which resembles our project most:
+In order to acknowledge the existing technology with similar functionalities, a competitor analysis is conducted.
+There are various systems in the market that can track individuals across multiple cameras, we have selected 3 of which most closely resemble our project:
 
-% \begin{itemize}
-%     \item \textbf{\textit{Wongnai}}---a restaurant and hotel review application focusing on Thailand's locality.
-%     \item \textbf{\textit{Retty}}---a user-centric restaurant review application for Japanese.
-%     \item \textbf{\textit{OpenRice}}---a restaurant review platform focusing on Asian cuisine.
-% \end{itemize}
-
-% \par
-% KU Eater is an application that solely focuses on the scope of cafeterias in Kasetsart University.
-% Unlike our competitors, users in our application can state their dietary restrictions such as being a vegetarian,
-% not liking certain ingredients etc. Those factors are parameters to our AI-driven recommendation system.
-% KU Eater is also different from other food reviewing platforms because of the depth our application harnesses,
-% users are able to see the individual dishes information and popularity score.
+\begin{itemize}
+    \item \textbf{\textit{Hikvision AI Camera Systems}}---a commercial leader in the Thailand AI camera market offering multi-camera tracking solutions primarily for general security applications.
+    \item \textbf{\textit{YOLORe-IDNet}}---a research implementation combining YOLO object detection with re-identification networks for real-time tracking without prior knowledge.
+    \item \textbf{\textit{JARVIS-MoCap}}---an open-source markerless 3D motion capture system designed for research environments requiring precise tracking.
+\end{itemize}
+\par
+The \usevar{\srsTitle} stands apart from competitors through its unique combination of persistent identity tracking across non-overlapping camera views and blind spots, a capability not found in Hikvision's proprietary hardware-dependent solution or YOLORe-IDNet's research implementation. Unlike JARVIS-MoCap, which requires controlled environments and specialized equipment, our system works with existing camera infrastructure and adapts to varying lighting conditions through self-calibrating algorithms. Our multi-model fusion approach ensures reliable tracking even when subjects disappear from view temporarily, maintaining identity across campus blind spots where other systems lose track. The system's interactive 3D mapping provides security personnel with comprehensive spatial awareness that surpasses the limited 2D representations of competitors, making it uniquely suited for complex campus environments where maintaining continuous identity is critical for security operations.
 
 \section{Literature Review}
 \label{section:literature-review}
 
-% The integration of AI and ML in personalized food recommendation systems represents a transformative approach to addressing
-% the diverse dietary needs and preferences within university campuses. Marquis et al. \cite{marquisetal:2018}
-% delve into the determinants of university students' food behavior, underscoring the necessity of tailoring
-% food recommendations to individual preferences, a core functionality of the KU Eater application.
+The development of multi-camera person tracking systems represents a significant advancement in computer vision and surveillance technology, addressing the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. This literature review examines the current state of the art in multi-camera tracking, focusing on the three key technical challenges our system addresses: cross-camera identity preservation, environmental adaptation, and spatial mapping.
 
-% Singh and Dwivedi \cite{singhanddwivedi:2023} proposed an approach to food recommendation system using K-nearest neighbor technique.
-% Their work provides an exemplary foundation for KU Eater to build a customized recommendation system upon,
-% and is relevant to KU Eater since their method took dietary requirements into account.
+Hikvision, a leading provider of security products and solutions, has developed AI-powered camera systems that incorporate deep learning algorithms for person tracking and identification. Their technology automatically detects humans and vehicles through real-time video analytics \cite{hikvision:acusense}. This approach minimizes false alarms by distinguishing humans and vehicles from other moving objects, a capability that aligns with our system's environmental adaptation goals. However, Hikvision's commercial focus prioritizes general security applications rather than the specific challenges of campus environments addressed by our solution.
 
-% Thongthanomkul's \cite{thongthanomkul:2020} article on improving Wongnai's search system with Machine Learning
-% and Wongnai's \cite{wongnaicorpus:github} corpus provides examples of how artificial intelligence enhances search functionality.
+Gautam et al. \cite{gautam:2023} proposed YOLORe-IDNet, "an efficient multi-camera system for person-tracking" that combines correlation filters and Intersection Over Union (IOU) constraints with a deep learning model for cross-camera person re-identification. Their approach achieves "a high F1-Score of 79\% and an IOU of 59\% comparable to existing state-of-the-art algorithms" without requiring pre-existing images of subjects. This work demonstrates the feasibility of real-time tracking across multiple cameras but lacks the comprehensive spatial mapping and interactive user interface of our proposed system.
 
-% Operational and economic considerations, as evidenced in the successes of large-scale recommendation systems \cite{sangwan:2023,netflix:2022},
-% provide a blueprint for KU Eater's potential impact. The application not only addresses the immediate needs of campus
-% dining but also sets a precedent for the role of AI and ML in creating a dynamic and responsive university dining ecosystem.
+The JARVIS-MoCap project provides "a Python library for precise multi-view markerless 3D motion capture in complex environments" \cite{jarvis:github}. Their hybrid 2D-and 3D-CNN pose estimation network is "designed to provide precise and robust tracking even under heavy occlusions," addressing one aspect of the environmental adaptation challenge. While JARVIS-MoCap excels at precise motion tracking for research applications, it requires specialized camera equipment and focuses on biomechanical analysis rather than security applications.
 
-% In conclusion, the reviewed literature shows importance in the role of AI and ML in improving the dining experience on university campuses.
-% KU Eater, with its emphasis on personalized recommendations and user feedback analysis,
-% to address the nuanced demands of campus dining, offering a promising solution to the challenges identified in the current dining system.
+Wang et al. \cite{wangetal:2021} highlighted the importance of tracking people across multiple cameras for safety, daily operations, and space management in campus settings. Their work identified the challenges of maintaining identity across camera transitions, particularly in environments with varying lighting conditions and complex layouts. Our system builds upon these insights by integrating advanced re-identification techniques with a unified spatial mapping approach.
+
+The Thailand AI Camera Market is experiencing significant growth, estimated at USD 24 million in 2024 and expected to reach USD 86.8 million by 2030, growing at a CAGR of 23.9\% \cite{thailand:market}. This market expansion is driven by increasing demand for advanced security solutions and the Thai government's focus on developing smart cities. Our system is positioned to address this growing market with specialized capabilities for campus environments.
+
+In conclusion, while existing systems have made significant progress in multi-camera tracking, there remains a gap in solutions that effectively integrate persistent identity tracking, environmental adaptation, and interactive spatial mapping for campus applications. Our Intelligent Multi-Camera Person Tracking System addresses this gap by combining state-of-the-art computer vision techniques with a modern, accessible tech stack designed for practical deployment in real-world environments.
