@@ -25,6 +25,7 @@ The goal of this project is to create a tracking system that can keep track of p
 
 \section{Problem Statement}
 \label{section:problem-statement}
+
 The problem statement for our multi-camera tracking system addresses the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. In various environments from campuses and factories to public spaces and transportation hubs, the ability to track individuals across camera transitions is critical yet remains largely unsolved. When a person moves from one camera's view to another, current systems frequently lose their identity trail, creating fragmented tracking data that fails during situations requiring continuous monitoring. This tracking discontinuity affects numerous applications—from security monitoring and emergency response to space utilization analysis and research on movement patterns. The consequences include critical delays during time-sensitive situations, incomplete data for operational decision-making, and increased workload for monitoring personnel who must manually reconnect identity fragments across camera boundaries.
 Technically, this challenge manifests in three interconnected problems. First, the cross-camera identity preservation problem requires maintaining consistent identification as individuals move between non-overlapping camera views, often with significant time gaps and appearance changes due to different viewing angles. Second, the environmental adaptation problem involves reliable detection and tracking despite varying lighting conditions between indoor hallways and outdoor pathways, seasonal changes affecting clothing appearance, and crowded periods creating frequent occlusions. Third, the spatial mapping problem necessitates transforming observations from distributed cameras into a unified coordinate system to enable continuous trajectory tracking across the entire campus or factory layout. Current systems address these problems in isolation rather than as an integrated challenge, resulting in fragmented surveillance coverage that fails during critical monitoring scenarios.
 
@@ -75,22 +76,22 @@ The primary users are professionals responsible for monitoring complex environme
     \noindent\begin{tabular}{| p{2.65in} | p{2.65in} |}
         \hline & \\[-10pt]
         \persona{Campus Security Officer}
-        {Continuous tracking across buildings, person description filtering, security protocol integration.}
-        {Loses subjects between cameras, wastes time manually searching feeds during incidents.}
-        {To locate persons of interest quickly, maintain tracking throughout the facility, and coordinate response based on accurate location data.} &
+        {Track subjects across buildings, integrate security protocols.}
+        {Loses track between cameras, wastes time searching feeds during incidents.}
+        {Locate persons quickly, maintain tracking throughout facility, coordinate based on location.} &
         \persona{Facility Operations Manager}
-        {Occupancy visualization, usage pattern analysis, resource optimization.}
-        {Cannot understand movement patterns affecting resource allocation or identify bottlenecks across facility areas.}
-        {To optimize space utilization, identify congestion points, and improve efficiency through data-driven decisions.} \\[10pt]
+        {Monitor occupancy, analyze usage, optimize resources.}
+        {Cannot analyze movement patterns for resource allocation or identify bottlenecks.}
+        {Optimize space use, identify congestion, improve efficiency with data.} \\[10pt]
         \hline & \\[-10pt]
         \persona{Emergency Response Coordinator}
-        {Evacuation tracking, density monitoring, resource coordination.}
-        {Limited awareness of developing situations, difficulty tracking individuals needing assistance.}
-        {To monitor safety concerns, coordinate resources effectively, and maintain awareness across multiple zones simultaneously.} &
+        {Track evacuations, monitor crowding, coordinate resources.}
+        {Limited situation awareness, difficulty tracking individuals needing assistance.}
+        {Monitor safety issues, coordinate resources, maintain multi-zone awareness.} &
         \persona{Research Analyst}
-        {Movement pattern data, behavioral insights, space usage analysis.}
-        {No integrated view of navigation patterns or space configuration effects.}
-        {To understand actual space usage, identify underutilized areas, and make data-driven facility improvement recommendations.} \\[10pt]
+        {Analyze movement patterns, behavioral insights, space usage.}
+        {Lacks integrated view of navigation patterns and space effects.}
+        {Understand space usage, identify underused areas, recommend data-driven improvements.} \\[10pt]
         \hline
     \end{tabular}
     \caption{Personas from User Analysis for Intelligent Multi-Camera Person Tracking System}
