@@ -5,38 +5,36 @@
 \label{section:competitor-analysis}
 
 \begin{table}[htbp!]
-    \begin{adjustwidth}{-.85in}{-.85in}
-        \noindent
-        \centering
-        \small\begin{tabularx}{1.3\textwidth}{|X|>{\columncolor{green!20}}X|X|X|X|}
-            \hline & \textbf{\usevar{\srsTitle}} & \textbf{Hikvision} & \textbf{YOLORe-IDNet} & \textbf{JARVIS-MoCap} \\\hline
-            \textbf{Primary Focus} & Campus-optimized tracking with persistent identity & General surveillance with limited identity tracking & Tracking without historical context & Research-focused motion capture \\\hline
-            \textbf{Core Technology} & Multi-model fusion with adaptive learning & Proprietary algorithms with fixed parameters & Single detection model with re-ID & Research-oriented pose estimation \\\hline
-            \textbf{Identity Preservation} & Continuous tracking across blind spots & Limited to overlapping camera views & Struggles with extended disappearances & Requires continuous visibility \\\hline
-            \textbf{Environmental Adaptation} & Self-calibrating for any lighting/weather & Pre-configured environmental settings & Limited adaptation capabilities & Controlled environment only \\\hline
-            \textbf{Spatial Integration} & 3D mapping with interactive UI & 2D mapping with fixed views & Limited spatial representation & Lab-specific spatial modeling \\\hline
-            \textbf{Integration API} & Open REST API with event streaming & Closed ecosystem with limited exports & No documented API & Research code only \\\hline
-            \textbf{Tech Stack} & FastAPI backend, Next.js frontend, Docker/NGINX deployment & Proprietary software stack & Research implementation only & Python libraries without web interface \\\hline
-            \textbf{Cross-Platform Support} & Web-based interface accessible from any device & Dedicated monitoring stations & Command-line interface & Desktop application only \\\hline
-        \end{tabularx}
-    \end{adjustwidth}
-    \caption{Competitor Analysis of Intelligent Multi-Camera Person Tracking System}
+   \begin{adjustwidth}{-.85in}{-.85in}
+       \noindent
+       \centering
+       \small\begin{tabularx}{1.3\textwidth}{|X|>{\columncolor{green!20}}X|X|X|X|}
+           \hline & \textbf{\usevar{\srsTitle}} & \textbf{Hikvision} & \textbf{YOLORe-IDNet} & \textbf{JARVIS-MoCap} \\\hline
+           \textbf{Primary Focus} & Campus tracking with persistent identity & Single-camera surveillance with minimal cross-camera capability & Real-time detection without integrated systems & Research motion capture in controlled settings \\\hline
+           \textbf{Core Technology} & Multi-model fusion with spatial mapping & Proprietary algorithms optimized for single views & YOLO detection with separate Re-ID network & Markerless pose estimation with synced cameras \\\hline
+           \textbf{Multi-Camera Detection} & Independent detection robust to occlusions & Strong within-view detection, poor across views & No multi-camera management system & Requires calibrated camera arrays \\\hline
+           \textbf{Tracking and Re-ID} & Identity across non-overlapping views & Excellent within single views, fails across views & Matches appearance without trajectories & Tracks pose, not identity \\\hline
+           \textbf{Spatial Representation} & Unified coordinate system visualization & Limited to individual camera views & No spatial mapping functionality & Limited to pre-calibrated environments \\\hline
+           \textbf{System Accessibility} & Web interface with easy deployment & Requires dedicated hardware & Command-line interface for experts & Research software with complex setup \\\hline
+           \textbf{Cross-Platform Support} & Any device with browser access & Specific hardware and OS requirements & Platform-dependent implementation & Desktop with specific dependencies \\\hline
+       \end{tabularx}
+   \end{adjustwidth}
+   \caption{Competitor Analysis of Intelligent Multi-Camera Person Tracking System}
 \end{table}
 
 In order to acknowledge the existing technology with similar functionalities, a competitor analysis is conducted.
 There are various systems in the market that can track individuals across multiple cameras, we have selected 3 of which most closely resemble our project:
 
 \begin{itemize}
-    \item \textbf{\textit{Hikvision AI Camera Systems}}---a commercial leader in the Thailand AI camera market offering multi-camera tracking solutions primarily for general security applications.
-    \item \textbf{\textit{YOLORe-IDNet}}---a research implementation combining YOLO object detection with re-identification networks for real-time tracking without prior knowledge.
-    \item \textbf{\textit{JARVIS-MoCap}}---an open-source markerless 3D motion capture system designed for research environments requiring precise tracking.
+   \item \textbf{\textit{Hikvision AI Camera Systems}}---a commercial leader in the Thailand AI camera market offering excellent single-camera tracking but limited cross-camera capabilities.
+   \item \textbf{\textit{YOLORe-IDNet}}---a research implementation combining YOLO object detection with re-identification networks for real-time tracking without prior knowledge.
+   \item \textbf{\textit{JARVIS-MoCap}}---an open-source markerless 3D motion capture system designed for research environments requiring precise tracking.
 \end{itemize}
 \par
-The \usevar{\srsTitle} stands apart from competitors through its unique combination of persistent identity tracking across non-overlapping camera views and blind spots, a capability not found in Hikvision's proprietary hardware-dependent solution or YOLORe-IDNet's research implementation. Unlike JARVIS-MoCap, which requires controlled environments and specialized equipment, our system works with existing camera infrastructure and adapts to varying lighting conditions through self-calibrating algorithms. Our multi-model fusion approach ensures reliable tracking even when subjects disappear from view temporarily, maintaining identity across campus blind spots where other systems lose track. The system's interactive 3D mapping provides security personnel with comprehensive spatial awareness that surpasses the limited 2D representations of competitors, making it uniquely suited for complex campus environments where maintaining continuous identity is critical for security operations.
+The \usevar{\srsTitle} stands apart from competitors through its unique combination of persistent identity tracking across non-overlapping camera views and blind spots, a capability not found in Hikvision's proprietary hardware-dependent solution which excels at single-camera tracking but fails across non-overlapping views with time gaps. Unlike YOLORe-IDNet's research implementation which lacks continuous identity maintenance, our system preserves identity even when subjects disappear temporarily. JARVIS-MoCap requires controlled environments and specialized equipment, while our system works with existing camera infrastructure and adapts to varying lighting conditions through self-calibrating algorithms. Our multi-model fusion approach ensures reliable tracking even in campus blind spots where other systems lose track. The system's interactive 3D mapping provides security personnel with comprehensive spatial awareness that surpasses the limited single-view representations of competitors, making it uniquely suited for complex campus environments where maintaining continuous identity is critical for security operations.
 
 \section{Literature Review}
 \label{section:literature-review}
-
 
 The development of multi-camera person tracking systems represents a significant advancement in computer vision and surveillance technology, addressing the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. This literature review examines the current state of the art in multi-camera tracking, focusing on the three key technical challenges our system addresses: cross-camera identity preservation, environmental adaptation, and spatial mapping.
 
