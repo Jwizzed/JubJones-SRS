@@ -18,16 +18,17 @@
 \section{Background}
 \label{section:background}
 
-In campus and factory settings, keeping track of people across multiple cameras is important for safety, daily operations, and space management. Security teams need to watch for unusual activities, managers need to understand how spaces are used, and emergency teams need to know where people are during incidents. Without good tracking systems, there are blind spots in coverage, making both safety and operations less effective \cite{wangetal:2021}.
-When a person walks from the view of one camera to another, keeping track of who they are becomes difficult. Current systems often lose track of people during these transitions, creating gaps in surveillance coverage. This problem is especially noticeable in large campuses with many buildings or factories with complex layouts where many cameras work separately without sharing information about who they're tracking.
-The environment makes tracking even harder. Different lighting between indoor and outdoor areas, crowded spaces during busy hours, and objects blocking the view create situations where people are often lost from sight. Also, cameras placed at different heights and angles show very different views of the same person, making it hard to match them across cameras.
-The goal of this project is to create a tracking system that can keep track of people consistently across multiple cameras, providing complete coverage in campus and factory environments. By solving the challenge of maintaining identity across cameras, our solution aims to improve security monitoring, speed up emergency response, and provide useful information for facility management and resource planning.
+In large campus and factory environments, tracking people across multiple cameras is crucial for safety, security, and operational efficiency. Security teams need to quickly locate individuals involved in incidents like theft or unauthorized access. Factory managers require clear understanding of worker movements to ensure safety protocol compliance. Emergency responders need to pinpoint locations during evacuations. Without effective multi-camera tracking, blind spots and identification failures lead to delayed responses and compromised safety \cite{wangetal:2021}.
+When individuals transition between camera views, maintaining their identity becomes challenging. Existing systems often fail during these handoffs, creating fragmented surveillance coverage. For example, a student moving from an outdoor courtyard to a building lobby might be lost during transition, making it difficult to determine if they later entered a restricted area. This problem is particularly significant in sprawling campuses with numerous buildings or complex factory layouts where cameras operate independently.
+Environmental factors further complicate tracking. Lighting differences between bright outdoor areas and dim hallways alter appearances significantly. Crowded periods during class changes or shift rotations create frequent occlusions. Cameras at varying heights and angles provide drastically different perspectives of the same person, hindering accurate matching across views - a bag visible from the side might be completely hidden from the front.
+Our project aims to develop a robust tracking system called \textit{SpotOn} that consistently identifies and tracks individuals across camera networks, providing uninterrupted coverage in campus and factory settings. By solving the identity maintenance challenge across camera transitions, our solution will enhance security monitoring, expedite emergency responses, and provide valuable data for facility management and resource optimization.
 
 \section{Problem Statement}
 \label{section:problem-statement}
 
-The problem statement for our multi-camera tracking system addresses the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. In various environments from campuses and factories to public spaces and transportation hubs, the ability to track individuals across camera transitions is critical yet remains largely unsolved. When a person moves from one camera's view to another, current systems frequently lose their identity trail, creating fragmented tracking data that fails during situations requiring continuous monitoring. This tracking discontinuity affects numerous applications—from security monitoring and emergency response to space utilization analysis and research on movement patterns. The consequences include critical delays during time-sensitive situations, incomplete data for operational decision-making, and increased workload for monitoring personnel who must manually reconnect identity fragments across camera boundaries.
+The problem statement for the \usevar{\srsTitle} addresses the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. In various environments from campuses and factories to public spaces and transportation hubs, the ability to track individuals across camera transitions is critical yet remains largely unsolved. When a person moves from one camera's view to another, current systems frequently lose their identity trail, creating fragmented tracking data that fails during situations requiring continuous monitoring. This tracking discontinuity affects numerous applications—from security monitoring and emergency response to space utilization analysis and research on movement patterns. The consequences include critical delays during time-sensitive situations, incomplete data for operational decision-making, and increased workload for monitoring personnel who must manually reconnect identity fragments across camera boundaries.
 Technically, this challenge manifests in three interconnected problems. First, the cross-camera identity preservation problem requires maintaining consistent identification as individuals move between non-overlapping camera views, often with significant time gaps and appearance changes due to different viewing angles. Second, the environmental adaptation problem involves reliable detection and tracking despite varying lighting conditions between indoor hallways and outdoor pathways, seasonal changes affecting clothing appearance, and crowded periods creating frequent occlusions. Third, the spatial mapping problem necessitates transforming observations from distributed cameras into a unified coordinate system to enable continuous trajectory tracking across the entire campus or factory layout. Current systems address these problems in isolation rather than as an integrated challenge, resulting in fragmented surveillance coverage that fails during critical monitoring scenarios.
+
 
 \section{Solution Overview}
 \label{section:solution-overview}
@@ -38,10 +39,10 @@ The \usevar{\srsTitle} addresses multi-camera person tracking challenges through
 \label{subsection:main-features}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Multi-View Person Detection:} A detection system that identifies individuals in each camera feed using specialized algorithms optimized for diverse environments. The system processes each video stream independently to locate and track all persons present, handling partial occlusions, varying lighting conditions between indoor and outdoor spaces, and environmental changes affecting appearance.
-    
-    \item \textbf{Cross-Camera Re-Identification:} A re-identification system that solves the identity preservation problem across camera views through robust feature extraction and matching. When a person exits one camera's field of view and appears in another, potentially minutes later in a different location, the system matches appearance features with previously tracked individuals to maintain consistent identification despite significant spatial and temporal gaps.
-    
+    \item \textbf{Multi-View Person Detection:} A system that identifies and locates all individuals within each camera feed, creating bounding boxes around people in the video frames. This detection works independently on each camera, handling challenges like partial occlusions, varying lighting conditions, and environmental changes without attempting to match identities across cameras.
+
+    \item \textbf{Cross-Camera Re-Identification:} A specialized system that matches detected individuals across different camera views by analyzing their visual features. When someone exits one camera's view and appears in another camera, this system determines if they're the same person by comparing appearance characteristics like clothing, size, and walking patterns, maintaining consistent identification despite changes in perspective.
+
     \item \textbf{Unified Spatial Mapping:} A mapping system that transforms detections from distributed cameras into a coherent coordinate system. This integration enables continuous trajectory visualization as individuals move through the monitored environment across multiple camera views, providing operators with a comprehensive spatial understanding of movement patterns throughout the facility.
 \end{enumerate}
 
@@ -49,9 +50,12 @@ The \usevar{\srsTitle} addresses multi-camera person tracking challenges through
 \label{subsection:optional-features}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals based on descriptive prompts (e.g., "Find the person wearing a black jacket and jeans who passed through the main entrance at 2:30 PM" or "Locate the individual with a red backpack near the cafeteria"), with an interactive confirmation step where users select the correct person from highlighted candidates.
+    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals based on descriptive prompts (e.g., "Find the person wearing a black jacket and jeans who passed through the main entrance at 2:30 PM"), with an interactive confirmation step where users select the correct person from highlighted candidates.
+
     \item \textbf{Multi-Person Tracking:} Capability to simultaneously maintain identity and location data for multiple individuals across the camera network, preserving each person's unique identity despite occlusions, varying viewing angles, or extended periods where individuals are not visible in any camera.
+
     \item \textbf{Movement Pattern Analysis:} AI-powered analysis to identify typical movement patterns and provide insights for space utilization, traffic management, and anomaly detection in pedestrian flows across the monitored environment.
+
     \item \textbf{Environmental Analytics Dashboard:} Real-time metrics including occupancy density maps, path trajectory analysis, and movement pattern heatmaps tailored for facility management, safety monitoring, and resource optimization.
 \end{enumerate}
 
@@ -60,38 +64,41 @@ The \usevar{\srsTitle} addresses multi-camera person tracking challenges through
 
 \begin{enumerate}[leftmargin=80pt]
     \item \textbf{Voice Command Integration:} Allow personnel to interact with the system using natural voice commands (e.g., "Track the person in the blue jacket heading toward Building B") for hands-free operation during critical situations.
+
     \item \textbf{Anomaly Detection:} Implement AI-powered anomaly detection to automatically identify unusual behavior patterns (such as suspicious movements, crowd formations, or potential security incidents) across the monitored environment.
+
     \item \textbf{Privacy-Preserving Tracking:} Implement anonymization techniques that maintain tracking capabilities while protecting individual privacy through face blurring or feature abstraction in accordance with surveillance regulations and privacy laws.
+
     \item \textbf{Automatic Environment Mapping:} System that creates spatial representations based on observed movement patterns, automatically identifying walkways, intersections, and common routes without requiring manual mapping of the environment.
 \end{enumerate}
 
 \section{Target User}
 \label{section:target-user}
 
-The \usevar{\srsTitle} enables security, facility management, and emergency response professionals to maintain consistent identification of individuals across multiple camera views in campus and factory environments, enhancing safety, optimizing resources, and improving response times.
-The primary users are professionals responsible for monitoring complex environments with distributed camera networks.
+The \usevar{\srsTitle} enables professionals in security, facility management, and emergency response to maintain consistent identification of individuals across multiple camera views in complex environments, enhancing safety, optimizing operations, and improving response times.
+The primary users are personnel responsible for monitoring distributed camera networks across large spaces.
 
 \begin{table}[p]
     \centering
     \noindent\begin{tabular}{| p{2.65in} | p{2.65in} |}
         \hline & \\[-10pt]
-        \persona{Campus Security Officer}
-        {Track subjects across buildings, integrate security protocols.}
-        {Loses track between cameras, wastes time searching feeds during incidents.}
-        {Locate persons quickly, maintain tracking throughout facility, coordinate based on location.} &
-        \persona{Facility Operations Manager}
-        {Monitor occupancy, analyze usage, optimize resources.}
-        {Cannot analyze movement patterns for resource allocation or identify bottlenecks.}
-        {Optimize space use, identify congestion, improve efficiency with data.} \\[10pt]
+        \persona{Security Officer}
+        {Track subjects across non-overlapping camera zones, identify unauthorized access.}
+        {Loses identity between cameras, spends critical time searching feeds during incidents.}
+        {Maintain continuous tracking, quickly locate persons of interest, coordinate response teams.} &
+        \persona{Facility Manager}
+        {Monitor space utilization, analyze traffic patterns, plan resource allocation.}
+        {Cannot capture comprehensive movement data for occupancy planning or identify bottlenecks.}
+        {Optimize space usage, identify congestion points, make data-driven facility decisions.} \\[10pt]
         \hline & \\[-10pt]
-        \persona{Emergency Response Coordinator}
-        {Track evacuations, monitor crowding, coordinate resources.}
-        {Limited situation awareness, difficulty tracking individuals needing assistance.}
-        {Monitor safety issues, coordinate resources, maintain multi-zone awareness.} &
-        \persona{Research Analyst}
-        {Analyze movement patterns, behavioral insights, space usage.}
-        {Lacks integrated view of navigation patterns and space effects.}
-        {Understand space usage, identify underused areas, recommend data-driven improvements.} \\[10pt]
+        \persona{Emergency Coordinator}
+        {Track evacuations, monitor crowd density, coordinate personnel during incidents.}
+        {Lacks complete situational awareness across transition zones between cameras.}
+        {Ensure safety compliance, rapidly locate individuals needing assistance, coordinate resources.} &
+        \persona{Analytics Specialist}
+        {Extract behavioral insights, analyze movement patterns, develop predictive models.}
+        {Cannot integrate cross-camera data for comprehensive movement analysis.}
+        {Identify usage trends, measure operational efficiency, provide data-backed improvement recommendations.} \\[10pt]
         \hline
     \end{tabular}
     \caption{Personas from User Analysis for Intelligent Multi-Camera Person Tracking System}

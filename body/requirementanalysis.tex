@@ -29,56 +29,83 @@
 \subsection{Primary Stakeholders}
 \label{subsection:primary-stakeholders}
 
-% \begin{enumerate}[leftmargin=80pt]
-%     \item \textbf{Users:} The primary stakeholders are users of our application,
-%     they have a key role to populate our application's data, and evaluate our project's impact.
-%     For specification of our users see \ref{section:target-user}.
-%     \item \textbf{Food stall owners:} Owners of food stalls in cafeterias on Kasetsart University grounds
-%     is our primary source of data acquisition. With KU Eater, we make sure to bring positive changes not just to
-%     consumers but also the producers.
-% \end{enumerate}
+\begin{enumerate}[leftmargin=80pt]
+    \item \textbf{Users:} The primary stakeholders are the users of our multi-camera tracking system, including security personnel, facility managers, emergency response coordinators, and research analysts.  Their interaction with the system is crucial for effective monitoring, incident response, and data-driven decision-making.  For a detailed specification of our users, see \ref{section:target-user}.
+    \item \textbf{System Administrators:}  These individuals are responsible for the installation, configuration, and maintenance of the system.  Their needs include ease of deployment, system stability, and access to diagnostic tools.
+    \item \textbf{University/Factory Management:}  These stakeholders are interested in the overall benefits of the system, such as improved safety, optimized resource allocation, and enhanced operational efficiency.  They require reports and data summaries to justify the investment and track performance.
+\end{enumerate}
 
 \section{User Stories}
 \label{section:user-stories}
 
 %% User Stories Start
 
-% \userstory{Menu Items at Fingertips%
-% }{user of cafeteria in Kasetsart University%
-% }{know what menus are available in the stalls beforehand%
-% }{I don't need to waste my time choosing at the cafeteria}
+\userstory{Track Individuals Across Cameras%
+}{security officer%
+}{seamlessly track individuals as they move between different camera views%
+}{I can maintain continuous surveillance and respond quickly to incidents}
 
-% \userstory{Recommending Trending Food Items%
-% }{user of cafeteria in Kasetsart University%
-% }{be able to see what kinds of dish are trending by other students%
-% }{I will have best food choices to try out}
+\userstory{Identify Individuals After Re-Appearance%
+}{security officer%
+}{re-identify individuals who have temporarily left the camera network's view and reappeared%
+}{I can maintain a consistent track of individuals even with gaps in coverage}
 
-% \userstory{Recommending Food Items based on Dietary Restrictions%
-% }{user of cafeteria in Kasetsart University with a dietary restriction%
-% }{be able to see what kinds of dish are offered for people with same dietary restriction%
-% }{I get to know what are the best food items I can have at the cafeteria}
+\userstory{Visualize Movement Patterns%
+}{facility operations manager%
+}{view a map displaying the movement trajectories of individuals across the monitored area%
+}{I can understand how spaces are being used and identify potential bottlenecks or areas of congestion}
 
-% \userstory{Searching Food Items with Specific Names%
-% }{user of cafeteria in Kasetsart University%
-% }{be able to search for a specific dish%
-% }{I can pinpoint where to get a food item that I want}
+\userstory{Review Historical Tracking Data%
+}{research analyst%
+}{access and analyze historical tracking data for individuals and groups%
+}{I can understand movement patterns, space utilization, and other behavioral insights}
 
-% \userstory{Filtering Food Items based on Dietary Restrictions%
-% }{user of cafeteria in Kasetsart University with a dietary restriction%
-% }{search and filter for menu items that satisfies my dietary restriction%
-% }{I get my own list of dishes that I can have to browse}
+\userstory{Export Tracking Data%
+}{System Administrator%
+}{be able to export the tracking data%
+}{I can integrate to the existing system in the organization}
 
-% \userstory{Reviewing Menu Items Offered%
-% }{customer of a food stall in a cafeteria of KU%
-% }{post a review of the food item I get at the stall%
-% }{other users can read my review and know more about food offered at the stall}
+\userstory{Select a Specific Individual for Tracking%
+}{security officer%
+}{select a specific individual from a live camera feed or a list of detected persons for prioritized tracking and detailed information display%
+}{I can focus attention and receive more detailed information on a person of interest, while others are still tracked in the background}
 
-% \userstory{Comparing Similiar Dishes of Different Stalls%
-% }{certain food lover who dines at a cafeteria in KU%
-% }{see differences of reviews that of the same food item but offered by different stalls%
-% }{I get to compare and choose to purchase the specific dish between the stalls}
+\userstory{Deselect a Tracked Individual%
+}{security officer%
+}{remove the prioritized tracking and detailed display from a currently selected individual%
+}{I can shift my focus to other individuals or situations, returning the deselected individual to the general tracking pool}
+
+\userstory{View Multiple Camera Feeds Simultaneously%
+}{Security Officer%
+}{to view and monitor the live camera feeds%
+}{I could see the environment in real time}
 
 %% User Stories End
+
+\section{Use Cases}
+\label{section:use-cases}
+%    \begin{usecase}{Track a Suspicious Individual}
+%        \textbf{Actors:} Security Officer
+%        \textbf{Description:} A security officer observes suspicious behavior from an individual on one camera.  The officer uses the system to initiate tracking of that individual, maintaining their identity as they move across multiple camera views.  The system provides real-time location updates and alerts the officer if the individual enters a restricted area.
+%        \textbf{Pre-conditions:} The system is operational and cameras are calibrated. The security officer is logged in.
+%        \textbf{Post-conditions:} The individual's movements are tracked and recorded.  Alerts are generated based on predefined rules.
+%    \end{usecase}
+%
+%     \begin{usecase}{Respond to an Emergency}
+%        \textbf{Actors:} Emergency Response Coordinator
+%        \textbf{Description:}  During an emergency (e.g., fire alarm), the coordinator uses the system to monitor the evacuation of a building.  The system displays the locations of individuals, identifies areas of high density, and helps the coordinator direct resources to assist those who may need help. The coordinator can search a person by their appearence to effectively pin point people in need.
+%         \textbf{Pre-conditions:} The system is operational. Emergency protocols are defined within the system.
+%        \textbf{Post-conditions:} Evacuation is monitored, and resources are deployed effectively.  Data is recorded for post-incident analysis.
+%    \end{usecase}
+%
+%    \begin{usecase}{Analyze Space Utilization}
+%        \textbf{Actors:} Facility Operations Manager
+%        \textbf{Description:} A facility manager uses the system to analyze historical movement data within a building. The system generates heatmaps showing areas of high and low traffic, identifies common pathways, and provides data on occupancy density over time.  This information is used to optimize space allocation, improve traffic flow, and inform decisions about renovations or resource placement.
+%        \textbf{Pre-conditions:} The system has been collecting data for a sufficient period.
+%        \textbf{Post-conditions:}  Reports and visualizations are generated, providing insights into space utilization.
+%    \end{usecase}
+
+% Use Stories End
 
 \section{Use Case Diagram}
 \label{section:use-case-diagram}
