@@ -71,31 +71,6 @@
 }{I can keep the tracking system running smoothly and minimize disruptions to users.}
 %% User Stories End
 
-\section{Use Cases}
-\label{section:use-cases}
-%    \begin{usecase}{Track a Suspicious Individual}
-%        \textbf{Actors:} Security Officer
-%        \textbf{Description:} A security officer observes suspicious behavior from an individual on one camera.  The officer uses the system to initiate tracking of that individual, maintaining their identity as they move across multiple camera views.  The system provides real-time location updates and alerts the officer if the individual enters a restricted area.
-%        \textbf{Pre-conditions:} The system is operational and cameras are calibrated. The security officer is logged in.
-%        \textbf{Post-conditions:} The individual's movements are tracked and recorded.  Alerts are generated based on predefined rules.
-%    \end{usecase}
-%
-%     \begin{usecase}{Respond to an Emergency}
-%        \textbf{Actors:} Emergency Response Coordinator
-%        \textbf{Description:}  During an emergency (e.g., fire alarm), the coordinator uses the system to monitor the evacuation of a building.  The system displays the locations of individuals, identifies areas of high density, and helps the coordinator direct resources to assist those who may need help. The coordinator can search a person by their appearence to effectively pin point people in need.
-%         \textbf{Pre-conditions:} The system is operational. Emergency protocols are defined within the system.
-%        \textbf{Post-conditions:} Evacuation is monitored, and resources are deployed effectively.  Data is recorded for post-incident analysis.
-%    \end{usecase}
-%
-%    \begin{usecase}{Analyze Space Utilization}
-%        \textbf{Actors:} Facility Operations Manager
-%        \textbf{Description:} A facility manager uses the system to analyze historical movement data within a building. The system generates heatmaps showing areas of high and low traffic, identifies common pathways, and provides data on occupancy density over time.  This information is used to optimize space allocation, improve traffic flow, and inform decisions about renovations or resource placement.
-%        \textbf{Pre-conditions:} The system has been collecting data for a sufficient period.
-%        \textbf{Post-conditions:}  Reports and visualizations are generated, providing insights into space utilization.
-%    \end{usecase}
-
-% Use Stories End
-
 \section{Use Case Diagram}
 \label{section:use-case-diagram}
 
@@ -157,157 +132,80 @@
 %     \item \textbf{\textit{Guest}}---a group of user which extends from base functionalities, they are able to Sign Up and Login.
 %     \item \textbf{\textit{Member}}---an authorized group of user, being able to Write Reviews, Rate Menu Items and Edit their Profiles.
 % \end{itemize}
-
 \section{Use Case Model}
 \label{section:use-case-model}
 
 % Use Cases Start
 
-% \begin{usecase}{Viewing the Menu}
-%     \textbf{Actors:} Tom (Cafeteria User), KU Eater (System)
-    
-%     \textbf{Description:} Tom wants to see the food items being offered at the cafeteria.
+\begin{usecase}{Track Individual Across Cameras}
+    \textbf{Actors:} Security Officer, \textit{SpotOn} (System)
 
-%     \textbf{Scenario:}
+    \textbf{Description:} A security officer needs to track an individual's movements across multiple camera views within a campus or factory environment.
 
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item Tom opens KU Eater application on his device.
-%         \item System renders the main page which contains recommendations and browse-able list of menus and stalls.
-%         \item Tom can now browse the menu of each stalls and choose his favorite food.
-%     \end{enumerate}
-% \end{usecase}
+    \textbf{Scenario:}
 
-% \begin{usecase}{Seeing Recommendations on Trending Menu}
-%     \textbf{Actors:} Tom (Cafeteria User), KU Eater (System)
-    
-%     \textbf{Description:} Tom doesn't know what to eat, so he wants to find any stalls that could be good. The metrics
-%     for good food is popularity.
+    \begin{enumerate}[leftmargin=80pt]
+        \item The security officer logs into the \textit{SpotOn} system.
+        \item The officer selects a location (e.g., campus or factory).
+        \item The officer selects a date for the video feeds.
+        \item The system displays the available camera views for the selected location and date.
+        \item The system shows all detected people with assigned IDs in each camera's video feed.
+        \item The system displays a map showing the locations of detected individuals.
+        \item The officer selects an individual in a camera view (e.g., by clicking on their ID or cropped image).
+        \item The system highlights that individual across all camera views where they appear and updates their movement history on the map.
+    \end{enumerate}
+\end{usecase}
 
-%     \textbf{Scenario:}
+\begin{usecase}{Maintain Tracking During Temporary Disappearance}
+    \textbf{Actors:} Security Officer, \textit{SpotOn} (System)
 
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item Tom opens KU Eater application on his device.
-%         \item System starts to generate lists of recommendations, one of the list "Now Trending" scores the recommendations
-%         based on average user ratings and review scores.
-%         \item System renders back to Tom with an amount of topmost trending stalls and their menus.
-%         \item Tom clicks on "See More."
-%         \item System renders a scrollable list of more trending stalls.
-%         \item Tom can now browse a list of menu items which are trending.
-%     \end{enumerate}
-% \end{usecase}
+    \textbf{Description:} A security officer needs to maintain tracking of an individual even when they are temporarily out of sight of all cameras (e.g., going around a corner).
 
-% \begin{usecase}{Seeing Personalized Recommendations}
-%     \textbf{Actors:} Amber (Cafeteria User), KU Eater (System)
-    
-%     \textbf{Description:} Amber has been using KU Eater for a while and is now a member, she's has a pattern of liking seafood.
-%     She wants to discover food choices available in the app.
+     \textbf{Scenario:}
+    \begin{enumerate}[leftmargin=80pt]
+        \item The security officer is tracking an individual using the \textit{SpotOn} system.
+        \item The individual moves out of view of all cameras.
+        \item The system uses predictive algorithms to estimate the individual's likely location.
+        \item When the individual reappears in another camera view, the system automatically re-identifies them and continues tracking.
+        \item The system updates the individual's movement history, showing the estimated path during the period of disappearance.
+    \end{enumerate}
+\end{usecase}
 
-%     \textbf{Preconditions:} Amber is a member and has rated and loved seafood in the cafeteria.
+\begin{usecase}{Visualize Movement Paths on a Map}
+    \textbf{Actors:} Facility Manager, \textit{SpotOn} (System)
 
-%     \textbf{Scenario:}
+    \textbf{Description:} A facility manager wants to visualize the movement paths of individuals within the facility to analyze space utilization.
 
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item Amber opens KU Eater application on her device.
-%         \item System starts to generate lists of recommendations, one of the list "For You" scores recommendations
-%         based on similarity of user preferences and menu database.
-%         \item System renders back to Amber with an amount of relevant stalls and their menus.
-%         \item Amber clicks on "See More."
-%         \item System renders a scrollable list of more suitable stalls.
-%         \item Amber can now browse a list of menu items which are mostly seafood and tailored for her.
-%     \end{enumerate}
-% \end{usecase}
+    \textbf{Scenario:}
 
-% \begin{usecase}{Searching for a Specific Dish}
-%     \textbf{Actors:} John (Cafeteria User), KU Eater (System)
-    
-%     \textbf{Description:} John wants to have boat noodles for lunch. He's using KU Eater to speed up
-%     his process of finding.
+    \begin{enumerate}[leftmargin=80pt]
+        \item The facility manager logs into the \textit{SpotOn} system.
+        \item The manager selects a location (e.g., campus or factory).
+        \item The manager selects a date for analysis.
+        \item The system displays a map of the facility.
+        \item The system displays the movement paths of individuals (or aggregated movement data) overlaid on the map for the selected date period.
+        \item The manager can filter the displayed data (e.g., by specific camera views or time intervals).
+    \end{enumerate}
+\end{usecase}
 
-%     \textbf{Scenario:}
+\begin{usecase}{Prioritize Tracking of Specific Individual}
+    \textbf{Actors:} Security Officer/Emergency Coordinator, \textit{SpotOn} (System)
 
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item John opens KU Eater application on his device.
-%         \item System renders the main page with search bar at the top.
-%         \item John clicks on Search bar and types in "boat noodles."
-%         \item System looks for stalls that sells boat noodles and renders a collective list of relevant stalls.
-%         \item John will now see many stalls selling boat noodles.
-%     \end{enumerate}
-% \end{usecase}
+    \textbf{Description:}  A security officer or emergency coordinator needs to prioritize the tracking of a specific individual.
 
-% \begin{usecase}{Filtering with Dietary Restrictions}
-%     \textbf{Actors:} Harry (Cafeteria User), KU Eater (System)
+    \textbf{Scenario:}
 
-%     \textbf{Description:} Harry is allergic to bell peppers, however he wants to have stir-fry which some stalls cook with bell peppers.
-%     He wants to find stalls that serve his way.
+    \begin{enumerate}[leftmargin=80pt]
+        \item The security officer/emergency coordinator logs into the \textit{SpotOn} system.
+        \item The user selects a location and date.
+        \item The system displays the available camera views and detected individuals.
+        \item The user designates an individual for prioritized tracking (e.g., by selecting from a list of detected individuals).
+        \item The system provides prominent visual cues (e.g., highlighting) whenever the prioritized individual is detected in any camera view.
+        \item The system displays detailed information about the prioritized individual, including position tracking (status, coordinates, confidence, timestamp), first detection time, current tracking duration, and movement analysis.
+    \end{enumerate}
+\end{usecase}
 
-%     \textbf{Scenario:}
-
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item Harry opens KU Eater application on his device.
-%         \item System renders the main page with search bar at the top.
-%         \item Harry clicks on Search bar and types in "stir-fry."
-%         \item Harry also puts in filter as he doesn't want to include "bell peppers."
-%         \item System looks for stalls that sells stir-fry with no bell peppers and renders a collective list of relevant stalls.
-%         \item Harry will be able to browse the many relevant stalls.
-%     \end{enumerate}
-% \end{usecase}
-
-% \begin{usecase}{Reading Reviews on Specific Stall}
-%     \textbf{Actors:} Tom (Cafeteria User), KU Eater (System)
-
-%     \textbf{Description:} Tom founds a trending dish on three stalls, however he wants to compare between each stalls.
-
-%     \textbf{Scenario:}
-
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item Tom opens KU Eater application on his device.
-%         \item System renders the main page which contains recommendations and browse-able list of menus and stalls.
-%         \item Tom sees three stalls that sell fried chicken---which piques his interest.
-%         \item Tom clicks on one of the stalls.
-%         \item System retrieves the most relevant reviews which are for fried chicken and renders them as a list.
-%         \item Tom can now read the reviews on a specific stall.
-%     \end{enumerate}
-% \end{usecase}
-
-% \begin{usecase}{Writing Review for a Dish in Stall}
-%     \textbf{Actors:} Mike (Cafeteria User), KU Eater (System)
-
-%     \textbf{Description:} Mike has just finished his meal and would like to get his thoughts on the dish to the platform.
-
-%     \textbf{Preconditions:} Mike is a member on KU Eater.
-
-%     \textbf{Scenario:}
-
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item Mike opens KU Eater application on his device.
-%         \item System renders the main page.
-%         \item Mike goes to the correct stall page and clicks on his eaten menu item.
-%         \item System renders information about his meal, including ingredients and other reviews.
-%         \item Mike clicks on "Add Review," and writes his thoughts before hitting submit.
-%         \item System redirects Mike back to the same menu item page with his comment now added.
-%     \end{enumerate}
-% \end{usecase}
-
-% \begin{usecase}{Rating a Dish in Stall}
-%     \textbf{Actors:} Carol (Cafeteria User), KU Eater (System)
-
-%     \textbf{Description:} Carol has just finished her meal and wanted to help the stall gain more traction, but is lazy to be writing reviews.
-
-%     \textbf{Preconditions:} Carol is a member on KU Eater.
-
-%     \textbf{Scenario:}
-
-%     \begin{enumerate}[leftmargin=80pt]
-%         \item Carol opens KU Eater application on her device.
-%         \item System renders the main page.
-%         \item Carol goes to the correct stall page and finds her menu item.
-%         \item Carol clicks on "Thumbs Up" button.
-%         \item System records her rating and uses it to re-rank the stalls.
-%     \end{enumerate}
-% \end{usecase}
-
-% % Use Cases End
-
+% Use Cases End
 % \newpage
 
 \section{User Interface Design}
