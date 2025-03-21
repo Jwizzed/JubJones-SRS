@@ -135,73 +135,67 @@
 \section{Use Case Model}
 \label{section:use-case-model}
 
-% Use Cases Start
-
 \begin{usecase}{Track Individual Across Cameras}
-    \textbf{Actors:} Security Officer, \textit{SpotOn} (System)
-
-    \textbf{Description:} A security officer needs to track an individual's movements across multiple camera views within a campus or factory environment.
-
+    \textbf{Actors:} Security Officer
+    
+    \textbf{Description:} Track an individual's movements across multiple camera views.
+    
     \textbf{Scenario:}
-
     \begin{enumerate}[leftmargin=80pt]
-        \item The security officer logs into the \textit{SpotOn} system.
-        \item The officer selects a location (e.g., campus or factory).
-        \item The officer selects a date for the video feeds.
-        \item The system displays the available camera views for the selected location and date.
-        \item The system shows all detected people with assigned IDs in each camera's video feed.
-        \item The system displays a map showing the locations of detected individuals.
-        \item The officer selects an individual in a camera view (e.g., by clicking on their ID or cropped image).
-        \item The system highlights that individual across all camera views where they appear and updates their movement history on the map.
+        \item Log into SpotOn.
+        \item Select a location and date.
+        \item View available camera feeds.
+        \item See people with assigned IDs in each camera view.
+        \item View a map showing detected individuals.
+        \item Select an individual in any camera view.
+        \item See that individual highlighted in all cameras where they appear.
+        \item View their movement history on the map.
     \end{enumerate}
 \end{usecase}
 
 \begin{usecase}{Maintain Tracking During Temporary Disappearance}
-    \textbf{Actors:} Security Officer, \textit{SpotOn} (System)
-
-    \textbf{Description:} A security officer needs to maintain tracking of an individual even when they are temporarily out of sight of all cameras (e.g., going around a corner).
-
-     \textbf{Scenario:}
+    \textbf{Actors:} Security Officer
+    
+    \textbf{Description:} Continue tracking an individual even when temporarily out of camera view.
+    
+    \textbf{Scenario:}
     \begin{enumerate}[leftmargin=80pt]
-        \item The security officer is tracking an individual using the \textit{SpotOn} system.
-        \item The individual moves out of view of all cameras.
-        \item The system uses predictive algorithms to estimate the individual's likely location.
-        \item When the individual reappears in another camera view, the system automatically re-identifies them and continues tracking.
-        \item The system updates the individual's movement history, showing the estimated path during the period of disappearance.
+        \item Track an individual in the system.
+        \item When the person moves out of all camera views, the system marks this state.
+        \item When the person reappears, the system reconnects their identity.
+        \item See the individual's complete path, with estimated routes during gaps shown as dashed lines.
     \end{enumerate}
 \end{usecase}
 
 \begin{usecase}{Visualize Movement Paths on a Map}
-    \textbf{Actors:} Facility Manager, \textit{SpotOn} (System)
-
-    \textbf{Description:} A facility manager wants to visualize the movement paths of individuals within the facility to analyze space utilization.
-
+    \textbf{Actors:} Facility Manager
+    
+    \textbf{Description:} View movement patterns within a facility for space utilization analysis.
+    
     \textbf{Scenario:}
-
     \begin{enumerate}[leftmargin=80pt]
-        \item The facility manager logs into the \textit{SpotOn} system.
-        \item The manager selects a location (e.g., campus or factory).
-        \item The manager selects a date for analysis.
-        \item The system displays a map of the facility.
-        \item The system displays the movement paths of individuals (or aggregated movement data) overlaid on the map for the selected date period.
-        \item The manager can filter the displayed data (e.g., by specific camera views or time intervals).
+        \item Log into SpotOn.
+        \item Select a location and date.
+        \item View a bird's-eye map of the facility.
+        \item See movement paths of all individuals overlaid on the map.
+        \item Filter paths by camera view.
+        \item Select an individual to highlight only their path.
     \end{enumerate}
 \end{usecase}
 
 \begin{usecase}{Prioritize Tracking of Specific Individual}
-    \textbf{Actors:} Security Officer/Emergency Coordinator, \textit{SpotOn} (System)
-
-    \textbf{Description:}  A security officer or emergency coordinator needs to prioritize the tracking of a specific individual.
-
+    \textbf{Actors:} Security Officer/Emergency Coordinator
+    
+    \textbf{Description:} Focus system resources on tracking a specific individual.
+    
     \textbf{Scenario:}
-
     \begin{enumerate}[leftmargin=80pt]
-        \item The security officer/emergency coordinator logs into the \textit{SpotOn} system.
-        \item The user selects a location and date.
-        \item The system displays the available camera views and detected individuals.
-        \item The user designates an individual for prioritized tracking (e.g., by selecting from a list of detected individuals).
-        \item The system provides prominent visual cues (e.g., highlighting) whenever the prioritized individual is detected in any camera view.
-        \item The system displays detailed information about the prioritized individual, including position tracking (status, coordinates, confidence, timestamp), first detection time, current tracking duration, and movement analysis.
+        \item Log into SpotOn.
+        \item Select a location and date.
+        \item View camera feeds and detected individuals.
+        \item Designate an individual for prioritized tracking.
+        \item See visual highlighting of the prioritized individual in all cameras.
+        \item View their position, detection time, tracking duration, and movement details.
     \end{enumerate}
 \end{usecase}
 
