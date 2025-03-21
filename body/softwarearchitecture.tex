@@ -204,3 +204,270 @@
 %     # refers to ingredients prohibited
 %     for consumption.
 % \end{verbatim}
+
+\section{AI Component}
+\label{section:ai-component}
+
+\subsection{Overview of the AI Component}
+\label{subsection:ai-component-overview}
+
+The AI component of our system is designed to handle object detection, tracking, and re-identification (Re-ID) for batch processing of video feeds. This component serves as the core intelligence of the application, enabling it to recognize and track objects across multiple camera views. While the system prioritizes accurate analysis over real-time processing, it is optimized for efficient batch processing of video data. The AI component integrates with other system modules by providing analysis through APIs and WebSocket connections, supporting the system's overall objectives of accurate object tracking and identification.
+
+\subsection{AI Model Description}
+\label{subsection:ai-model-description}
+
+\subsubsection{Object Detection}
+\label{subsubsection:object-detection}
+
+\begin{itemize}
+    \item \textbf{Model Type:} YOLOv11 (You Only Look Once) deep learning model
+    \item \textbf{Architecture:} Employs a backbone network for feature extraction followed by detection layers that predict bounding boxes and class probabilities
+    \item \textbf{Key Features:} Utilizes extended efficient layer aggregation networks (E-ELAN) and dynamic label assignment for improved performance
+    \item \textbf{Function:} Responsible for identifying and localizing objects (people) within video frames
+\end{itemize}
+
+\subsubsection{Tracking System}
+\label{subsubsection:tracking-system}
+
+\begin{itemize}
+    \item \textbf{Model Type:} ByteTrack multi-object tracking algorithm
+    \item \textbf{Architecture:} Built upon StrongSORT tracker with byte-wise tracking capabilities
+    \item \textbf{Key Features:} Effectively handles low-confidence detections and combines appearance features with motion information to track objects across frames
+    \item \textbf{Function:} Maintains identity consistency of detected objects across consecutive frames
+\end{itemize}
+
+\subsubsection{Re-Identification (Re-ID) System}
+\label{subsubsection:reid-system}
+
+\begin{itemize}
+    \item \textbf{Model Type:} FastReID deep convolutional neural network
+    \item \textbf{Architecture:} Specialized deep learning network that extracts discriminative features for person re-identification
+    \item \textbf{Key Features:} Supports open-set Re-ID methods, critical for real-world applications where previously unseen identities may appear
+    \item \textbf{Function:} Associates identities across different camera views and non-consecutive frames
+\end{itemize}
+
+\subsection{Dataset Information}
+\label{subsection:dataset-information}
+
+\subsubsection{Source}
+\label{subsubsection:dataset-source}
+
+The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evaluating our AI models. This dataset is collected from two distinct environments: a campus and a factory, designed to provide a challenging testbed for real-world surveillance and tracking scenarios.
+
+\subsubsection{Size and Composition}
+\label{subsubsection:dataset-composition}
+
+\begin{itemize}
+    \item \textbf{Total Scenarios:} 25 scenarios (13 campus, 12 factory)
+    \item \textbf{Number of Cameras:} 16 multi-modal cameras (RGB and thermal)
+    \item \textbf{Total Frames:} Approximately 3.05 million frames
+    \item \textbf{Frame Rate:} 23 frames per second
+    \item \textbf{Video Duration:} Approximately 5.5 minutes per scenario
+    \item \textbf{Dataset Split:}
+    \begin{itemize}
+        \item \textit{Training Set:} 14 scenarios (7 campus, 7 factory)
+        \item \textit{Validation Set:} 5 scenarios (3 factory, 2 campus)
+        \item \textit{Test Set:} 6 scenarios (2 factory, 4 campus)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Technical Specifications}
+\label{subsubsection:dataset-technical-specs}
+
+\begin{itemize}
+    \item \textbf{Resolution:} RGB: 1920x1080 pixels, Thermal: 320x240 pixels
+    \item \textbf{Annotation Process:} Semi-automatic labeling with manual correction
+    \item \textbf{Multi-Modal Data:} RGB and thermal data are spatially aligned and temporally synchronized
+\end{itemize}
+
+\subsubsection{Key Features}
+\label{subsubsection:dataset-key-features}
+
+\begin{itemize}
+    \item \textbf{Multi-Camera Views:} Multiple camera angles to train models for cross-view recognition
+    \item \textbf{Environmental Diversity:} Different times of day, weather conditions, and seasons
+    \item \textbf{Challenging Scenarios:} Occlusions, varying lighting conditions, and noisy detections
+    \item \textbf{Thermal Data:} Enhances tracking accuracy in scenarios with limited visibility
+\end{itemize}
+
+\subsection{Training Process}
+\label{subsection:training-process}
+
+\subsubsection{Training Environment}
+\label{subsubsection:training-environment}
+
+\begin{itemize}
+    \item \textbf{Hardware:} NVIDIA RTX 4090 GPU
+    \item \textbf{Software:} PyTorch deep learning framework
+    \item \textbf{Computing Resources:} High-performance computing cluster for parallel training
+\end{itemize}
+
+\subsubsection{Hyperparameters}
+\label{subsubsection:hyperparameters}
+
+\begin{itemize}
+    \item \textbf{Learning Rate:} 
+    \begin{itemize}
+        \item YOLOv11: 0.01
+        \item ByteTrack and FastReID: 0.001
+    \end{itemize}
+    \item \textbf{Batch Size:} 
+    \begin{itemize}
+        \item YOLOv11: 32
+        \item ByteTrack and FastReID: 16
+    \end{itemize}
+    \item \textbf{Number of Epochs:}
+    \begin{itemize}
+        \item YOLOv11: 100 epochs
+        \item ByteTrack and FastReID: 50 epochs
+    \end{itemize}
+    \item \textbf{Optimizer:} Adam with weight decay of 0.0005
+\end{itemize}
+
+\subsubsection{Data Augmentation}
+\label{subsubsection:data-augmentation}
+
+\begin{itemize}
+    \item \textbf{Techniques:} Random cropping, horizontal flipping, color jittering, random erasing
+    \item \textbf{Purpose:} Prevent overfitting and improve model generalization
+    \item \textbf{Implementation:} Applied during training using PyTorch transformations
+\end{itemize}
+
+\subsection{Evaluation Metrics}
+\label{subsection:evaluation-metrics}
+
+\subsubsection{Object Detection Metrics}
+\label{subsubsection:detection-metrics}
+
+\begin{itemize}
+    \item \textbf{Precision:} Measures the accuracy of positive predictions
+    \item \textbf{Recall:} Measures the ability to find all relevant instances
+    \item \textbf{Average Precision (AP):} Summarizes the precision-recall curve
+    \item \textbf{Confidence Threshold:} 0.5 for determining true positives
+\end{itemize}
+
+\subsubsection{Tracking Metrics}
+\label{subsubsection:tracking-metrics}
+
+\begin{itemize}
+    \item \textbf{Multiple Object Tracking Accuracy (MOTA):} Measures overall tracking accuracy, considering false positives, missed detections, and identity switches
+    \item \textbf{Multiple Object Tracking Precision (MOTP):} Measures the precision of tracking results
+    \item \textbf{ID F1 Score (IDF1):} Measures the identity preservation capabilities
+    \item \textbf{Identity Switches (IDSW):} Counts the number of identity switches
+\end{itemize}
+
+\subsubsection{Re-Identification Metrics}
+\label{subsubsection:reid-metrics}
+
+\begin{itemize}
+    \item \textbf{Rank-1 Accuracy:} Percentage of queries where the correct match is the top result
+    \item \textbf{Mean Average Precision (mAP):} Average precision across all ranks
+    \item \textbf{Cumulative Matching Characteristic (CMC) Curve:} Measures the probability of finding the correct match within the top-k matches
+\end{itemize}
+
+\subsection{Best Practices}
+\label{subsection:best-practices}
+
+\subsubsection{Model Versioning}
+\label{subsubsection:model-versioning}
+
+\begin{itemize}
+    \item \textbf{Version Control:} Each trained model is versioned and stored in a centralized repository
+    \item \textbf{Documentation:} Detailed documentation maintained for each model version, including:
+    \begin{itemize}
+        \item Hyperparameters used for training
+        \item Training and validation performance metrics
+        \item Dataset version and preprocessing details
+        \item Dependencies and environment specifications
+    \end{itemize}
+    \item \textbf{Backup Strategy:} Regular backups of model weights and checkpoints to prevent data loss
+\end{itemize}
+
+\subsubsection{Continuous Learning}
+\label{subsubsection:continuous-learning}
+
+\begin{itemize}
+    \item \textbf{Data Updates:} Periodic dataset updates with new data to keep models current
+    \item \textbf{Model Fine-tuning:} Regular model adjustments to adapt to changes in data distribution
+    \item \textbf{Performance Monitoring:} Continuous evaluation of model performance on validation data
+    \item \textbf{Feedback Loop:} Incorporation of user feedback to improve model accuracy
+\end{itemize}
+
+\subsubsection{Ethical Considerations}
+\label{subsubsection:ethical-considerations}
+
+\begin{itemize}
+    \item \textbf{Bias Mitigation:} Regular audits to ensure models do not exhibit biases based on gender, race, or other sensitive attributes
+    \item \textbf{Transparency:} Model decision-making processes made transparent to ensure accountability
+    \item \textbf{Privacy Protection:} Strict adherence to privacy regulations regarding the use of personal data
+    \item \textbf{Security Measures:} Implementation of robust security protocols to prevent unauthorized access to models and data
+\end{itemize}
+
+\subsection{Integration and Deployment}
+\label{subsection:integration-deployment}
+
+\subsubsection{APIs}
+\label{subsubsection:apis}
+
+\begin{itemize}
+    \item \textbf{RESTful APIs:} 
+    \begin{itemize}
+        \item \textit{/api/detection:} Endpoint for object detection requests
+        \item \textit{/api/tracking:} Endpoint for tracking requests
+        \item \textit{/api/reid:} Endpoint for re-identification requests
+        \item \textit{/api/batch-process:} Endpoint for batch processing of video data
+    \end{itemize}
+    \item \textbf{WebSocket:} 
+    \begin{itemize}
+        \item \textit{ws://hostname/tracking:} Socket for real-time tracking updates
+        \item \textit{ws://hostname/notification:} Socket for system notifications
+    \end{itemize}
+    \item \textbf{Documentation:} Comprehensive API documentation using OpenAPI specification
+\end{itemize}
+
+\subsubsection{Deployment Strategy}
+\label{subsubsection:deployment-strategy}
+
+\begin{itemize}
+    \item \textbf{Containerization:} 
+    \begin{itemize}
+        \item Docker containers for encapsulating each AI model
+        \item Docker Compose for managing multi-container deployments
+    \end{itemize}
+    \item \textbf{Orchestration:} 
+    \begin{itemize}
+        \item Kubernetes for container orchestration
+        \item Horizontal Pod Autoscaling for handling varying loads
+    \end{itemize}
+    \item \textbf{CI/CD Pipeline:} 
+    \begin{itemize}
+        \item Automated testing and deployment using Jenkins
+        \item Blue-green deployment strategy for zero-downtime updates
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Database and Caching}
+\label{subsubsection:database-caching}
+
+\begin{itemize}
+    \item \textbf{TimescaleDB:} 
+    \begin{itemize}
+        \item Stores time-series data such as tracking events
+        \item Schema optimized for efficient querying of temporal data
+    \end{itemize}
+    \item \textbf{Redis:} 
+    \begin{itemize}
+        \item Implements real-time caching for tracking results
+        \item Configured with appropriate eviction policies and persistence
+    \end{itemize}
+    \item \textbf{Data Retention:} 
+    \begin{itemize}
+        \item Configurable retention periods for different types of data
+        \item Automated data archiving for long-term storage
+    \end{itemize}
+\end{itemize}
+
+\subsection{Conclusion}
+\label{subsection:conclusion}
+
+The AI component is a critical element of our system, enabling sophisticated batch processing of video feeds for object detection, tracking, and re-identification. By leveraging state-of-the-art models like YOLOv11, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The robust training methodology using NVIDIA RTX 4090 GPUs, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The seamless integration with other system components through well-defined APIs and deployment strategies provides a scalable and reliable solution for our users.
