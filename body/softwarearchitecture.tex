@@ -220,7 +220,7 @@ The AI component of our system is designed to handle object detection, tracking,
 \label{subsubsection:object-detection}
 
 \begin{itemize}
-    \item \textbf{Model Type:} YOLOv11 (You Only Look Once) deep learning model
+    \item \textbf{Model Type:} YOLO (You Only Look Once) deep learning model
     \item \textbf{Architecture:} Employs a backbone network for feature extraction followed by detection layers that predict bounding boxes and class probabilities
     \item \textbf{Key Features:} Utilizes extended efficient layer aggregation networks (E-ELAN) and dynamic label assignment for improved performance
     \item \textbf{Function:} Responsible for identifying and localizing objects (people) within video frames
@@ -308,17 +308,17 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \begin{itemize}
     \item \textbf{Learning Rate:} 
     \begin{itemize}
-        \item YOLOv11: 0.01
+        \item YOLO: 0.01
         \item ByteTrack and FastReID: 0.001
     \end{itemize}
     \item \textbf{Batch Size:} 
     \begin{itemize}
-        \item YOLOv11: 32
+        \item YOLO: 32
         \item ByteTrack and FastReID: 16
     \end{itemize}
     \item \textbf{Number of Epochs:}
     \begin{itemize}
-        \item YOLOv11: 100 epochs
+        \item YOLO: 100 epochs
         \item ByteTrack and FastReID: 50 epochs
     \end{itemize}
     \item \textbf{Optimizer:} Adam with weight decay of 0.0005
@@ -470,4 +470,4 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \subsection{Conclusion}
 \label{subsection:conclusion}
 
-The AI component is a critical element of our system, enabling sophisticated batch processing of video feeds for object detection, tracking, and re-identification. By leveraging state-of-the-art models like YOLOv11, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The robust training methodology using NVIDIA RTX 4090 GPUs, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The seamless integration with other system components through well-defined APIs and deployment strategies provides a scalable and reliable solution for our users.
+The AI component is a critical element of our system, enabling sophisticated batch processing of video feeds for object detection, tracking, and re-identification. By leveraging state-of-the-art models like YOLO, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The robust training methodology using NVIDIA RTX 4090 GPUs, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The seamless integration with other system components through well-defined APIs and deployment strategies provides a scalable and reliable solution for our users.
