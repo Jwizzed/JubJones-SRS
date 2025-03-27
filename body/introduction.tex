@@ -83,7 +83,8 @@ The primary users are personnel responsible for monitoring distributed camera ne
 \begin{table}[p]
     \centering
     \noindent\begin{tabular}{| p{2.65in} | p{2.65in} |}
-        \hline & \\[-10pt]
+        \hline & \\[-10pt] % Top rule adjustment space
+        % --- Row 1 ---
         \persona{Security Officer}
         {Track subjects across non-overlapping camera zones, identify unauthorized access.}
         {Loses identity between cameras, spends critical time searching feeds during incidents.}
@@ -91,17 +92,17 @@ The primary users are personnel responsible for monitoring distributed camera ne
         \persona{Facility Manager}
         {Monitor space utilization, analyze traffic patterns, plan resource allocation.}
         {Cannot capture comprehensive movement data for occupancy planning or identify bottlenecks.}
-        {Optimize space usage, identify congestion points, make data-driven facility decisions.} \\[10pt]
-        \hline & \\[-10pt]
+        {Optimize space usage, identify congestion points, make data-driven facility decisions.} \\[10pt] % Space between rows
+        \hline & \\[-10pt] % Mid rule adjustment space
+        % --- Row 2 ---
+        % Persona 3 in the first column
         \persona{Emergency Coordinator}
         {Track evacuations, monitor crowd density, coordinate personnel during incidents.}
         {Lacks complete situational awareness across transition zones between cameras.}
         {Ensure safety compliance, rapidly locate individuals needing assistance, coordinate resources.} &
-        \persona{Analytics Specialist}
-        {Extract behavioral insights, analyze movement patterns, develop predictive models.}
-        {Cannot integrate cross-camera data for comprehensive movement analysis.}
-        {Identify usage trends, measure operational efficiency, provide data-backed improvement recommendations.} \\[10pt]
-        \hline
+        % Second column is intentionally left empty to maintain the 2x2 structure visually
+         \\[10pt] % Space below the last persona row
+        \hline % Bottom rule
     \end{tabular}
     \caption{Personas from User Analysis for \usevar{\srsTitle}}
 \end{table}
