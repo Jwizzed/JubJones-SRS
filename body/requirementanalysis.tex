@@ -79,64 +79,55 @@
 \section{Use Case Diagram}
 \label{section:use-case-diagram}
 
-% \begin{figure}[h!]
-%     \centering
-%     \begin{tikzpicture}
+\begin{figure}[h!]
+    \centering
+    \begin{tikzpicture}
 
-%         \begin{umlsystem}[x=4]{KU Eater}
-%             \umlusecase[name=signup, y=4.5]{Sign Up}
-%             \umlusecase[name=login, y=3]{Login}
-%             \umlusecase[name=viewrec, y=1, width=2.5cm]{View Recommendations}
-%             \umlusecase[name=genrec, x=6.5, y=2, width=2.5cm]{Generate Recommendations}
-%             \umlusecase[name=menuinfo, x=4, y=0.25]{See Menu Info}
-%             \umlusecase[name=searchmenu, x=1, y=-1]{Search Menu Items}
-%             \umlusecase[name=userrec, x=6.5, y=-4, width=3.5cm]{Personalized Recommendations}
-%             \umlusecase[name=trendrec, x=6.5, y=4.5, width=2.5cm]{Trending Recommendations}
-%             \umlusecase[name=readreview, y=-2.5]{Read Reviews}
-%             \umlusecase[name=writereview, x=-0.25, y=-4]{Write Review}
-%             \umlusecase[name=rateitem, x=1, y=-5.5]{Rate Menu Items}
-%             \umlusecase[name=editprofile, x=3, y=-7]{Edit Profile}
-%         \end{umlsystem}
+        % System boundary
+        \begin{umlsystem}[x=4]{SpotOn}
+            % Use cases inside the system boundary
+            \umlusecase[name=track, y=4, width=3cm]{Track Individual Across Cameras}
+            \umlusecase[name=maintain, y=1.5, width=4cm]{Maintain Tracking During Temporary Disappearance}
+            \umlusecase[name=visualize, y=-1, width=3.5cm]{Visualize Movement Paths on a Map}
+            \umlusecase[name=prioritize, y=-3.5, width=4cm]{Prioritize Tracking of Specific Individual}
+        \end{umlsystem}
 
-%         \umlactor[y=-1]{User}
-%         \umlactor[y=3]{Guest}
-%         \umlactor[y=-5]{Member}
-%         \umlactor[x=15]{System}
+        % Actors outside the system boundary
+        \umlactor[x=-4, y=3]{Security Officer}
+        \umlactor[x=-4, y=0]{Facility Manager}
+        \umlactor[x=-4, y=-2]{Analytics Specialist}
+        \umlactor[x=-4, y=-4]{Emergency Coordinator}
 
-%         \umlassoc{Guest}{login}
-%         \umlassoc{Guest}{signup}
-%         \umlassoc{User}{viewrec}
-%         \umlassoc{User}{menuinfo}
-%         \umlassoc{User}{searchmenu}
-%         \umlassoc{User}{readreview}
-%         \umlassoc{Member}{writereview}
-%         \umlassoc{Member}{rateitem}
-%         \umlassoc{Member}{editprofile}
-%         \umlassoc{System}{genrec}
-%         \umlinclude{viewrec}{genrec}
-%         \umlinclude{userrec}{writereview}
-%         \umlinclude{userrec}{rateitem}
-%         \umlinclude{userrec}{editprofile}
-%         \umlinherit{Guest}{User}
-%         \umlinherit{Member}{User}
-%         \umlinherit{userrec}{genrec}
-%         \umlinherit{trendrec}{genrec}
+        % Associations between actors and use cases
+        % Security Officer associations
+        \umlassoc{Security Officer}{track}
+        \umlassoc{Security Officer}{maintain}
+        \umlassoc{Security Officer}{prioritize}
 
-%     \end{tikzpicture}
-%     \caption{Use Case Diagram of KU Eater}
-%     \label{fig:use-case-diagram}
-%     \vspace*{-1in}
-% \end{figure}
+        % Facility Manager association
+        \umlassoc{Facility Manager}{visualize}
 
-% Use case diagram (Figure \ref{fig:use-case-diagram}) is a visualization of functionalities that KU Eater provides for end-users. We decided to break
-% down the users \textit{(on the left side of figure)} into three groups:
+        % Analytics Specialist association
+        \umlassoc{Analytics Specialist}{visualize}
 
-% \begin{itemize}
-%     \item \textbf{\textit{User}}---a default group of users which has all the basic functionalities including: Viewing Recommendations, Seeing Menu Details,
-%     Searching for Menu Items, and Reading Reviews.
-%     \item \textbf{\textit{Guest}}---a group of user which extends from base functionalities, they are able to Sign Up and Login.
-%     \item \textbf{\textit{Member}}---an authorized group of user, being able to Write Reviews, Rate Menu Items and Edit their Profiles.
-% \end{itemize}
+        % Emergency Coordinator association
+        \umlassoc{Emergency Coordinator}{prioritize}
+
+    \end{tikzpicture}
+    \caption{Use Case Diagram of SpotOn Multi-Camera Tracking System}
+    \label{fig:use-case-diagram}
+\end{figure}
+\clearpage
+The use case diagram (Figure \ref{fig:use-case-diagram}) illustrates the interactions between different user roles (actors) and the core functionalities (use cases) of the SpotOn Multi-Camera Tracking System. The actors, shown on the left side of the diagram, represent the primary user groups interacting with the system:
+
+\begin{itemize}
+    \item \textbf{Security Officer:} Interacts with tracking, maintaining tracking through gaps, and prioritizing specific individuals.
+    \item \textbf{Facility Manager:} Primarily interacts with visualizing movement paths.
+    \item \textbf{Analytics Specialist:} Also interacts with visualizing movement paths for analysis.
+    \item \textbf{Emergency Coordinator:} Interacts with prioritizing the tracking of specific individuals during critical events.
+\end{itemize}
+This diagram provides a high-level overview of who uses the system and for what main purposes.
+
 \section{Use Case Model}
 \label{section:use-case-model}
 
