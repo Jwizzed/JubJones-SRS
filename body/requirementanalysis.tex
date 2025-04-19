@@ -133,9 +133,9 @@ This diagram provides a high-level overview of who uses the system and for what 
 
 \begin{usecase}{Track Individual Across Cameras}
     \textbf{Actors:} Security Officer
-    
+
     \textbf{Description:} Track an individual's movements across multiple camera views.
-    
+
     \textbf{Scenario:}
     \begin{enumerate}[leftmargin=80pt]
         \item Log into SpotOn.
@@ -151,9 +151,9 @@ This diagram provides a high-level overview of who uses the system and for what 
 
 \begin{usecase}{Maintain Tracking During Temporary Disappearance}
     \textbf{Actors:} Security Officer
-    
+
     \textbf{Description:} Continue tracking an individual even when temporarily out of camera view.
-    
+
     \textbf{Scenario:}
     \begin{enumerate}[leftmargin=80pt]
         \item Track an individual in the system.
@@ -165,9 +165,9 @@ This diagram provides a high-level overview of who uses the system and for what 
 
 \begin{usecase}{Visualize Movement Paths on a Map}
     \textbf{Actors:} Facility Manager/Analytics Specialist
-    
+
     \textbf{Description:} View movement patterns within a facility for space utilization analysis.
-    
+
     \textbf{Scenario:}
     \begin{enumerate}[leftmargin=80pt]
         \item Log into SpotOn.
@@ -181,9 +181,9 @@ This diagram provides a high-level overview of who uses the system and for what 
 
 \begin{usecase}{Prioritize Tracking of Specific Individual}
     \textbf{Actors:} Security Officer/Emergency Coordinator
-    
+
     \textbf{Description:} Focus system resources on tracking a specific individual.
-    
+
     \textbf{Scenario:}
     \begin{enumerate}[leftmargin=80pt]
         \item Log into SpotOn.
@@ -239,40 +239,67 @@ The user interface presents an intuitive flow across multiple views as illustrat
 \newpage
 
 \section{Target and Development System}
-\label{section:development-system}
+\label{section:target-development-system} % Changed label
 
-\subsection{Data Preparation}
-\label{subsection:data-preparation-system}
-% In order to prepare data for KU Eater, proper tooling is needed both for data storage and retrieval. The following list is the technologies we used in data preparation:
+\subsection{Data Ingestion and Playback}
+\label{subsection:data-ingestion-playback} % Added name and corrected label
+% The MTMMC tracking system requires robust data handling capabilities for both ingestion and playback to support real-time person tracking across multiple cameras.
 
-% \begin{itemize}[leftmargin=80pt]
-%     \item \textbf{Google Sheets:} In order to record interview results such as stall information, list of menu items, we decided to use Google Sheets as our storage for raw data\footnote{The spreadsheet containing the data: \url{https://docs.google.com/spreadsheets/d/1oQ_PykNVvtV5KKtKOrva9aiZeK4S42EuFP9S6qaO4cg}}.
-%     The advantage of this tool is that we have faster access to data, especially when we are doing interviews with data holders.
-%     \item \textbf{PostgreSQL:} PostgreSQL is a relational database system, one of the advantages that PostgreSQL offers is the synchronous replication, we can use that feature in order to separate between the master data store, and sandbox database for training ML models.
-%     PostgreSQL is used as our main datastore. PostgreSQL also has vector support for AI-driven applications.
-% \end{itemize}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Amazon S3:} The MTMMC Dataset image files are stored in Amazon S3, providing reliable, scalable object storage. This allows for consistent access to time-stamped or sequentially named images for each camera, which is essential for synchronized playback across multiple feeds.
+    \item \textbf{Frontend UI:} The user interface enables selection of specific camera views and time ranges, initiating the playback process through an intuitive and responsive control panel. This triggers backend processes to locate and retrieve the relevant image sequences.
+    \item \textbf{FastAPI Backend:} Upon receiving playback requests, the backend identifies the sequence of relevant image files within the specified time range, establishes the initial playback state, and begins the core processing loop for each camera feed.
+\end{itemize}
 
-% \subsection{Recommendation Engine}
-% \label{subsection:recommendation-engine}
-% KU Eater at its core features a recommendation system, in order to build a consistent and fast service, we chose the following technologies:
+\subsection{Core Processing Pipeline}
+\label{subsection:core-processing-pipeline} % Added name and corrected label
+The system employs a sophisticated pipeline for processing each frame from all active camera feeds, combining object detection, tracking, and re-identification capabilities:
 
-% \begin{itemize}[leftmargin=80pt]
-%     \item \textbf{gRPC:} A high performant protocol to do Remote Procedure Calls (RPC) that allows us to share schemas between
-%     services. This allows for consistent data throughout the application's scope and predictable behavior.
-%     \item \textbf{Tonic:} A gRPC server based on the Rust programming language. It is performant and can be
-%     used to serve data asynchronously for a near real-time experience.
-%     \item \textbf{PostgreSQL:} Like in the step of Data Preparation (\ref{subsection:data-preparation-system}), we can use replication to our advantage to update data in real-time
-%     both from autonomous systems or administrator edits.
-% \end{itemize}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Faster R-CNN:} This object detection and tracking model processes each frame to identify persons and assign temporary, camera-specific track IDs. The model outputs bounding boxes, confidence scores, and tracking states for each detected individual across consecutive frames.
+    \item \textbf{OSNet:} The OpenSet Network extracts appearance features (embeddings) for person re-identification. The system conditionally triggers OSNet based on specific rules including new track confirmation, track re-activation after occlusion, cross-camera handoff candidates, and periodic refreshing of long-lived tracks.
+    \item \textbf{Re-Identification:} The system compares embedding vectors against a gallery of recent embeddings to associate temporary track IDs with persistent global person IDs across multiple cameras. This process utilizes both Redis for fast lookups of recently seen persons and TimescaleDB for historical embedding comparison.
+    \item \textbf{Perspective Transformation:} Using pre-calculated homography matrices, the system transforms image-space coordinates to a unified top-down map coordinate system. This enables consistent tracking visualization across the entire monitored area regardless of the originating camera.
+\end{itemize}
 
+\subsection{Data Management and Communication}
+\label{subsection:data-management-communication} % Added name and corrected label
+To support real-time tracking and historical analysis, the system employs a combination of in-memory caching and persistent storage solutions:
 
-% \subsection{Web Application}
-% \label{subsection:web-application}
-% KU Eater as a web-based mobile application, needs an interface designed with a target of mobile phone users in mind.
-% In order to complement our requirements, our approach to the development process of the application must be mobile-first.
-% The following is the technology stack of KU Eater web application:
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Redis:} This in-memory data store caches the latest state for each active global person ID, including current map coordinates, timestamp, last camera ID, and bounding box information. Redis enables rapid lookups for real-time tracking status and visualization.
+    \item \textbf{TimescaleDB:} Built as an extension to PostgreSQL and optimized for time-series data, TimescaleDB stores detailed historical tracking events with timestamps, global IDs, camera IDs, bounding boxes, and map coordinates. Vector support (pgvector) enhances embedding similarity searches for improved re-identification.
+    \item \textbf{WebSocket:} FastAPI's WebSocket implementation facilitates real-time communication between the backend and frontend components. The backend pushes processed frame data including camera ID, timestamp, image URL, and tracking data with global person IDs, bounding boxes, and map coordinates.
+\end{itemize}
 
-% \begin{itemize}[leftmargin=80pt]
-%     \item \textbf{React Native:} React Native is a framework based on React that offers powerful data fetching functionalities, built-in caching using existing web technologies etc. \\
-%     The framework is native to Javascript, and can ensure its compatibility across devices. It is used as our frontend for the application and a mediator between the backend.
-% \end{itemize}
+\subsection{Frontend Implementation}
+\label{subsection:frontend-implementation} % Added name and corrected label
+The user interface provides intuitive visualization and interaction capabilities to monitor tracked individuals across multiple camera views:
+
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{React:} This JavaScript library forms the foundation of the user interface components, providing a responsive and component-based architecture that efficiently updates based on state changes.
+    \item \textbf{Zustand:} This lightweight state management solution stores and manages tracking data received via WebSocket, organizing it by camera ID, global person ID, and timestamp for efficient rendering and interaction.
+    \item \textbf{Leaflet.js:} This interactive mapping library visualizes the top-down perspective of tracked individuals, displaying their real-time positions and movement paths on a shared coordinate system derived from the homography transformations.
+    \item \textbf{Canvas/SVG:} These rendering technologies are used to overlay bounding boxes and labels on camera feed images, providing visual identification of tracked individuals within each view.
+\end{itemize}
+
+\subsection{Deployment Infrastructure}
+\label{subsection:deployment-infrastructure} % Added name and corrected label
+The system is designed for containerized deployment with comprehensive monitoring capabilities:
+
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Docker:} All system components are containerized for consistent deployment across environments, with the backend requiring GPU access for efficient execution of deep learning models.
+    \item \textbf{Nginx:} Serving as the entry point and reverse proxy, Nginx handles HTTPS termination, request routing, WebSocket proxying, and potential load balancing for scaled backend instances.
+    \item \textbf{Kubernetes:} This container orchestration platform manages, scales, and ensures the reliability of all system services in production environments, with Docker Compose available for simpler development setups.
+    \item \textbf{Prometheus \& Grafana:} This monitoring stack collects and visualizes system metrics including CPU, RAM, and GPU utilization, while Loki and Promtail handle log aggregation and collection for comprehensive system observability.
+\end{itemize}
+
+\subsection{MLOps Workflow}
+\label{subsection:mlops-workflow} % Added name and corrected label
+The machine learning operations workflow supports model development, training, and deployment:
+
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{MLflow:} This platform provides experiment tracking capabilities for logging parameters, metrics, and artifacts during model development, along with a model registry for versioning and staging trained models.
+    \item \textbf{Dagshub:} Complementing MLflow, this service enhances collaboration on machine learning projects with extended versioning and sharing capabilities for models and datasets.
+    \item \textbf{CI/CD Pipeline:} The system supports continuous integration and deployment for model updates, fetching approved model artifacts from the registry, building new Docker images, and updating running services with minimal downtime.
+\end{itemize}
