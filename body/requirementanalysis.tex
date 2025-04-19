@@ -239,67 +239,40 @@ The user interface presents an intuitive flow across multiple views as illustrat
 \newpage
 
 \section{Target and Development System}
-\label{section:target-development-system} % Changed label
+\label{section:development-system}
 
-\subsection{Data Ingestion and Playback}
-\label{subsection:data-ingestion-playback} % Added name and corrected label
-% The MTMMC tracking system requires robust data handling capabilities for both ingestion and playback to support real-time person tracking across multiple cameras.
+This section outlines the technical requirements for the development and operation of our multi-camera tracking system, focusing on the capabilities needed to support the user stories and use cases identified earlier.
+
+\subsection{Data Handling and Input Capabilities}
+\label{subsection:data-handling-input}
+To effectively analyze the multi-camera tracking scenarios, the system must process recorded video data from the MTMMC dataset (\ref{subsection:dataset-information}). Key requirements include:
 
 \begin{itemize}[leftmargin=80pt]
-    \item \textbf{Amazon S3:} The MTMMC Dataset image files are stored in Amazon S3, providing reliable, scalable object storage. This allows for consistent access to time-stamped or sequentially named images for each camera, which is essential for synchronized playback across multiple feeds.
-    \item \textbf{Frontend UI:} The user interface enables selection of specific camera views and time ranges, initiating the playback process through an intuitive and responsive control panel. This triggers backend processes to locate and retrieve the relevant image sequences.
-    \item \textbf{FastAPI Backend:} Upon receiving playback requests, the backend identifies the sequence of relevant image files within the specified time range, establishes the initial playback state, and begins the core processing loop for each camera feed.
+    \item \textbf{Scalable Data Storage Access:} The system must interface with storage solutions capable of holding significant volumes of video data. It requires efficient access mechanisms to retrieve data based on time ranges and camera identifiers, ensuring recorded footage is readily available for retrospective analysis.
+    \item \textbf{Historical Data Processing:} The system needs to process recorded video feeds from multiple cameras, potentially spanning different time periods. This capability is essential for batch analysis of past events and movement patterns.
+    \item \textbf{Flexible Data Source Configuration:} The system needs a configuration-driven mechanism to specify the location of the input data sources, select specific scenarios or time windows for analysis, and identify the relevant cameras.
 \end{itemize}
 
-\subsection{Core Processing Pipeline}
-\label{subsection:core-processing-pipeline} % Added name and corrected label
-The system employs a sophisticated pipeline for processing each frame from all active camera feeds, combining object detection, tracking, and re-identification capabilities:
+\subsection{Core Tracking and Analysis Engine Requirements}
+\label{subsection:core-tracking-analysis}
+The central function of our multi-camera tracking system relies on sophisticated algorithms capable of tracking individuals across multiple camera views. This necessitates several core analytical capabilities:
 
 \begin{itemize}[leftmargin=80pt]
-    \item \textbf{Faster R-CNN:} This object detection and tracking model processes each frame to identify persons and assign temporary, camera-specific track IDs. The model outputs bounding boxes, confidence scores, and tracking states for each detected individual across consecutive frames.
-    \item \textbf{OSNet:} The OpenSet Network extracts appearance features (embeddings) for person re-identification. The system conditionally triggers OSNet based on specific rules including new track confirmation, track re-activation after occlusion, cross-camera handoff candidates, and periodic refreshing of long-lived tracks.
-    \item \textbf{Re-Identification:} The system compares embedding vectors against a gallery of recent embeddings to associate temporary track IDs with persistent global person IDs across multiple cameras. This process utilizes both Redis for fast lookups of recently seen persons and TimescaleDB for historical embedding comparison.
-    \item \textbf{Perspective Transformation:} Using pre-calculated homography matrices, the system transforms image-space coordinates to a unified top-down map coordinate system. This enables consistent tracking visualization across the entire monitored area regardless of the originating camera.
+    \item \textbf{Robust Person Detection:} The system requires the ability to accurately detect individuals within diverse single-camera views, handling variations in appearance, lighting, and partial occlusions typical in campus or factory environments (\ref{section:background}).
+    \item \textbf{Intra-Camera Tracking Consistency:} Capability to maintain stable tracking of individuals within the field of view of a single camera over consecutive frames, assigning temporary identifiers.
+    \item \textbf{Cross-Camera Re-Identification Logic:} A fundamental requirement is the implementation of logic to associate and match individuals across non-overlapping camera views (\ref{section:problem-statement}). This involves comparing extracted appearance features to maintain a persistent identity even with temporal gaps or changes in perspective.
+    \item \textbf{Unified Coordinate System Transformation:} The system must be capable of transforming detected locations from individual camera image planes into a common spatial reference frame (e.g., a top-down map). This is essential for visualizing continuous movement paths across the entire monitored environment (\ref{subsection:main-features}).
+    \item \textbf{Efficient State and Trajectory Management:} Requires mechanisms for managing the state of numerous tracked individuals (current location, persistent ID, last seen time/camera) and for storing historical trajectory data. This includes both data structures for processing and persistent storage for historical analysis.
 \end{itemize}
 
-\subsection{Data Management and Communication}
-\label{subsection:data-management-communication} % Added name and corrected label
-To support real-time tracking and historical analysis, the system employs a combination of in-memory caching and persistent storage solutions:
+\subsection{User Interface and Visualization Needs}
+\label{subsection:user-interface-visualization}
+To deliver actionable insights to users like security officers and facility managers (\ref{section:target-user}), the system must provide an intuitive interface focused on effective visualization of tracking data:
 
 \begin{itemize}[leftmargin=80pt]
-    \item \textbf{Redis:} This in-memory data store caches the latest state for each active global person ID, including current map coordinates, timestamp, last camera ID, and bounding box information. Redis enables rapid lookups for real-time tracking status and visualization.
-    \item \textbf{TimescaleDB:} Built as an extension to PostgreSQL and optimized for time-series data, TimescaleDB stores detailed historical tracking events with timestamps, global IDs, camera IDs, bounding boxes, and map coordinates. Vector support (pgvector) enhances embedding similarity searches for improved re-identification.
-    \item \textbf{WebSocket:} FastAPI's WebSocket implementation facilitates real-time communication between the backend and frontend components. The backend pushes processed frame data including camera ID, timestamp, image URL, and tracking data with global person IDs, bounding boxes, and map coordinates.
-\end{itemize}
-
-\subsection{Frontend Implementation}
-\label{subsection:frontend-implementation} % Added name and corrected label
-The user interface provides intuitive visualization and interaction capabilities to monitor tracked individuals across multiple camera views:
-
-\begin{itemize}[leftmargin=80pt]
-    \item \textbf{React:} This JavaScript library forms the foundation of the user interface components, providing a responsive and component-based architecture that efficiently updates based on state changes.
-    \item \textbf{Zustand:} This lightweight state management solution stores and manages tracking data received via WebSocket, organizing it by camera ID, global person ID, and timestamp for efficient rendering and interaction.
-    \item \textbf{Leaflet.js:} This interactive mapping library visualizes the top-down perspective of tracked individuals, displaying their real-time positions and movement paths on a shared coordinate system derived from the homography transformations.
-    \item \textbf{Canvas/SVG:} These rendering technologies are used to overlay bounding boxes and labels on camera feed images, providing visual identification of tracked individuals within each view.
-\end{itemize}
-
-\subsection{Deployment Infrastructure}
-\label{subsection:deployment-infrastructure} % Added name and corrected label
-The system is designed for containerized deployment with comprehensive monitoring capabilities:
-
-\begin{itemize}[leftmargin=80pt]
-    \item \textbf{Docker:} All system components are containerized for consistent deployment across environments, with the backend requiring GPU access for efficient execution of deep learning models.
-    \item \textbf{Nginx:} Serving as the entry point and reverse proxy, Nginx handles HTTPS termination, request routing, WebSocket proxying, and potential load balancing for scaled backend instances.
-    \item \textbf{Kubernetes:} This container orchestration platform manages, scales, and ensures the reliability of all system services in production environments, with Docker Compose available for simpler development setups.
-    \item \textbf{Prometheus \& Grafana:} This monitoring stack collects and visualizes system metrics including CPU, RAM, and GPU utilization, while Loki and Promtail handle log aggregation and collection for comprehensive system observability.
-\end{itemize}
-
-\subsection{MLOps Workflow}
-\label{subsection:mlops-workflow} % Added name and corrected label
-The machine learning operations workflow supports model development, training, and deployment:
-
-\begin{itemize}[leftmargin=80pt]
-    \item \textbf{MLflow:} This platform provides experiment tracking capabilities for logging parameters, metrics, and artifacts during model development, along with a model registry for versioning and staging trained models.
-    \item \textbf{Dagshub:} Complementing MLflow, this service enhances collaboration on machine learning projects with extended versioning and sharing capabilities for models and datasets.
-    \item \textbf{CI/CD Pipeline:} The system supports continuous integration and deployment for model updates, fetching approved model artifacts from the registry, building new Docker images, and updating running services with minimal downtime.
+    \item \textbf{Multi-Feed Presentation:} The user interface must be designed to display multiple camera feeds concurrently, allowing operators to monitor different areas simultaneously.
+    \item \textbf{Integrated Data Overlay:} Requires the capability to overlay tracking information (such as bounding boxes, persistent IDs, status indicators) directly onto the corresponding camera feeds in a clear and understandable manner.
+    \item \textbf{Spatial Map Display:} A core requirement is the visualization of movement on a unified map (\ref{subsection:main-features}). The interface must display current positions and historical paths of tracked individuals on this map to provide a comprehensive view of movement patterns.
+    \item \textbf{Time-Based Navigation:} Users need the ability to select specific time periods for review and analysis, with controls to navigate through the recorded footage across multiple cameras simultaneously.
+    \item \textbf{Responsive Display Framework:} The frontend component must be built using technologies that support efficient rendering of tracking data and provide a clear presentation suitable for monitoring and analysis tasks.
 \end{itemize}
