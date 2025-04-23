@@ -1,15 +1,9 @@
-% body/aicomponentdesign.tex
 \chapter{AI Component Design}
-\label{chap:ai-component-design}
-
-This chapter details the design and integration of Artificial Intelligence (AI) components within the \usevar{\srsTitle} system. Understanding where AI fits into the overall workflow and the specific goals it aims to achieve is crucial for effective development and evaluation. The following sections outline the analysis, design, implementation, and evaluation considerations for the AI modules.
-
+\label{chap}
 \section{Business Context and AI Integration}
-\label{section:ai-integration-context}
-
+\label{section:business_context} % Changed label to be unique
 \usevar{\srsTitle} tackles the complex challenge of tracking individuals across multiple camera views in environments like campuses and factories. The core task requires recognizing and associating individuals as they move between potentially non-overlapping camera fields, often amidst changing appearances, viewpoints, lighting conditions, and occlusions. This inherent complexity and real-world variability make manual tracking labor-intensive, error-prone, and difficult to address effectively with traditional rule-based programming. Artificial Intelligence is therefore central to \usevar{\srsTitle}, providing the automation necessary to significantly improve this process.
-
-The primary AI-driven workflow resides within the system's backend processing core, orchestrated by a service like FastAPI. This workflow involves several key AI steps:
+The primary AI-driven workflow resides within the system's backend processing core, orchestrated by a service-oriented architecture. This workflow involves several key AI steps:
 \begin{enumerate}
     \item \textbf{Person Detection:} Identifying individuals within each camera frame using high-performance detection models.
     \item \textbf{Intra-Camera Tracking:} Maintaining consistent temporary IDs for detected individuals within a single camera's view over consecutive frames, utilizing robust tracking algorithms.
@@ -17,19 +11,20 @@ The primary AI-driven workflow resides within the system's backend processing co
     \item \textbf{Cross-Camera Re-Identification (Re-ID):} Matching these appearance embeddings across different camera views and time gaps to assign a persistent global identity, linking temporary tracks together.
     \item \textbf{Spatial Mapping:} Transforming the detected location of individuals from the camera's 2D image plane onto a unified top-down map coordinate system using geometric transformation techniques.
 \end{enumerate}
-These AI components perform the essential visual analysis and identity association. Figure \ref{fig:ai-architecture-overview} provides a high-level illustration of this system architecture and the integration points for these AI modules.
-
+These AI components perform the essential visual analysis and identity association. Figure \ref{fig:system_architecture} provides a high-level illustration of this system architecture and the integration points for these AI modules.
 \begin{figure}[!htb] % Use !htb to suggest placement: here, top, bottom
     \centering
     % Use \makebox or adjust width as needed for centering wide figures
     \makebox[\textwidth][c]{
-        \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/architecture.jpg}
+        % Create a dummy black box if the image file is missing
+        \rule{1.0\textwidth}{0.6\textwidth}
+        % Replace the line above with the actual \includegraphics command when the image is available
+        % \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/architecture.jpg}
     }
     \caption{System Architecture Overview Highlighting AI Component Integration}
-    \label{fig:ai-architecture-overview}
+    \label{fig:system_architecture} % Changed label to be unique and descriptive
 \end{figure}
 \clearpage % Ensure figure placement doesn't clash excessively with text
-
 The justification for employing AI stems from the nature of the problem itself:
 \begin{itemize}
     \item \textbf{Complexity Beyond Rules:} Recognizing and matching people under diverse visual conditions involves intricate pattern recognition that surpasses the capabilities of predefined rules. AI models excel at learning these complex patterns directly from data.
@@ -38,13 +33,9 @@ The justification for employing AI stems from the nature of the problem itself:
     \item \textbf{Value Despite Imperfection:} Achieving flawless accuracy in cross-camera tracking is exceptionally difficult due to the inherent ambiguities and challenges (e.g., severe occlusions, drastic appearance changes). However, an AI system achieving high, albeit imperfect, accuracy still delivers significant value. It drastically reduces the manual workload for operators and provides a level of situational awareness unattainable through manual means or simpler systems. Even with occasional errors, such as false positive matches or missed detections, the system's ability to automatically correlate identities across most views aligns with the primary goal of enhancing operational efficiency and speeding up investigations. The objective is a substantial improvement over the baseline, accepting a trade-off where occasional inaccuracies are outweighed by the overall gains in automation and insight.
 \end{itemize}
 
-
-
 \section{Goal Hierarchy}
-\label{section:goal-hierarchy}
-
+\label{section:goal_hierarchy} % Changed label to be unique
 Ensuring the AI components effectively contribute to the overall success of \usevar{\srsTitle} requires aligning goals across multiple levels. This hierarchical approach clarifies the purpose of each component and provides measurable targets for development and evaluation, moving from broad organizational objectives down to specific AI model performance.
-
 \begin{itemize}
     \item \textbf{Organization Level Goals:}
         \begin{itemize}
@@ -54,7 +45,6 @@ Ensuring the AI components effectively contribute to the overall success of \use
             \item Reduce costs associated with manual surveillance monitoring and incident investigation time.
         \end{itemize}
         \textbf{Measurement:} Success at this level is measured via key performance indicators such as reduction in security incidents, faster incident resolution times, documented improvements in space utilization, and potential reduction in monitoring personnel hours.
-
     \item \textbf{System Level Goals (\usevar{\srsTitle}):}
         \begin{itemize}
             \item Provide accurate and continuous tracking of individuals across multiple, potentially non-overlapping, camera views.
@@ -84,16 +74,13 @@ Ensuring the AI components effectively contribute to the overall success of \use
         \textbf{Measurement:} AI model performance is quantified using standard computer vision benchmarks on relevant datasets (like the MTMMC test split), including metrics such as Average Precision (AP), Recall, MOTA, MOTP, IDF1, IDSW, Rank-1 Accuracy, mAP, CMC curves, and coordinate projection error where applicable.
 \end{itemize}
 
-
 \section{Task Requirements Analysis Using AI Canvas}
-\label{section:ai-canvas}
-
+\label{section:task_analysis} % Changed label to be unique
 This section breaks down the core AI task of multi-camera person tracking using the AI Canvas framework to clarify requirements, inputs, outputs, and evaluation criteria.
 
 \subsection{AI Task Requirements}
-\label{subsection:ai-task-requirements}
+\label{subsection:ai_task_reqs} % Changed label to be unique
 The AI components must meet the following requirements within the specified operational environment and constraints:
-
 \begin{itemize}
     \item \textbf{Requirements (REQ):} The fundamental goals the AI must achieve.
         \begin{itemize}
@@ -125,14 +112,11 @@ The AI components must meet the following requirements within the specified oper
         \end{itemize}
 \end{itemize}
 
-
 \subsection{AI Canvas Development}
-\label{subsection:ai-canvas-development}
+\label{subsection:ai_canvas_dev} % Changed label to be unique
 Applying the AI Canvas framework helps to structure the analysis of the primary AI task: assigning a consistent global identity across multiple camera views.
-
 \begin{itemize}
     \item \textbf{Task/Decision Examined:} The core task is to determine if a person detected in one camera view at a certain time is the same individual as a person detected in another (or the same) camera view at a later time. This involves combining detection, tracking, and re-identification.
-
     \item \textbf{Prediction:} The key uncertainty the AI needs to resolve is: "Given appearance features (embedding) extracted from track A in camera X and features from track B in camera Y, what is the probability that A and B represent the same unique individual?"
 
     \item \textbf{Judgment:} Evaluating the correctness of the prediction involves considering the payoffs:
@@ -187,76 +171,57 @@ Applying the AI Canvas framework helps to structure the analysis of the primary 
         \end{itemize}
 \end{itemize}
 
-
 \subsection{Innovation}
-\label{subsection:ai-innovation}
+\label{subsection:innovation} % Changed label to be unique
 While \usevar{\srsTitle} leverages established state-of-the-art AI techniques for tasks like detection, tracking, and re-identification, its core innovation lies in the effective integration and adaptation of these methods to address the specific, challenging problem of robust multi-camera person tracking in complex real-world environments. Many existing solutions excel at single-camera tracking but falter when attempting to maintain identity consistently across non-overlapping views with temporal gaps—precisely the gap \usevar{\srsTitle} aims to fill. The combination of accurate detection, persistent intra-camera tracking, discriminative Re-ID, and unified spatial mapping into a cohesive system designed for practical deployment represents a significant advancement tailored for campus and factory surveillance needs where multi-camera coverage is essential.
 
 \section{User Experience Design with AI}
-\label{section:ai-ux}
-
-Integrating AI effectively into the user experience is paramount for \usevar{\srsTitle}. The user interface, detailed in Section \ref{section:user-interface-design} (Figures \ref{fig:mockup-landing-page} through \ref{fig:mockup-group-view-expanded}), serves as the primary medium through which users interact with the system's AI-driven capabilities for retrospective analysis of recorded video feeds.
-
-The mockups illustrate how AI enhances the user's situational awareness. In the Group View (Figure \ref{fig:mockup-group-view}), the unified map displaying individual tracking paths is a direct result of the AI's ability to perform detection (Faster R-CNN), cross-camera re-identification (OSNet features + association logic), and spatial mapping (Homography via OpenCV). This provides an immediate overview of movement across the monitored space. Similarly, the Expanded Group View (Figure \ref{fig:mockup-group-view-expanded}) leverages AI to display bounding boxes with consistent global IDs overlaid on camera feeds and list currently tracked individuals with their associated cropped images. The capability for a user to select and focus tracking on a specific person relies heavily on the AI backend maintaining that individual's persistent `GlobalPersonID` across different camera views and time gaps.
-
-The primary interaction style employed is a combination of **Automation** and **Annotation**:
-
+\label{section:ux_design} % Changed label to be unique
+Integrating AI effectively into the user experience is paramount for \usevar{\srsTitle}. The user interface, detailed in Section \ref{section} (Figures \ref{fig} through \ref{fig}), serves as the primary medium through which users interact with the system's AI-driven capabilities for retrospective analysis of recorded video feeds.
+The mockups illustrate how AI enhances the user's situational awareness. In the Group View (Figure \ref{fig:mockup-group-view}), the unified map displaying individual tracking paths is a direct result of the AI's ability to perform detection, cross-camera re-identification, and spatial mapping. This provides an immediate overview of movement across the monitored space. Similarly, the Expanded Group View (Figure \ref{fig:mockup-group-view-expanded}) leverages AI to display bounding boxes with consistent global IDs overlaid on camera feeds and list currently tracked individuals with their associated cropped images. The capability for a user to select and focus tracking on a specific person relies heavily on the AI backend maintaining that individual's persistent GlobalPersonID across different camera views and time gaps.
+The primary interaction style employed is a combination of Automation and Annotation:
 \begin{itemize}
-    \item \textbf{Automation:} The core AI pipeline—detecting individuals, maintaining intra-camera tracks (e.g., using ByteTrack embedded within the detection/tracking model), conditionally extracting features (OSNet), performing re-identification to assign or retrieve global IDs, and projecting locations onto the map—operates automatically in the backend (FastAPI orchestrator) as it processes the selected video data sequentially from the source (e.g., S3). Users initiate the analysis by selecting the time range and cameras (Figure \ref{fig:mockup-landing-page-datetime}), but do not need to manually trigger each step of the detection or Re-ID process.
-
+    \item \textbf{Automation:} The core AI pipeline—detecting individuals, maintaining intra-camera tracks, conditionally extracting features, performing re-identification to assign or retrieve global IDs, and projecting locations onto the map—operates automatically in the backend as it processes the selected video data sequentially from the source. Users initiate the analysis by selecting the time range and cameras (Figure \ref{fig}), but do not need to manually trigger each step of the detection or Re-ID process.
     \item \textbf{Annotation:} The AI's outputs serve to annotate the raw visual data presented to the user. Bounding boxes and assigned `GlobalPersonID` labels are overlaid directly onto the camera feeds in the frontend (Figure \ref{fig:mockup-group-view-expanded}). Furthermore, the calculated map coordinates derived from perspective transformation are used to draw trajectories and current positions on the unified map (Figure \ref{fig:mockup-group-view}), providing enriched context and spatial understanding that wouldn't exist with raw video alone.
 \end{itemize}
-
-While the current UI design (Figures \ref{fig:mockup-landing-page}-\ref{fig:mockup-group-view-expanded}) does not include explicit mechanisms for users to provide real-time feedback directly on AI predictions within the interface (e.g., correcting a misidentification or confirming a correct match), feedback is crucial for system improvement. Analysis of tracking errors, potentially flagged during operational use or specific testing phases using the MTMMC dataset, will be collected offline. This feedback informs the continuous learning cycle (as mentioned in Section \ref{subsubsection:continuous-learning}), guiding hyperparameter tuning (e.g., Re-ID similarity thresholds), identifying challenging scenarios (like specific lighting conditions or difficult handoffs between cameras as described in Section \ref{section:ai-canvas}), and potentially triggering model retraining efforts to enhance accuracy over time.
-
-The integration of AI fundamentally transforms the utility of the surveillance system compared to non-AI approaches or simpler single-camera tracking systems. Without AI, security personnel would face the overwhelming and error-prone task of manually monitoring numerous feeds, attempting to correlate individuals across disparate views – a process that is inefficient and often fails, especially in complex environments with many cameras and potential blind spots (as outlined in Section \ref{section:background}). \usevar{\srsTitle}'s AI components automate this complex cognitive task. By automatically detecting, tracking, and re-identifying individuals across the entire camera network and presenting this information cohesively through annotated feeds and a unified spatial map, the system significantly reduces operator workload, enables faster incident response and investigation (addressing needs in \ref{userstory:1}, \ref{userstory:5}), facilitates better understanding of movement patterns for facility management (\ref{userstory:3}), and provides a level of comprehensive situational awareness previously unattainable through manual observation alone.
+While the current UI design (Figures \ref{fig}-\ref{fig}) does not include explicit mechanisms for users to provide real-time feedback directly on AI predictions within the interface (e.g., correcting a misidentification or confirming a correct match), feedback is crucial for system improvement. Analysis of tracking errors, potentially flagged during operational use or specific testing phases using the MTMMC dataset, will be collected offline. This feedback informs the continuous learning cycle (as mentioned in Section \ref{subsubsection}), guiding hyperparameter tuning (e.g., Re-ID similarity thresholds), identifying challenging scenarios (like specific lighting conditions or difficult handoffs between cameras as described in Section \ref{section}), and potentially triggering model retraining efforts to enhance accuracy over time.
+The integration of AI fundamentally transforms the utility of the surveillance system compared to non-AI approaches or simpler single-camera tracking systems. Without AI, security personnel would face the overwhelming and error-prone task of manually monitoring numerous feeds, attempting to correlate individuals across disparate views – a process that is inefficient and often fails, especially in complex environments with many cameras and potential blind spots (as outlined in Section \ref{section}). \usevar{\srsTitle}'s AI components automate this complex cognitive task. By automatically detecting, tracking, and re-identifying individuals across the entire camera network and presenting this information cohesively through annotated feeds and a unified spatial map, the system significantly reduces operator workload, enables faster incident response and investigation (addressing needs in \ref{userstory:1}, \ref{userstory:5}), facilitates better understanding of movement patterns for facility management (\ref{userstory:3}), and provides a level of comprehensive situational awareness previously unattainable through manual observation alone.
 
 \section{Deployment Strategy}
-\label{section:ai-deployment}
-
+\label{section:deployment} % Changed label to be unique
 This section outlines the strategy for deploying the AI components of the \usevar{\srsTitle} system and integrating them within the overall software architecture to ensure a robust and scalable solution.
 
 \subsection{Deployment Plan}
-\label{subsection:deployment-plan}
-
+\label{subsection:deployment_plan} % Changed label to be unique
 \begin{itemize}
     \item \textbf{Deployment Location:}
-        The AI components, specifically the object detection (Faster R-CNN) and re-identification (OSNet) models, are integrated directly within the system's core \textbf{Backend} service. This Backend service, along with the entire system infrastructure (Frontend server, databases, caching, reverse proxy), is designed to be deployed in a \textbf{Cloud} environment. This approach leverages cloud scalability and managed services, facilitating access to necessary computational resources (including potential GPU instances for the Backend) and centralized data storage (AWS S3 for image data).
-
+        The AI components, specifically the object detection and re-identification models, are integrated directly within the system's core \textbf{Backend} service. This Backend service, along with the entire system infrastructure (Frontend server, databases, caching, reverse proxy), is designed to be deployed in a \textbf{Cloud} environment. This approach leverages cloud scalability and managed services, facilitating access to necessary computational resources (including potential GPU instances for the Backend) and centralized data storage for image data.
     \item \textbf{AI Communication with System Components:}
-        The AI models (Faster R-CNN, OSNet) run embedded within the Python-based FastAPI Backend process. Communication between the AI logic and other system parts occurs as follows:
+        The AI models run embedded within the Backend process. Communication between the AI logic and other system parts occurs as follows:
         \begin{itemize}
-            \item \textbf{Internal Calls:} The main FastAPI application logic directly invokes the PyTorch models (loaded in memory) for detection, tracking, and feature extraction using standard Python function calls. Image preprocessing is handled internally using OpenCV.
-            \item \textbf{Backend to Data Storage/Cache:} The Backend interacts with Redis (for real-time state caching and Re-ID gallery lookups) and TimescaleDB/PostgreSQL (for storing historical tracking events and embeddings) through standard database client libraries within the Python environment.
-            \item \textbf{Backend to Frontend (Real-time):} Processed tracking results, including AI-generated bounding boxes, global IDs, and map coordinates, are pushed from the FastAPI Backend to the React Frontend using \textbf{WebSocket} connections. This allows for real-time visualization updates on the user interface. The WebSocket connection is managed by FastAPI and proxied through Nginx.
-            \item \textbf{Frontend to Backend (Control/Queries):} User interactions triggering playback control (start, stop, seek) or requests for historical/analytical data are sent from the React Frontend to the FastAPI Backend primarily via \textbf{RESTful APIs} (implicitly provided by FastAPI for specific endpoints) or potentially dedicated messages over the established WebSocket connection. All external communication first passes through the Nginx reverse proxy.
+            \item \textbf{Internal Calls:} The main application logic directly invokes the models (loaded in memory) for detection, tracking, and feature extraction using standard function calls. Image preprocessing is handled internally using computer vision libraries.
+            \item \textbf{Backend to Data Storage/Cache:} The Backend interacts with in-memory systems (for real-time state caching and Re-ID gallery lookups) and databases (for storing historical tracking events and embeddings) through standard client libraries.
+            \item \textbf{Backend to Frontend (Real-time):} Processed tracking results, including AI-generated bounding boxes, global IDs, and map coordinates, are pushed from the Backend to the Frontend using \textbf{WebSocket} connections. This allows for real-time visualization updates on the user interface. The WebSocket connection is managed by the Backend and proxied through the web server.
+            \item \textbf{Frontend to Backend (Control/Queries):} User interactions triggering playback control (start, stop, seek) or requests for historical/analytical data are sent from the Frontend to the Backend primarily via \textbf{RESTful APIs} or potentially dedicated messages over the established WebSocket connection. All external communication first passes through the reverse proxy.
         \end{itemize}
 
     \item \textbf{Tools and Frameworks Used:}
-        The deployment relies on the following key technologies as described in the system architecture:
-        \begin{itemize}
-            \item \textit{Containerization \& Orchestration:} \textbf{Docker} for containerizing all services (Backend, Frontend server, Databases, etc.), and \textbf{Kubernetes} or \textbf{Docker Compose} for orchestrating the deployment and management of these containers.
-            \item \textit{Backend Framework:} \textbf{FastAPI} (Python) serves as the core backend framework, hosting the API endpoints, WebSocket logic, and orchestrating the AI processing pipeline.
-            \item \textit{AI Models \& Libraries:} \textbf{PyTorch} as the deep learning framework, with specific models like \textbf{Faster R-CNN} (for detection/tracking) and \textbf{OSNet} (for Re-ID). \textbf{OpenCV} is used for image manipulation.
-            \item \textit{Frontend Framework \& State Management:} \textbf{React} for building the user interface and \textbf{Zustand} for managing frontend state.
-            \item \textit{Data Storage \& Caching:} \textbf{AWS S3} for raw image data storage, \textbf{Redis} for caching, and \textbf{TimescaleDB} (built on \textbf{PostgreSQL}) for historical time-series tracking data.
-            \item \textit{Reverse Proxy:} \textbf{Nginx} acts as the entry point, handling request routing, load balancing (if scaled), serving static frontend files, and proxying WebSocket connections.
-            \item \textit{Monitoring \& Logging:} \textbf{Prometheus} for metrics collection, \textbf{Loki} for log aggregation (with agents like \textbf{Promtail}), and \textbf{Grafana} for visualization dashboards.
-        \end{itemize}
+        The deployment relies on key technologies for containerization, orchestration, backend and frontend frameworks, AI libraries, data storage, caching, reverse proxy, and monitoring systems. These technologies align with modern cloud-native deployment practices, ensuring scalability, maintainability, and efficient resource utilization.
 
     \item \textbf{System Qualities (Reliability, Security, Maintainability, Scalability):}
         The deployment strategy incorporates several elements to ensure key system qualities:
         \begin{itemize}
-            \item \textit{Reliability:} Container orchestration (Kubernetes/Compose) enables automatic restarts of failed containers. The monitoring stack (Prometheus, Grafana, Loki) provides visibility into system health, allowing for proactive issue detection and resolution. Redundancy can be built into the database and caching layers depending on cloud provider options and configuration.
-            \item \textit{Security:} The \textbf{Nginx} reverse proxy acts as a single entry point, allowing for centralized implementation of security measures like HTTPS termination, rate limiting, and access controls. Containerization isolates services, reducing the attack surface. Network policies within the orchestrator (Kubernetes) can further restrict communication between services. Secure access to AWS S3 and databases relies on proper IAM roles and credentials management.
-            \item \textit{Maintainability:} Containerization with \textbf{Docker} ensures consistent environments across development, testing, and production, simplifying updates and dependency management. Defining infrastructure as code (e.g., Docker Compose files, Kubernetes manifests) makes the deployment reproducible and easier to modify. The modular architecture with clear service boundaries (Frontend, Backend, Database, Cache) aids in isolating and managing components. Centralized logging (Loki) and metrics (Prometheus) simplify troubleshooting.
-            \item \textit{Scalability:} Deploying in the \textbf{Cloud} provides access to scalable resources. \textbf{Kubernetes} (or potentially Docker Swarm with Compose) allows for horizontal scaling of stateless services like the FastAPI Backend and the Nginx proxy by running multiple container instances behind a load balancer (handled by Nginx or the orchestrator's ingress controller). The database (TimescaleDB) and cache (Redis) can often be scaled independently using cloud provider services or specific clustering features. The processing pipeline itself, handling data sequentially, can be parallelized across multiple cameras if backend resources allow or scaled horizontally if processing independent time chunks is feasible.
+            \item \textit{Reliability:} Container orchestration enables automatic restarts of failed containers. The monitoring stack provides visibility into system health, allowing for proactive issue detection and resolution. Redundancy can be built into the database and caching layers depending on cloud provider options and configuration.
+            \item \textit{Security:} The reverse proxy acts as a single entry point, allowing for centralized implementation of security measures like HTTPS termination, rate limiting, and access controls. Containerization isolates services, reducing the attack surface. Network policies within the orchestrator can further restrict communication between services. Secure access to storage resources and databases relies on proper access management and credentials handling.
+            \item \textit{Maintainability:} Containerization ensures consistent environments across development, testing, and production, simplifying updates and dependency management. Defining infrastructure as code makes the deployment reproducible and easier to modify. The modular architecture with clear service boundaries (Frontend, Backend, Database, Cache) aids in isolating and managing components. Centralized logging and metrics simplify troubleshooting.
+            \item \textit{Scalability:} Deploying in the \textbf{Cloud} provides access to scalable resources. Container orchestration allows for horizontal scaling of stateless services like the Backend and the web proxy by running multiple container instances behind a load balancer. The database and cache can often be scaled independently using cloud provider services or specific clustering features. The processing pipeline itself, handling data sequentially, can be parallelized across multiple cameras if backend resources allow or scaled horizontally if processing independent time chunks is feasible.
         \end{itemize}
 \end{itemize}
 
 \subsection{Proof of Concept}
+\label{subsection:poc} % Changed label to be unique
 % Content to be added later
 
 \section{(Optional) Reflection and Future Development}
-\label{section:ai-reflection}
+\label{section:reflection} % Changed label to be unique
 % Content to be added later
