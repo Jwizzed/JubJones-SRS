@@ -15,7 +15,6 @@ The primary AI-driven workflow resides within the system's backend processing co
 These AI components perform the essential visual analysis and identity association. Figure \ref{fig:system_architecture} provides a high-level illustration of this system architecture and the integration points for these AI modules.
 \begin{figure}[!htb] % Use !htb to suggest placement: here, top, bottom
     \centering
-
     \makebox[\textwidth][c]{
         \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/architecture.jpg}
     }
@@ -115,7 +114,6 @@ The AI components must meet the following requirements within the specified oper
 Applying the AI Canvas framework helps to structure the analysis of the primary AI task: assigning a consistent global identity across multiple camera views.
 \begin{figure}[!htb] % Use !htb to suggest placement: here, top, bottom
     \centering
-
     \makebox[\textwidth][c]{
         \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/ai_canvas.jpg}
     }
@@ -178,9 +176,492 @@ Applying the AI Canvas framework helps to structure the analysis of the primary 
         \end{itemize}
 \end{itemize}
 
+\subsubsection{ML Canvas Design}
+\label{subsubsection:ml_canvas_design}
+Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specifically tailored for the Intelligent Multi-Camera Person Tracking and Analytics System. This canvas provides a detailed blueprint for the ML components, building upon the general AI task analysis.
+
+\begin{figure}[!htb]
+    \centering
+    \makebox[\textwidth][c]{
+        \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/ml_canvas.jpg}
+    }
+    \caption{ML Canvas for Intelligent Multi-Camera Person Tracking and Analytics System}
+    \label{fig:ml_canvas}
+\end{figure}
+\clearpage
+
+\begin{itemize}
+    \item \textbf{Problem Statement \& Business Objectives (ML Canvas):}
+        The system directly addresses the significant challenges security and facility personnel face in tracking individuals across complex, multi-camera environments. It tackles the limitations of manual monitoring—its labor intensity, error propensity, and fragmented views—and the core technical hurdle of maintaining consistent identity (Re-Identification) despite variations in appearance, lighting, occlusions, and camera viewpoints. The overarching business objectives are to enhance safety, improve operational efficiency by automating tracking, provide unified spatial visualization of movement, reduce incident investigation time, and optimize resource allocation based on analytics.
+
+    \item \textbf{Input Data Requirements (ML Canvas):}
+        The necessary components for the system primarily involve recorded RGB video feeds or image sequences from multiple cameras, initially using datasets like MTMMC stored on AWS S3. These inputs encapsulate real-world challenges such as diverse lighting, occlusions, crowds, and viewpoint changes. Crucially, pre-calculated camera calibration data (Homography matrices) are also specified as essential inputs for spatial mapping. The large-scale data volume and standard formats (e.g., JPG, config files) are acknowledged requirements.
+
+    \item \textbf{Processing Approach \& Model Selection (ML Canvas):}
+        Central to the design is a backend-driven batch processing pipeline orchestrated by FastAPI. This pipeline integrates key AI steps in sequence:
+        \begin{enumerate}[label=(\Alph*)]
+            \item Person Detection, utilizing Faster R-CNN for robust object localization.
+            \item Intra-Camera Tracking, employing algorithms like BotSort to maintain temporary IDs within single camera views.
+            \item Conditional Feature Extraction for Re-ID, using CLIP to generate discriminative embeddings under specific triggers.
+            \item Cross-Camera Re-Identification, which compares embeddings against a gallery (managed via Redis/TimescaleDB) to assign persistent GlobalPersonIDs.
+            \item Spatial Mapping, applying the input homography matrices via OpenCV to project detected locations onto a unified map.
+        \end{enumerate}
+        The justifications for each model choice emphasize accuracy, robustness, and efficiency.
+
+    \item \textbf{Expected Outputs (ML Canvas):}
+        The system's outputs encompass both user-facing visualizations and stored data for analysis.
+        \begin{itemize}
+            \item \textit{For the UI:} Annotated video feeds displaying bounding boxes and GlobalPersonIDs, alongside a unified map interface showing current locations and historical paths. These are delivered via WebSocket JSON payloads.
+            \item \textit{For historical analysis:} Structured tracking events (timestamp, IDs, coordinates, optional embeddings) stored in a TimescaleDB database.
+        \end{itemize}
+
+    \item \textbf{Success Criteria \& Evaluation Metrics (ML Canvas):}
+        A dual approach to measuring performance is outlined:
+        \begin{itemize}
+            \item \textit{AI Model-Level Metrics (Offline Evaluation):} Specific metrics such as AP (Average Precision), MOTA (Multiple Object Tracking Accuracy), IDF1 (ID F1-Score), Rank-1 accuracy, and mAP (mean Average Precision) using dedicated test sets.
+            \item \textit{System and Business-Level Metrics (Online/Operational Assessment):} Critical indicators including efficiency gains, reduction in incident investigation response time, user satisfaction levels, task completion rates for key scenarios, and overall system reliability.
+        \end{itemize}
+\end{itemize}
+This detailed ML Canvas provides a comprehensive blueprint for the development and evaluation of this intelligent surveillance system, specifying the concrete choices and flows for the machine learning pipeline.
+
+
 \subsection{Innovation}
-\label{subsection:innovation} % Kept original unique label
+\label{subsection:innovation}
 While \usevar{\srsTitle} leverages established state-of-the-art AI techniques for tasks like detection, tracking, and re-identification, its core innovation lies in the effective integration and adaptation of these methods to address the specific, challenging problem of robust multi-camera person tracking in complex real-world environments. Many existing solutions excel at single-camera tracking but falter when attempting to maintain identity consistently across non-overlapping views with temporal gaps—precisely the gap \usevar{\srsTitle} aims to fill. The combination of accurate detection, persistent intra-camera tracking, discriminative Re-ID, and unified spatial mapping into a cohesive system designed for practical deployment represents a significant advancement tailored for campus and factory surveillance needs where multi-camera coverage is essential.
+
+
+\section{AI Model Development, Training, and Evaluation}
+\label{section:ai_model_dev_train_eval}
+
+This section details the core AI model development lifecycle, including training procedures, fairness analysis, comparative experimentation for model selection, and methods for model interpretability.
+
+\subsection{Model Training Implementation}
+\label{subsection:model_training_impl}
+This subsection details the implementation process for training the person detection model (Faster R-CNN) for the Intelligent Multi-Camera Person Tracking and Analytics System. The implementation utilizes PyTorch and TorchVision, leveraging pre-trained weights and fine-tuning on the MTMMC dataset. MLflow is used for tracking experiments and results.
+
+\textbf{Basic Input Data Exploration \& Preprocessing Functions:}
+
+\textit{Data Exploration:} An initial Exploratory Data Analysis (EDA) was performed (detailed separately, referencing \texttt{src/pipelines/eda\_pipeline.py} and \texttt{configs/eda\_config.yaml}). This explored aspects like dataset structure, frame counts per camera, annotation distributions (bounding box sizes, track lengths), and performed quality checks (missing GT, invalid annotations, frame count mismatches, out-of-bounds boxes, image dimension consistency). The provided EDA summary artifact confirms key preprocessing parameters.
+
+\textit{Data Types \& Basic Statistics:}
+\begin{itemize}
+    \item Images are loaded as NumPy arrays (BGR format) using OpenCV (\texttt{cv2.imdecode}).
+    \item Annotations are loaded from \texttt{gt.txt} files and initially processed as tuples (obj\_id, cx, cy, w, h).
+    \item The EDA summary indicates original image dimensions are consistently 1920x1080 pixels in the sampled data.
+\end{itemize}
+
+\textit{Preprocessing Pipeline (\texttt{src/data/training\_dataset.py}, \texttt{src/training/runner.py -> get\_transform}):}
+\begin{itemize}
+    \item Loading: Images and annotations are loaded per frame per camera using \texttt{MTMMCDetectionDataset}.
+    \item Color Conversion: Images are converted from BGR to RGB format suitable for TorchVision models.
+    \item Resizing: Images are resized to a target input width (e.g., 640 pixels, as specified in \texttt{configs/eda\_config.yaml} and confirmed by the EDA summary artifact) while maintaining the aspect ratio. The EDA summary shows this results in resized dimensions of 640x360.
+    \item ToTensor \& Scaling: Images are converted to PyTorch Tensors (\texttt{torch.float32}) and pixel values are scaled to the range [0.0, 1.0].
+    \item Normalization: Standard ImageNet normalization is applied using mean [0.485, 0.456, 0.406] and standard deviation [0.229, 0.224, 0.225] (confirmed by EDA summary artifact).
+    \item Augmentation (Training Only): Random horizontal flipping (p=0.5) is applied during training (\texttt{get\_transform(train=True)}).
+    \item Target Formatting: Ground truth bounding boxes (cx, cy, w, h) are converted to the XYXY format ([xmin, ymin, xmax, ymax]) expected by Faster R-CNN. Labels are assigned (class ID 1 for 'person'). Both boxes and labels are wrapped in \texttt{tv\_tensors} (specifically \texttt{tv\_tensors.BoundingBoxes}) for compatibility with TorchVision's v2 transforms.
+    \item Collation: A custom \texttt{collate\_fn} (\texttt{src/utils/torch\_utils.py}) is used by the DataLoader to handle batches, ensuring images are grouped as a list of tensors and targets remain a list of dictionaries.
+\end{itemize}
+
+\textbf{Model Architecture Definition:}
+
+\textit{Model Choice:} The selected model is Faster R-CNN with a ResNet-50 backbone and Feature Pyramid Network (FPN), obtained from \texttt{torchvision.models.detection.fasterrcnn\_resnet50\_fpn}.
+
+\textit{Architecture Overview:} Faster R-CNN is a two-stage object detector.
+\begin{itemize}
+    \item Stage 1 (Region Proposal Network - RPN): Scans the feature map (from ResNet-50 + FPN) to propose candidate regions (regions of interest - RoIs) that might contain objects.
+    \item Stage 2 (RoI Head): Extracts features for each proposed RoI using RoIAlign and performs classification (object vs. background, or specific object classes) and bounding box regression to refine the box coordinates.
+\end{itemize}
+
+\textit{Pre-trained Weights:} The model is initialized using pre-trained weights from ImageNet (specifically \texttt{FasterRCNN\_ResNet50\_FPN\_Weights.DEFAULT} as specified in \texttt{fasterrcnn\_training\_config.yaml}).
+
+\textit{Head Modification (\texttt{src/training/runner.py -> get\_fasterrcnn\_model}):} The pre-trained classification head (box predictor) is replaced with a new \texttt{FastRCNNPredictor} instance. This new head is configured for the specific number of classes required for this task: 2 (Person + Background), as defined in \texttt{fasterrcnn\_training\_config.yaml}.
+
+\textit{Fine-tuning:} The number of trainable layers in the ResNet-50 backbone can be configured via \texttt{trainable\_backbone\_layers} (set to 3 in the config), allowing for fine-tuning deeper parts of the network.
+
+\textbf{Training Loop \& Hyperparameters:}
+
+\textit{Orchestration:} The training process is orchestrated by \texttt{src/run\_training\_fasterrcnn.py}, which loads the configuration (\texttt{configs/fasterrcnn\_training\_config.yaml}), sets up MLflow, and calls \texttt{src/training/runner.py} (\texttt{run\_single\_training\_job}).
+
+\textit{Engine:} The core training and validation logic resides in the PyTorch engine (\texttt{src/training/pytorch\_engine.py}).
+
+\textit{Hyperparameters (from \texttt{configs/fasterrcnn\_training\_config.yaml}):}
+\begin{itemize}
+    \item epochs: 5 (Note: This is low, indicative of a sample run).
+    \item batch\_size: 2.
+    \item optimizer: AdamW.
+    \item learning\_rate: 0.001 (initial).
+    \item weight\_decay: 0.005.
+    \item lr\_scheduler: StepLR (decays LR by gamma=0.1 every step\_size=3 epochs).
+    \item gradient\_clip\_norm: 1.0 (Max gradient norm for clipping).
+\end{itemize}
+
+\textit{Loss Calculation:} The standard Faster R-CNN loss components (RPN classification, RPN regression, RoI head classification, RoI head regression) are calculated internally by the TorchVision model during the forward pass. The \texttt{train\_one\_epoch} function sums these component losses for backpropagation.
+
+\textit{Device:} Training runs on the device selected via the configuration ('auto', 'cuda', 'cpu', etc.), resolved using \texttt{src/utils/device\_utils.py}.
+
+\textit{Mixed Precision:} Automatic Mixed Precision (AMP) is enabled via \texttt{torch.cuda.amp.GradScaler} when training on CUDA devices to potentially speed up training and reduce memory usage.
+
+\textit{Checkpointing:} Model checkpoints (including model state, optimizer state, epoch, and validation metrics) are saved after each epoch. The best-performing checkpoint based on a specified validation metric (\texttt{val\_map\_50} in the config) is also saved separately. Checkpoints are stored under a directory specified in the config (checkpoints), organized by run ID.
+
+\textbf{Validation Methodology:}
+
+\textit{Data Split:} The \texttt{MTMMCDetectionDataset} performs a random split of the loaded (and potentially subsetted) data into training and validation sets based on the \texttt{val\_split\_ratio} (0.2 or 20\% in the config).
+
+\textit{Frequency:} Validation is performed at the end of each training epoch using the \texttt{evaluate} function in \texttt{src/training/pytorch\_engine.py}.
+
+\textit{Metrics:}
+\begin{itemize}
+    \item Validation Loss: The average loss across all validation batches is calculated.
+    \item Mean Average Precision (mAP): Standard COCO-style mAP metrics (\texttt{mAP@[.5:.95]}, \texttt{mAP@.50}, \texttt{mAP@.75}) and Mean Average Recall (MAR) metrics are calculated using \texttt{torchmetrics.detection.MeanAveragePrecision}. The evaluation uses the configured \texttt{person\_class\_id} (1 for the PyTorch model) to identify relevant detections and ground truth.
+\end{itemize}
+
+\textbf{Results Analysis (Initial Sample Run):}
+
+\textit{Disclaimer:} The following results are from an initial sample fine-tuning run. As specified in \texttt{fasterrcnn\_training\_config.yaml}, this run used only a fraction of the available data (\texttt{use\_data\_subset: true}, \texttt{data\_subset\_fraction: 0.1}) and ran for a limited number of epochs (\texttt{epochs: 5}). A full training process would require using the complete dataset, significantly more epochs, and potentially further hyperparameter optimization.
+
+\begin{table}[!htb]
+    \centering
+    \caption{Initial Sample Run Results for Faster R-CNN Fine-tuning}
+    \label{tab:fasterrcnn_sample_results}
+    \begin{tabular}{@{}lc@{}}
+        \toprule
+        Metric                      & Value   \\ \midrule
+        \texttt{eval\_map}           & 0.6522  \\
+        \texttt{eval\_map\_50}        & 0.8954  \\
+        \texttt{eval\_map\_75}        & 0.7522  \\
+        \texttt{eval\_map\_small}     & 0.3798  \\
+        \texttt{eval\_map\_medium}    & 0.6751  \\
+        \texttt{eval\_map\_large}     & 0.8463  \\
+        \texttt{eval\_mar\_1}         & 0.4318  \\
+        \texttt{eval\_mar\_10}        & 0.7013  \\
+        \texttt{eval\_mar\_100}       & 0.7088  \\
+        \texttt{eval\_mar\_small}     & 0.4132  \\
+        \texttt{eval\_mar\_medium}    & 0.7241  \\
+        \texttt{eval\_mar\_large}     & 0.8730  \\
+        \texttt{eval\_ap\_person}     & -1.0    \\
+        \texttt{val\_loss\_classifier}& 0.0360  \\
+        \texttt{val\_loss\_box\_reg}  & 0.1029  \\
+        \texttt{val\_loss\_objectness}& 0.0417  \\
+        \texttt{val\_loss\_rpn\_box\_reg}& 0.0472  \\
+        \texttt{val\_total\_loss}     & 0.2278  \\
+        \texttt{train\_total\_loss}   & 0.2260  \\ \bottomrule
+    \end{tabular}
+\end{table}
+
+\textit{Interpretation (Preliminary):}
+\begin{itemize}
+    \item The overall mAP (0.6522) suggests the model learned effectively even on the small subset and few epochs.
+    \item The high \texttt{mAP@.50} (0.8954) indicates good performance at detecting persons with reasonable overlap, while the \texttt{mAP@.75} (0.7522) shows decent localization accuracy.
+    \item Training and validation losses (0.226 vs 0.228) are very close, suggesting no significant overfitting occurred during this short run on the data subset.
+    \item The \texttt{eval\_ap\_person} metric is -1.0, indicating it wasn't successfully calculated or reported in this specific run. This could be due to various reasons, including potential misconfiguration in the metric calculation step for per-class AP, or insufficient examples of the 'person' class in the validation subset.
+    \item These results are promising for a baseline but require comprehensive training on the full dataset for robust evaluation and deployment.
+\end{itemize}
+
+\textbf{Unit Testing:}
+\textit{Purpose:} To validate key functionality within the training pipeline components, unit tests were implemented using pytest. These tests focus on isolating and verifying the behaviour of individual functions and classes.
+
+\textit{Test Structure:} Tests are organized within the \texttt{tests/} directory, mirroring the \texttt{src/} structure (e.g., \texttt{tests/data}, \texttt{tests/evaluation}, \texttt{tests/training}, \texttt{tests/utils}). pytest fixtures defined in \texttt{tests/conftest.py} (e.g., \texttt{mock\_fasterrcnn\_config}, \texttt{cpu\_device}, \texttt{mock\_project\_root}) provide standardized mock data and configurations for the tests.
+
+\textit{Key Areas Tested:}
+\begin{itemize}
+    \item Dataset (\texttt{tests/data/test\_training\_dataset.py}):
+    \begin{itemize}
+        \item Verifies the \texttt{MTMMCDetectionDataset}'s \texttt{\_\_getitem\_\_} method correctly loads image data and formats annotations (including empty annotations) into the required \texttt{tv\_tensors} structure (e.g., \texttt{BoundingBoxes} in XYXY format).
+        \item Uses mocking (\texttt{unittest.mock.patch}) to isolate the dataset class from actual file system reads (\texttt{Path.is\_file}, \texttt{np.fromfile}, \texttt{cv2.imdecode}) and the initial data loading scan (\texttt{\_load\_data\_samples}).
+        \item Tests the \texttt{get\_transform} utility function to ensure correct transforms are applied for training vs. validation modes.
+    \end{itemize}
+    \item Metrics (\texttt{tests/evaluation/test\_metrics.py}):
+    \begin{itemize}
+        \item Validates the interface and basic flow of the \texttt{compute\_map\_metrics} function.
+        \item Mocks the \texttt{torchmetrics.detection.MeanAveragePrecision} class to simulate metric calculation without requiring the actual library or extensive data.
+        \item Asserts that the \texttt{update} and \texttt{compute} methods of the mocked metric object are called correctly and that the results dictionary has the expected structure.
+        \item Tests are skipped (\texttt{pytest.mark.skipif}) if \texttt{torchmetrics} is not installed.
+    \end{itemize}
+    \item Training Runner (\texttt{tests/training/test\_runner.py}):
+    \begin{itemize}
+        \item Tests the \texttt{get\_fasterrcnn\_model} function responsible for loading the Faster R-CNN model.
+        \item Mocks the underlying \texttt{torchvision.models.detection.fasterrcnn\_resnet50\_fpn} function and weights enum to ensure the correct pre-trained weights and \texttt{trainable\_backbone\_layers} are requested.
+        \item Verifies that the model's classification head (box predictor) is replaced, a key step in fine-tuning.
+    \end{itemize}
+    \item Utilities (\texttt{tests/utils/test\_torch\_utils.py}):
+    \begin{itemize}
+        \item Tests the \texttt{collate\_fn} to ensure it correctly batches image tensors and target dictionaries, including handling empty targets.
+        \item Tests the \texttt{get\_optimizer} factory function to confirm it returns the correct optimizer instances (e.g., AdamW, SGD) based on the name provided.
+        \item Tests the \texttt{get\_lr\_scheduler} factory function to verify it returns the appropriate scheduler instances (e.g., StepLR, CosineAnnealingLR) or None for unsupported names.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Model Fairness Analysis}
+\label{subsection:model_fairness_analysis}
+Ensuring fairness in AI systems is critical, especially in security and surveillance applications where biases can lead to disproportionately negative outcomes for certain groups. While a full quantitative fairness audit requires specific demographic ground truth data often unavailable in datasets like MTMMC, we can analyze potential biases and discuss mitigation strategies relevant to the Intelligent Multi-Camera Person Tracking and Analytics System.
+
+\textbf{1. Potential Sources of Bias in Training Data (MTMMC Dataset)}
+The MTMMC dataset, while valuable for its scale and real-world complexity, may contain inherent biases that could influence model performance:
+\begin{itemize}
+    \item Demographic Imbalance:
+    \begin{itemize}
+        \item \textit{Geographic/Ethnic Bias:} Collected at a specific campus (KAIST) and factory in Korea, the dataset likely features a population predominantly of East Asian descent. Models trained on this data might exhibit lower performance (e.g., lower detection recall or Re-ID accuracy) for individuals from underrepresented ethnicities or races.
+        \item \textit{Age/Gender Bias:} The distribution of age groups and genders within the campus/factory setting might not reflect broader population distributions. If certain groups are less frequent, the model may learn less robust features for them.
+        \item \textit{Clothing Style Bias:} Campus environments often have common clothing styles (e.g., student attire). The model might struggle with less common or culturally specific attire not well-represented in the training data, potentially impacting Re-ID.
+    \end{itemize}
+    \item Environmental \& Situational Bias:
+    \begin{itemize}
+        \item \textit{Lighting Conditions:} While diverse, if certain lighting conditions (e.g., very low light, harsh shadows, specific times of day) are underrepresented compared to well-lit scenarios, the detection and Re-ID models might perform unfairly worse under those specific conditions.
+        \item \textit{Camera Viewpoint/Quality:} Some camera views might be inherently more challenging (e.g., distant, oblique angles, lower resolution feeds). Individuals primarily observed through these cameras might be tracked less reliably. The system's performance might be less "fair" to individuals who happen to frequent areas covered only by poor-quality views.
+        \item \textit{Occlusion Levels:} Individuals frequently moving through crowded areas or behind obstacles will experience higher occlusion rates. If the training data doesn't sufficiently cover heavy occlusion scenarios, the tracking (MOTA/IDF1) and Re-ID might unfairly penalize people in dense environments.
+        \item \textit{Behavioral Patterns:} The dataset likely captures typical pedestrian movements. Individuals with atypical gaits or movement patterns might be tracked less effectively.
+    \end{itemize}
+    \item Annotation Bias:
+    \begin{itemize}
+        \item \textit{Labeling Errors/Omissions:} Manual or semi-automated annotation processes might be prone to errors. Annotators might be less likely to accurately label individuals who are distant, heavily occluded, or appear briefly, potentially leading to biases against detecting or tracking such individuals.
+    \end{itemize}
+\end{itemize}
+
+\textbf{2. Fairness Metric Calculation (Conceptual Implementation)}
+Directly calculating fairness metrics like Equal Opportunity or Demographic Parity requires ground truth sensitive attributes (e.g., ethnicity, gender) linked to person IDs, which are not typically part of the MTMMC annotations. However, we can use proxy analyses by evaluating performance disparities across groups defined by observable characteristics or conditions:
+\begin{itemize}
+    \item Metric: Re-Identification Accuracy Disparity (e.g., Rank-1 Accuracy or mAP difference).
+    \item Groups: Define groups based on conditions where bias is suspected. Examples:
+    \begin{enumerate}
+        \item Group A: Tracks primarily observed in well-lit conditions (e.g., average pixel intensity > threshold).
+        \item Group B: Tracks primarily observed in low-lit conditions (e.g., average pixel intensity < threshold).
+        \item OR
+        \item Group C: Tracks with low average occlusion (< 20\% bounding box occlusion across frames).
+        \item Group D: Tracks with high average occlusion (> 50\% bounding box occlusion across frames).
+        \item OR
+        \item Group E: Tracks where the person's bounding box size is consistently large (e.g., average height > 100 pixels).
+        \item Group F: Tracks where the person's bounding box size is consistently small (e.g., average height < 50 pixels).
+    \end{enumerate}
+    \item Calculation Steps:
+    \begin{enumerate}
+        \item Identify and isolate tracklets belonging to each group within the MTMMC test set based on frame metadata or derived properties (lighting, occlusion estimates, bbox size).
+        \item Run the Re-ID component (e.g., CLIP feature extraction + gallery matching) on the test queries corresponding to each group.
+        \item Calculate Rank-1 Accuracy (or mAP) separately for Group A vs. Group B, Group C vs. Group D, etc.
+        \item Fairness Assessment: Compare the metrics. A significant drop in performance for one group (e.g., Rank-1 accuracy is 85\% for Group E but only 60\% for Group F) indicates a fairness issue related to that characteristic (distance/size in this case). The fairness metric could be the difference (e.g., 25\% drop) or ratio (e.g., 0.71) of the scores.
+    \end{enumerate}
+\end{itemize}
+
+\textbf{3. Approaches to Mitigate Detected Bias}
+If fairness analysis reveals significant performance disparities, several strategies can be employed:
+\begin{itemize}
+    \item Data-Based Mitigation:
+    \begin{itemize}
+        \item \textit{Targeted Data Augmentation:} Intensify augmentations simulating the conditions where the model underperforms (e.g., synthesize more low-light variations, add artificial occluders, use style transfer to diversify clothing appearances).
+        \item \textit{Data Balancing/Re-sampling:} If demographic labels become available or reliable proxies are found, use techniques like over-sampling underrepresented groups or under-sampling overrepresented groups during training. Generate synthetic data (if feasible) for minority groups.
+        \item \textit{Curriculum Learning:} Structure the training process to initially focus on easier examples and gradually introduce more challenging or underrepresented scenarios.
+    \end{itemize}
+    \item Model-Based Mitigation:
+    \begin{itemize}
+        \item \textit{Adversarial Debiasing:} If sensitive attributes are known, train the feature extractor (e.g., CLIP) with an additional adversarial loss that discourages the model from encoding information about the sensitive attribute, aiming for representations invariant to that attribute.
+        \item \textit{Fairness Regularization:} Add terms to the model's loss function that explicitly penalize performance disparities between defined groups (requires group labels).
+        \item \textit{Domain Generalization:} Employ techniques specifically designed to improve model robustness across different domains (e.g., varying lighting, camera types), which can indirectly improve fairness by reducing performance gaps caused by environmental variations.
+    \end{itemize}
+    \item Post-processing Mitigation:
+    \begin{itemize}
+        \item \textit{Group-Specific Thresholds:} Carefully adjust decision thresholds (e.g., Re-ID similarity score threshold) for different groups or conditions identified as problematic.
+    \end{itemize}
+    \item Operational Mitigation:
+    \begin{itemize}
+        \item \textit{Transparency \& User Training:} Make users aware of the system's limitations and potential biases (e.g., "Performance may be lower in dimly lit areas"). Train operators to critically evaluate the system's output, especially in challenging conditions.
+        \item \textit{Feedback Mechanism:} Allow users to easily flag incorrect identifications or tracking failures. This feedback can be invaluable for identifying systematic biases and informing targeted retraining efforts.
+        \item \textit{Continuous Monitoring:} Regularly re-evaluate fairness metrics on updated datasets or newly collected operational data to track bias drift and ensure mitigation strategies remain effective.
+    \end{itemize}
+\end{itemize}
+By proactively considering these potential biases and incorporating fairness analysis and mitigation strategies, we aim to develop a more equitable and trustworthy multi-camera tracking system.
+
+\subsection{Model Selection via Experimentation}
+\label{subsection:model_selection_experimentation}
+To select the optimal person detection model for the Intelligent Multi-Camera Person Tracking and Analytics System, several candidate architectures were evaluated using MLflow for experiment tracking and comparison. This allows for systematic tracking of model parameters, configurations, and performance metrics across different runs.
+
+\textbf{Experiment Setup:}
+We compared four distinct person detection models representing different architectural approaches:
+\begin{itemize}
+    \item Faster R-CNN (\texttt{fasterrcnn\_resnet50}): A representative Two-Stage CNN detector, known for high accuracy, particularly with varying object sizes.
+    \item RT-DETR (\texttt{rtdetr\_x}): A Vision Transformer (ViT) based detector, often achieving a good balance between speed and accuracy.
+    \item RT-DETR (\texttt{rtdetr\_l}): Another variant of the RT-DETR model.
+    \item YOLO (\texttt{yolo11x}): A representative One-Stage CNN detector, typically prioritized for speed.
+\end{itemize}
+Using the MLflow Tracking UI (as illustrated conceptually in Figures \ref{fig:mlflow_comparison_1} and \ref{fig:mlflow_comparison_2}), we logged key parameters for each run, including:
+\begin{itemize}
+    \item \texttt{model.model\_name}: Specific identifier for the model variant (e.g., \texttt{fasterrcnn\_resnet50}, \texttt{rtdetr\_x}).
+    \item \texttt{model.type}: The general architecture type (e.g., \texttt{fasterrcnn}, \texttt{rtdetr}, \texttt{yolo}).
+    \item \texttt{model.weights\_path}: Path to the pre-trained weights used for the specific experiment.
+    \item \texttt{model.person\_class\_id}: The class ID designated for 'person' detections within the model's output.
+\end{itemize}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/final_ai_images/mlflow_comparison_1.png} % Placeholder
+    \caption{Conceptual MLflow UI: Experiment Parameters Comparison}
+    \label{fig:mlflow_comparison_1}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/final_ai_images/mlflow_comparison_2.png} % Placeholder
+    \caption{Conceptual MLflow UI: Performance Metrics Chart}
+    \label{fig:mlflow_comparison_2}
+\end{figure}
+\clearpage
+
+\textbf{Performance Comparison (Quantitative):}
+The following table summarizes key performance metrics extracted from the MLflow comparison for the person detection task on the evaluation dataset:
+
+\begin{table}[!htb]
+  \centering
+  \caption{Performance Comparison of Person Detection Models}
+  \label{tab:model_performance_comparison}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{@{}lccccccccc@{}}
+    \toprule
+    Model Name & \texttt{eval\_ap\_person} & \texttt{eval\_map} & \texttt{eval\_map\_50} & \texttt{eval\_map\_75} & \texttt{eval\_map\_large} & \texttt{eval\_map\_medium} & \texttt{eval\_map\_small} & \texttt{processing\_fps} & \texttt{total\_person\_detections} \\ \midrule
+    \texttt{rtdetr\_x} & 0.322 & 0.322 & 0.497 & 0.334 & 0.496 & 0.203 & 0.039 & 16.09 & 156,107 \\
+    \texttt{fasterrcnn\_resnet50} & 0.320 & 0.320 & 0.546 & 0.310 & 0.473 & 0.255 & 0.033 & 10.42 & 190,884 \\
+    \texttt{rtdetr\_l} & 0.316 & 0.316 & 0.486 & 0.329 & 0.489 & 0.197 & 0.038 & 9.48 & 152,317 \\
+    \texttt{yolo11x} & 0.297 & 0.297 & 0.481 & 0.295 & 0.453 & 0.188 & 0.030 & 11.66 & 110,645 \\ \bottomrule
+  \end{tabular}%
+  }
+  \par\medskip\footnotesize
+  Note: \texttt{eval\_ap\_person} represents the mean Average Precision specifically for the 'person' class, serving as our primary accuracy metric. Metrics like \texttt{eval\_map\_50}, \texttt{\_large}, \texttt{\_medium} provide insight into performance at different IoU thresholds and object sizes. \texttt{processing\_fps} measures inference speed, and \texttt{total\_person\_detections} indicates the raw count of detected persons.
+\end{table}
+
+\textbf{Key Observations:}
+\begin{itemize}
+    \item Overall Accuracy (mAP): RTDETR-X achieves the highest overall mAP (0.322), marginally beating Faster R-CNN (0.320). YOLO performs the lowest.
+    \item Accuracy by Size: Faster R-CNN shows significantly better performance on medium-sized objects (\texttt{mAP Medium}: 0.255 vs. 0.203 for RTDETR-X). RTDETR-X has a slight edge on large objects. (Small object performance is not directly comparable from the AP metrics shown, but MAR metrics suggest similar performance at the top-1 recall level).
+    \item Recall/Total Detections: Faster R-CNN detects considerably more persons overall (190,884) compared to RTDETR-X (156,107) and others. This suggests potentially better recall, crucial for not missing individuals in a tracking scenario.
+    \item Speed (FPS): RTDETR-X is the fastest model (16.09 FPS), followed by YOLO, then Faster R-CNN and RTDETR-L.
+\end{itemize}
+
+\textbf{Justification for Final Model Selection (Baseline):}
+Based on the quantitative comparison and qualitative observations during initial testing, Faster R-CNN (\texttt{fasterrcnn\_resnet50}) is selected as the baseline person detection model for the system. The justification is as follows:
+\begin{enumerate}
+    \item Superior Medium Object Performance: While RTDETR-X has the highest overall mAP, Faster R-CNN's significantly better performance on medium-sized objects (\texttt{eval\_map\_medium}) is critical in real-world surveillance where individuals are often not very close (large) or extremely far (small).
+    \item Higher Detection Count (Recall): The substantially higher \texttt{total\_person\_detections} for Faster R-CNN strongly suggests better recall. In a tracking system, minimizing missed detections (false negatives) is often more critical than achieving the absolute highest precision, as a missed detection breaks the track entirely. This higher count likely reflects better performance on harder-to-detect individuals (potentially smaller, partially occluded).
+    \item Qualitative Stability (NMS Issue): During practical application tests on the dataset videos, the RTDETR models were observed to occasionally suffer from Non-Maximal Suppression (NMS) issues, leading to multiple bounding boxes being predicted for the same person (over-prediction). While potentially tunable, this instability makes Faster R-CNN a more reliable starting point.
+    \item Acceptable Speed: Although not the fastest, Faster R-CNN's processing speed (10.42 FPS) is deemed acceptable for the backend batch processing pipeline envisioned in the ML Canvas.
+\end{enumerate}
+Therefore, despite RTDETR-X showing marginally higher overall mAP and better speed, Faster R-CNN's robustness, particularly its strength in detecting medium-sized objects and its higher overall detection count (indicating better recall), combined with observed stability advantages, make it the preferred choice for the initial implementation. Further fine-tuning and comparison, potentially including a re-trained RTDETR addressing the NMS concerns, will be conducted in subsequent development phases.
+
+\subsection{Model Explainability}
+\label{subsection:model_explainability}
+Understanding *how* the selected Faster R-CNN model arrives at its predictions is crucial for building trust and diagnosing potential issues. This task focuses on implementing and demonstrating techniques to interpret the model's internal workings, specifically identifying which parts of an input image influenced a particular detection.
+
+\textbf{Methodology:}
+\begin{itemize}
+    \item   \textbf{Model:} Faster R-CNN (ResNet-50 + FPN backbone).
+    \item   \textbf{Technique:} Gradient-weighted Class Activation Mapping (Grad-CAM) was chosen as the explainability method. Grad-CAM is suitable for CNN-based models like Faster R-CNN as it produces visual heatmaps highlighting the image regions most important for a specific output class score. We utilize the \texttt{LayerGradCam} implementation from the \texttt{captum} library.
+    \item   \textbf{Configuration:} The process is configured via \texttt{configs/explainability\_config.yaml}, specifying the \texttt{method} ("gradcam"), the convolutional layer to target (\texttt{target\_layer\_name}, e.g., "backbone.body.layer4"), the confidence threshold for explaining detections, and the class index for 'person' (1).
+    \item   \textbf{Code:} The core logic is implemented in \texttt{src/explainability/faster\_rcnn\_explainer.py} (\texttt{explain\_detection\_gradcam}), visualization in \texttt{src/explainability/visualization.py} (\texttt{visualize\_explanation}), and orchestrated by \texttt{src/run\_explainability.py}.
+\end{itemize}
+
+\textbf{Implementation Details:}
+\begin{enumerate}
+    \item  \textbf{Model \& Target Layer:} The pre-trained and fine-tuned Faster R-CNN model is loaded (\texttt{src/inference/detector.py -> load\_trained\_fasterrcnn}). The specified target layer (e.g., the last layer of the ResNet backbone body) is retrieved.
+    \item  \textbf{Forward Function Wrapper:} A custom forward function is defined for Captum. This function takes the input image tensor, performs inference with the Faster R-CNN model, and specifically extracts the classification score for the *target detection* (identified by its index in the output list) and the *target class* ('person').
+    \item  \textbf{Attribution Calculation:} \texttt{LayerGradCam} uses the model, the target layer, and the forward wrapper. Its \texttt{attribute} method is called with the input image tensor. It calculates the gradients of the target score with respect to the target layer's feature maps, weights these maps by the gradients, and produces a raw attribution heatmap.
+    \item  \textbf{Visualization:} The raw heatmap is processed (summed across channels if necessary, normalized) and overlaid onto the original input image using OpenCV functions (\texttt{overlay\_heatmap}). Detected bounding boxes are drawn on the overlay, and the final visualization is saved as a PNG image.
+\end{enumerate}
+
+\textbf{Demonstration \& Results:}
+The \texttt{run\_explainability.py} script executes this process on the images specified in the configuration. Below are examples from the run output, showing the generated visualizations for the top-scoring 'person' detection in each test image:
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.7\textwidth,keepaspectratio]{jubjones/final_ai_images/s10_c09_000000_explain_gradcam_det1_score1.00.png}
+    \caption{Grad-CAM for Factory Scene (s10/c09/000000.jpg, Detection 1, Score: 0.9996)}
+    \label{fig:gradcam_example1}
+    \parbox{0.9\textwidth}{\footnotesize \textit{Interpretation:} The heatmap strongly highlights the torso and upper leg regions of the person within the bounding box. This focused activation pattern indicates that features in these areas were highly influential in the model's decision to classify this region as 'person' with extremely high confidence. The heatmap aligns well with the subject's silhouette.}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.7\textwidth,keepaspectratio]{jubjones/final_ai_images/s47_c02_000000_explain_gradcam_det1_score1.00.png}
+    \caption{Grad-CAM for Campus Scene (s47/c02/000000.jpg, Detection 1, Score: 0.9997)}
+    \label{fig:gradcam_example2}
+    \parbox{0.9\textwidth}{\footnotesize \textit{Interpretation:} For this smaller, more distant person, the Grad-CAM heatmap concentrates primarily on the upper body and head region. Even though the person occupies fewer pixels, the model clearly identifies relevant features, again correlating with the very high confidence score.}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.7\textwidth,keepaspectratio]{jubjones/final_ai_images/s47_c03_000000_explain_gradcam_det1_score1.00.png}
+    \caption{Grad-CAM for Campus Scene (s47/c03/000000.jpg, Detection 1, Score: 0.9998)}
+    \label{fig:gradcam_example3}
+    \parbox{0.9\textwidth}{\footnotesize \textit{Interpretation:} Similar to Example 2, the heatmap focuses on the core body (torso) of the detected person. The activation is relatively contained within the person's boundaries, contributing to the high prediction score.}
+\end{figure}
+\clearpage
+These visualizations provide valuable insights into the model's decision-making process, confirming that it generally focuses on relevant body parts for person detection. They serve as a tool for verifying expected behavior and potentially debugging cases where the model might focus on irrelevant background features or fail unexpectedly.
+
+\subsection{Prediction Reasoning}
+\label{subsection:prediction_reasoning}
+Beyond visualizing *where* the model looks (Section \ref{subsection:model_explainability}), this task focuses on providing a human-understandable *reason* or *justification* for individual predictions made by the Faster R-CNN model.
+
+\textbf{Mechanism Design:}
+A mechanism was designed to generate textual reasoning based on the quantitative output of the model (confidence score) and the qualitative evidence from the explainability analysis (the existence of a Grad-CAM visualization).
+\begin{itemize}
+    \item   \textbf{Input:} Takes the detection result dictionary (containing 'box', 'label', 'score') and context (explanation type, visualization availability).
+    \item   \textbf{Processing:} Uses heuristic rules based on the confidence score to infer the model's certainty (high, moderate, low). It explicitly mentions the confidence value and connects it to the presence or absence of strong visual features learned by the model. If a visual explanation (like Grad-CAM) was generated, the reasoning text refers the user to it for further insight into the influential image regions.
+    \item   \textbf{Output:} Produces a textual string summarizing the reasoning for that specific prediction.
+    \item   \textbf{Code:} The core logic is implemented in \texttt{src/explainability/reasoning.py} (\texttt{generate\_reasoning\_text}), and the overall process of applying it to detections and logging the results is handled in \texttt{src/run\_explainability.py} (\texttt{execute\_explainability}).
+\end{itemize}
+
+\textbf{Implementation Details:}
+The \texttt{generate\_reasoning\_text} function constructs sentences based on the input detection's confidence score. It provides different qualitative interpretations for high (>= 0.9), moderate (>= 0.7), and lower confidence scores. It then appends a sentence directing the user to the generated visualization (if \texttt{has\_visualization} is True), mentioning the explanation type (e.g., "GRADCAM Focus") and the bounding box coordinates, encouraging review of the highlighted regions (e.g., head, torso). The \texttt{execute\_explainability} function iterates through the top detections for each configured input image, calls this reasoning function, and logs the output both to the console and aggregates it into a final summary file (\texttt{\_reasoning\_log.txt}).
+
+\textbf{Example Outputs:}
+The \texttt{run\_explainability.py} script was executed using the configuration \texttt{configs/explainability\_config.yaml} on the three specified test images. The following are the exact textual reasoning outputs generated for the same top-scoring detections analyzed visually in Section \ref{subsection:model_explainability}:
+
+\textit{For s10/c09/000000.jpg (Detection 1, Score: 0.9996):}
+\begin{verbatim}
+Reasoning: Detected object classified as 'person' (label 1) with a 
+confidence score of 1.00. This high confidence suggests the model 
+found strong visual evidence matching features learned for the 
+'person' class. The associated visualization (GRADCAM Focus) 
+highlights the specific image regions that most influenced this 
+classification decision. These influential regions are located 
+primarily within the detected bounding box [523, 233, 611, 488]. 
+Reviewing the heatmap overlay can provide further insight into which 
+parts of the object (e.g., head, torso) contributed most to the 
+prediction.
+\end{verbatim}
+
+\textit{For s47/c02/000000.jpg (Detection 1, Score: 0.9997):}
+\begin{verbatim}
+Reasoning: Detected object classified as 'person' (label 1) with a 
+confidence score of 1.00. This high confidence suggests the model 
+found strong visual evidence matching features learned for the 
+'person' class. The associated visualization (GRADCAM Focus) 
+highlights the specific image regions that most influenced this 
+classification decision. These influential regions are located 
+primarily within the detected bounding box [1509, 248, 1592, 339]. 
+Reviewing the heatmap overlay can provide further insight into which 
+parts of the object (e.g., head, torso) contributed most to the 
+prediction.
+\end{verbatim}
+
+\textit{For s47/c03/000000.jpg (Detection 1, Score: 0.9998):}
+\begin{verbatim}
+Reasoning: Detected object classified as 'person' (label 1) with a 
+confidence score of 1.00. This high confidence suggests the model 
+found strong visual evidence matching features learned for the 
+'person' class. The associated visualization (GRADCAM Focus) 
+highlights the specific image regions that most influenced this 
+classification decision. These influential regions are located 
+primarily within the detected bounding box [617, 216, 651, 293]. 
+Reviewing the heatmap overlay can provide further insight into which 
+parts of the object (e.g., head, torso) contributed most to the 
+prediction.
+\end{verbatim}
+
+\textbf{Evaluation:}
+The implemented mechanism successfully generates human-readable explanations for individual predictions. While not employing complex methods like SHAP (which can be challenging for object detectors), it fulfills the requirement by:
+\begin{enumerate}
+    \item  Interpreting the primary quantitative output (confidence score).
+    \item  Relating the score to the model's perceived evidence strength.
+    \item  Integrating the output of the explainability method (Grad-CAM) by directing the user to the visual evidence.
+\end{enumerate}
+This provides a practical level of reasoning suitable for understanding the basis of individual detection decisions within the system. The complete reasoning log for all explained detections across the test images is saved as an artifact (\texttt{outputs/explanations/*\_reasoning\_log.txt}).
+
 
 \section{User Experience Design with AI}
 \label{section:ux_design} % Kept original unique label
