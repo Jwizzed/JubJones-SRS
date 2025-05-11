@@ -716,8 +716,46 @@ This section outlines the strategy for deploying the AI components of the \useva
 \end{itemize}
 
 \subsection{Proof of Concept}
-\label{subsection:poc} % Kept original unique label
-% Content to be added later
+\label{subsection:poc}
+The Proof of Concept (PoC) for the AI component focused on validating the feasibility, performance, and integration of the selected person detection model, which forms a critical foundation for the \usevar{\srsTitle}'s multi-camera tracking capabilities.
 
+\textbf{Model Development and Training Strategy:}
+The Faster R-CNN model, featuring a ResNet-50 backbone and Feature Pyramid Network (FPN), was selected as the baseline person detection model for the system. This decision was based on a comparative analysis of performance metrics, particularly its strong performance on medium-sized objects and high recall, as detailed in Section \ref{subsection:model_selection_experimentation}.
+The model was developed using the PyTorch deep learning framework and TorchVision library. It was fine-tuned on the MTMMC dataset (further described in Section \ref{subsection:dataset-information}), which provides diverse and challenging scenarios representative of the target campus and factory environments. The training pipeline, as outlined in Section \ref{subsection:model_training_impl}, incorporated several key stages:
+\begin{itemize}
+    \item Standardized data preprocessing, including image resizing, color conversion, tensor transformation, and normalization using ImageNet statistics.
+    \item Initialization with pre-trained weights from the ImageNet dataset to leverage learned features and expedite convergence.
+    \item Modification of the model's classification head (box predictor) to specifically cater to the 'person' class (and background), aligning with the system's objective.
+    \item Utilization of MLflow for systematic tracking of experiments, parameters, and results during the model development lifecycle.
+\end{itemize}
+
+\textbf{Testing and Validation Approach:}
+The performance of the person detection model was rigorously evaluated through:
+\begin{itemize}
+    \item \textbf{Quantitative Evaluation:} The model was tested against a dedicated validation split of the MTMMC dataset. Performance was measured using standard COCO-style mAP metrics, as detailed in Section \ref{subsection:model_training_impl} and summarized in Table \ref{tab:model_performance_comparison}.
+    \item \textbf{Unit Testing:} Key software components integral to the training and evaluation pipeline, such as dataset loading mechanisms, metric calculation functions, model instantiation logic, and utility functions, were subjected to unit tests using pytest. This ensured the reliability and correctness of the underlying codebase, as described in the "Unit Testing" part of Section \ref{subsection:model_training_impl}.
+\end{itemize}
+
+\textbf{Performance Results and Metrics:}
+The comparative performance of the selected Faster R-CNN model against other candidate architectures is presented in Table \ref{tab:model_performance_comparison}. For the 'person' class, the Faster R-CNN model achieved:
+\begin{itemize}
+    \item An `eval_ap_person` (Mean Average Precision for the 'person' class) of 0.320.
+    \item An overall `eval_map` of 0.320.
+    \item A notable `eval_map_medium` score of 0.255, indicating strong performance on medium-sized objects, which are critical in many surveillance scenarios.
+    \item The highest `total_person_detections` count of 190,884 among the compared models, suggesting superior recall capabilities crucial for minimizing missed detections in a tracking pipeline.
+    \item An acceptable processing speed of 10.42 FPS for the backend batch processing context.
+\end{itemize}
+Initial sample runs, detailed in Section \ref{subsection:model_training_impl} (see Table \ref{tab:fasterrcnn_sample_results}), demonstrated the model's learning capability even on a subset of data (e.g., `eval_map` of 0.6522), providing early validation and direction for subsequent, more extensive fine-tuning and experimentation.
+
+\textbf{Demonstration on Representative Data and Scenarios:}
+The practical applicability and interpretability of the chosen Faster R-CNN model were demonstrated through:
+\begin{itemize}
+    \item \textbf{Qualitative Visualizations:} Grad-CAM heatmaps, presented in Section \ref{subsection:model_explainability} (Figures \ref{fig:gradcam_example1}, \ref{fig:gradcam_example2}, and \ref{fig:gradcam_example3}), illustrate the model's ability to focus on relevant image regions (e.g., torso, head) when detecting persons in varied scenes (factory and campus environments) from the MTMMC dataset. This confirmed that the model learns meaningful features for person identification.
+    \item \textbf{Comparative Performance Justification:} As discussed in Section \ref{subsection:model_selection_experimentation}, while Faster R-CNN was not universally superior across all metrics (e.g., RTDETR-X had slightly higher overall mAP and speed), its robust performance on medium-sized objects, higher detection count (recall), and observed qualitative stability (less prone to NMS issues compared to some alternatives during initial tests) made it the preferred baseline model for this system.
+\end{itemize}
+This PoC effectively demonstrates that the chosen AI model, training methodology, and testing procedures yield a person detection component capable of meeting the foundational requirements of the \usevar{\srsTitle}. The achieved performance, validated through both quantitative metrics on representative datasets and qualitative analysis of its behavior on real-world like images, confirms the viability of the AI design for subsequent integration into the broader tracking and re-identification pipeline.
+
+
+\subsection{(Optional) Reflection and Future Development}
 \label{section:reflection} % Kept original unique label
-% Content to be added later4
+This section is designated for a comprehensive reflection on the project's development process, outcomes, and lessons learned, alongside an outline of potential avenues for future development and enhancements. The content for this section will be thoughtfully prepared and included upon the final completion of the project.
