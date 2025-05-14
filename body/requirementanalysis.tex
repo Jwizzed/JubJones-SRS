@@ -30,7 +30,7 @@
 \label{subsection:primary-stakeholders}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Users:} The primary stakeholders are the users of our multi-camera tracking system, including security personnel, facility managers, emergency response coordinators, and research analysts.  Their interaction with the system is crucial for effective monitoring, incident response, and data-driven decision-making.  For a detailed specification of our users, see \ref{section:target-user}.
+    \item \textbf{Users:} The primary stakeholders are the users of our multi-camera tracking system, including security personnel, facility managers, and emergency response coordinators. Their interaction with the system is crucial for effective monitoring, incident response, and data-driven decision-making. For a detailed specification of our users, see \ref{section:target-user}.
     \item \textbf{System Administrators:}  These individuals are responsible for the installation, configuration, and maintenance of the system.  Their needs include ease of deployment, system stability, and access to diagnostic tools.
     \item \textbf{University/Factory Management:}  These stakeholders are interested in the overall benefits of the system, such as improved safety, optimized resource allocation, and enhanced operational efficiency.  They require reports and data summaries to justify the investment and track performance.
     \item \textbf{MTMMC Dataset Providers/Owners:} The creators and distributors of the Multi-Target Multi-Camera (MTMMC) dataset used for training and evaluating the AI components of this project (\ref{subsection:dataset-information}).
@@ -61,9 +61,9 @@
 }{I can understand space usage, identify congestion points, and make informed decisions about facility layout and resource allocation.}
 
 \userstory{Access Historical Movement Data%
-}{analytics specialist%
+}{facility manager or security officer%
 }{access and analyze historical data on individual and group movements, including options to export this data%
-}{I can perform in-depth analysis of movement patterns, identify trends, and generate reports to improve operational efficiency and space utilization.  I can also share this data with other systems.}
+}{I can perform in-depth analysis of movement patterns, identify trends, and generate reports to improve operational efficiency, space utilization, or support incident investigations. I can also share this data with other systems.}
 
 \userstory{Prioritize Tracking of Specific Individuals%
 }{security officer/emergency coordinator%
@@ -95,8 +95,7 @@
         % Actors outside the system boundary
         \umlactor[x=-4, y=3]{Security Officer}
         \umlactor[x=-4, y=0]{Facility Manager}
-        \umlactor[x=-4, y=-2]{Analytics Specialist}
-        \umlactor[x=-4, y=-4]{Emergency Coordinator}
+        \umlactor[x=-4, y=-3.5]{Emergency Coordinator} % Adjusted y-coordinate for spacing
 
         % Associations between actors and use cases
         % Security Officer associations
@@ -106,9 +105,6 @@
 
         % Facility Manager association
         \umlassoc{Facility Manager}{visualize}
-
-        % Analytics Specialist association
-        \umlassoc{Analytics Specialist}{visualize}
 
         % Emergency Coordinator association
         \umlassoc{Emergency Coordinator}{prioritize}
@@ -123,7 +119,6 @@ The use case diagram (Figure \ref{fig:use-case-diagram}) illustrates the interac
 \begin{itemize}
     \item \textbf{Security Officer:} Interacts with tracking, maintaining tracking through gaps, and prioritizing specific individuals.
     \item \textbf{Facility Manager:} Primarily interacts with visualizing movement paths.
-    \item \textbf{Analytics Specialist:} Also interacts with visualizing movement paths for analysis.
     \item \textbf{Emergency Coordinator:} Interacts with prioritizing the tracking of specific individuals during critical events.
 \end{itemize}
 This diagram provides a high-level overview of who uses the system and for what main purposes.
@@ -164,7 +159,7 @@ This diagram provides a high-level overview of who uses the system and for what 
 \end{usecase}
 
 \begin{usecase}{Visualize Movement Paths on a Map}
-    \textbf{Actors:} Facility Manager/Analytics Specialist
+    \textbf{Actors:} Facility Manager
 
     \textbf{Description:} View movement patterns within a facility for space utilization analysis.
 
