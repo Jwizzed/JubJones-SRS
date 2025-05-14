@@ -179,13 +179,12 @@ Figure \ref{fig:ai_canvas} illustrates this.
             \item Requires user training on the interface for retrospective analysis and building trust in the AI's associations. It augments staff capabilities for investigation and analysis.
         \end{itemize}
 \end{itemize}
-
 Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specifically tailored for the Intelligent Multi-Camera Person Tracking and Analytics System. This canvas provides a detailed blueprint for the ML components, building upon the general AI task analysis.
 
 \begin{figure}[!htb]
     \centering
     \makebox[\textwidth][c]{
-        \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/ml_canvas.jpg}
+        \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/ml_canvas.jpg} 
     }
     \caption{ML Canvas for Intelligent Multi-Camera Person Tracking and Analytics System}
     \label{fig:ml_canvas}
@@ -196,7 +195,7 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
         The system directly addresses the significant challenges security and facility personnel face in tracking individuals across complex, multi-camera environments using recorded data. It tackles the limitations of manual review—its labor intensity, error propensity, and fragmented views—and the core technical hurdle of maintaining consistent identity (Re-Identification) despite variations in appearance, lighting, occlusions, and camera viewpoints present in historical footage. The overarching business objectives are to enhance safety through better post-incident analysis, improve operational efficiency by automating tracking in recorded data, provide unified spatial visualization of movement, reduce incident investigation time, and optimize resource allocation based on analytics from past events.
 
     \item \textbf{Input Data Requirements (ML Canvas):}
-        The necessary components for the system primarily involve recorded RGB video feeds (pre-split into sub-videos) or image sequences from multiple cameras, initially using datasets like MTMMC stored on cloud storage (e.g., AWS S3). These inputs encapsulate real-world challenges. Pre-calculated camera calibration data (Homography matrices) are essential inputs for spatial mapping.
+        The necessary components for the system primarily involve recorded RGB video feeds (pre-split into sub-videos) or image sequences from multiple cameras, initially using datasets like MTMMC stored on cloud storage (e.g., AWS S3). These inputs encapsulate real-world challenges. Pre-calculated camera calibration data (Homography matrices) are essential inputs for spatial mapping, which is performed by the backend system using outputs from the ML pipeline.
 
     \item \textbf{Processing Approach \& Model Selection (ML Canvas):}
         Central to the design is a backend-driven batch processing pipeline orchestrated by FastAPI. This pipeline integrates key AI steps in sequence:
@@ -205,22 +204,20 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
             \item Intra-Camera Tracking, employing algorithms like BotSort (potentially via BoxMOT) to maintain temporary IDs within single camera views.
             \item Conditional Feature Extraction for Re-ID, using models like CLIP (potentially via BoxMOT) to generate discriminative embeddings.
             \item Cross-Camera Re-Identification, which compares embeddings against a gallery (managed via Redis for recent/active data and TimescaleDB for historical data) to assign persistent GlobalPersonIDs.
-            \item Spatial Mapping, applying input homography matrices via libraries like OpenCV to project detected locations onto a unified map.
         \end{enumerate}
-        The justifications for model choices emphasize accuracy, robustness, and efficiency for retrospective analysis.
+        The ML pipeline provides track data (including pixel coordinates) which can then be used by the backend for spatial mapping. The justifications for model choices emphasize accuracy, robustness, and efficiency for retrospective analysis.
 
     \item \textbf{Expected Outputs (ML Canvas):}
         The system's outputs encompass both user-facing visualizations and stored data for analysis.
         \begin{itemize}
-            \item \textit{For the UI (from backend metadata):} Annotated video feeds (client-side rendering of bounding boxes and GlobalPersonIDs based on WebSocket metadata) alongside a unified map interface showing current locations and historical paths.
-            \item \textit{For historical analysis:} Structured tracking events (timestamp, IDs, coordinates, optional embeddings) stored in a TimescaleDB database.
+            \item \textit{For the UI (from backend metadata):} Annotated video feeds (client-side rendering of bounding boxes and GlobalPersonIDs based on WebSocket metadata) alongside a unified map interface showing current locations and historical paths (achieved by backend mapping of ML outputs).
+            \item \textit{For historical analysis:} Structured tracking events (timestamp, IDs, coordinates including map coordinates derived by the backend, optional embeddings) stored in a TimescaleDB database.
         \end{itemize}
 
     \item \textbf{Success Criteria \& Evaluation Metrics (ML Canvas):}
-        A dual approach to measuring performance is outlined:
+        Evaluation primarily focuses on AI Model-Level Metrics through offline assessment:
         \begin{itemize}
             \item \textit{AI Model-Level Metrics (Offline Evaluation):} Specific metrics such as AP (Average Precision), MOTA (Multiple Object Tracking Accuracy), IDF1 (ID F1-Score), Rank-1 accuracy, and mAP (mean Average Precision) using dedicated test sets from datasets like MTMMC.
-            \item \textit{System and Business-Level Metrics (Operational Assessment):} Critical indicators including efficiency gains in analytical tasks, reduction in incident investigation response time, user satisfaction levels, task completion rates for key scenarios using the system, and overall system reliability during batch processing.
         \end{itemize}
 \end{itemize}
 This detailed ML Canvas provides a comprehensive blueprint for the development and evaluation of this intelligent surveillance analysis system.
@@ -422,18 +419,6 @@ The PoC involved the following key steps:
     \item \textbf{Client-Side Interpretation:} The test client logged these incoming messages, demonstrating that the backend correctly performed the AI pipeline (detection, tracking, Re-ID, homography) and formatted the results into the specified JSON structure for WebSocket delivery.
 \end{enumerate}
 This PoC successfully validated that the backend service could manage a processing task, execute the AI pipeline on video data, and deliver structured, real-time tracking metadata suitable for a frontend application to consume for visualization (e.g., rendering bounding boxes on video playback and plotting trajectories on a map).
-
-% User to uncomment and provide path to their PoC UI image
-% \begin{figure}[!htb]
-%     \centering
-%     % \includegraphics[width=0.8\textwidth]{path/to/your/poc_ui_image.png}
-%     \caption{Conceptual User Interface for Proof of Concept System Demonstration}
-%     \label{fig:poc_ui_demonstration}
-% \end{figure}
-% Figure \ref{fig:poc_ui_demonstration} could illustrate a conceptual user interface developed for the PoC,
-% showcasing how the tracking metadata received from the backend (via WebSockets) might be rendered.
-% This would typically include a video playback area with overlaid bounding boxes and person IDs,
-% alongside a map view displaying synchronized trajectories and current locations of tracked individuals.
 
 \section{(Optional) Reflection and Future Development}
 \label{section:reflection} % This section remains untouched as per request
