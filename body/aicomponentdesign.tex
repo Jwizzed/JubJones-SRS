@@ -205,7 +205,7 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
             \item Conditional Feature Extraction for Re-ID, using models like CLIP (potentially via BoxMOT) to generate discriminative embeddings.
             \item Cross-Camera Re-Identification, which compares embeddings against a gallery (managed via Redis for recent/active data and TimescaleDB for historical data) to assign persistent GlobalPersonIDs.
         \end{enumerate}
-        The ML pipeline provides track data (including pixel coordinates) which can then be used by the backend for spatial mapping. The justifications for model choices emphasize accuracy, robustness, and efficiency for retrospective analysis.
+        The ML pipeline provides track data (including pixel coordinates) which can then be used by the backend for spatial mapping using tools like OpenCV with pre-supplied camera calibration data. The justifications for model choices emphasize accuracy, robustness, and efficiency for retrospective analysis.
 
     \item \textbf{Expected Outputs (ML Canvas):}
         The system's outputs encompass both user-facing visualizations and stored data for analysis.
@@ -217,9 +217,24 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
     \item \textbf{Success Criteria \& Evaluation Metrics (ML Canvas):}
         Evaluation primarily focuses on AI Model-Level Metrics through offline assessment:
         \begin{itemize}
-            \item \textit{AI Model-Level Metrics (Offline Evaluation):} Specific metrics such as AP (Average Precision), MOTA (Multiple Object Tracking Accuracy), IDF1 (ID F1-Score), Rank-1 accuracy, and mAP (mean Average Precision) using dedicated test sets from datasets like MTMMC.
+            \item \textit{AI Model-Level Metrics (Offline Evaluation):} Specific metrics such as AP (Average Precision) for detection; MOTA (Multiple Object Tracking Accuracy), IDF1 (ID F1-Score), and IDSW (ID Switches) for intra-camera tracking; and Rank-1 accuracy, and mAP (mean Average Precision) for re-identification, using dedicated test sets from datasets like MTMMC. Spatial mapping accuracy can be measured by projection error if ground truth map coordinates are available.
         \end{itemize}
 \end{itemize}
+
+Figure \ref{fig:ml_pipeline_stages} visually summarizes the core AI processing stages detailed in the "Processing Approach \& Model Selection (ML Canvas)" item. It outlines the sequential flow, the primary model or tool used, and key evaluation metrics for each stage from Person Detection to Spatial Mapping.
+
+\begin{figure}[!htb]
+    \centering
+    \makebox[\textwidth][c]{
+        \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/ml_pipeline_stages.jpg} 
+    }
+    \caption{Core AI Processing Pipeline Stages, Models, and Metrics. This diagram illustrates the sequential flow from Person Detection through Intra-Camera Tracking, Feature Extraction for Re-ID, Cross-Camera Re-ID, and finally to Spatial Mapping, highlighting the primary model/tool and evaluation metrics for each stage.}
+
+    \label{fig:ml_pipeline_stages}
+
+\end{figure}
+\clearpage
+
 This detailed ML Canvas provides a comprehensive blueprint for the development and evaluation of this intelligent surveillance analysis system.
 
 \subsection{(Optional) Innovation}
