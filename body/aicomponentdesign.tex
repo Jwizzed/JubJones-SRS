@@ -7,10 +7,11 @@
 
 The primary AI-driven workflow resides within the system's backend processing core, designed as a service-oriented architecture. This backend, built with FastAPI, orchestrates a pipeline for retrospective analysis of recorded video feeds. Video data (pre-split into manageable sub-video segments) is fetched from cloud storage (e.g., AWS S3) and cached locally for processing. The AI pipeline involves several key steps for each frame extracted from these video segments:
 \begin{enumerate}
-    \item \textbf{Person Detection:} Identifying individuals within each camera frame using high-performance detection models (e.g., Faster R-CNN).
-    \item \textbf{Intra-Camera Tracking:} Maintaining consistent temporary IDs for detected individuals within a single camera's view over consecutive frames, utilizing robust tracking algorithms (e.g., BotSort).
-    \item \textbf{Feature Extraction for Re-ID:} Generating unique appearance embeddings (features) from detected person images using discriminative feature extraction models (e.g., CLIP).
-    \item \textbf{Cross-Camera Re-Identification (Re-ID):} Matching these appearance embeddings across different camera views and time gaps to assign a persistent global identity, linking temporary tracks together. This involves managing an embedding gallery, potentially using Redis for recent embeddings and TimescaleDB for historical ones.
+    \item \textbf{Person Detection:} Identifying individuals within each camera frame using high-performance detection models (e.g., RT-DETR).
+    \item \textbf{Intra-Camera Tracking:} Maintaining consistent temporary IDs for detected individuals within a single camera's view over consecutive frames, utilizing robust tracking algorithms (e.g., ByteTrack).
+    \item \textbf{Space-Based Location Prediction:} For overlapping camera views, converting 3D location from one camera into 2D floor plan coordinates using homography, then mapping back to another camera's view to predict the person's location and assign intra-frame global IDs.
+    \item \textbf{Feature Extraction for Re-ID:} Generating unique appearance embeddings (features) from detected person images using discriminative feature extraction models (e.g., FastReID).
+    \item \textbf{Cross-Camera Re-Identification (Re-ID):} Matching these appearance embeddings across different camera views and time gaps to assign a persistent global identity for across-frame matching. This involves managing an embedding gallery, potentially using Redis for recent embeddings and TimescaleDB for historical ones.
     \item \textbf{Spatial Mapping:} Transforming the detected location of individuals from the camera's 2D image plane onto a unified top-down map coordinate system using geometric transformation techniques (e.g., homography matrices).
 \end{enumerate}
 These AI components perform the essential visual analysis and identity association. Tracking metadata (bounding boxes, global IDs, map coordinates, frame timestamps) is then compiled and can be streamed to a frontend client via WebSockets for visualization, while historical data is stored in TimescaleDB. Figure \ref{fig:system_architecture} provides a high-level illustration of this system architecture and the integration points for these AI modules.
@@ -200,10 +201,11 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
     \item \textbf{Processing Approach \& Model Selection (ML Canvas):}
         Central to the design is a backend-driven batch processing pipeline orchestrated by FastAPI. This pipeline integrates key AI steps in sequence:
         \begin{enumerate}[label=(\Alph*)]
-            \item Person Detection, utilizing models like Faster R-CNN for robust object localization.
-            \item Intra-Camera Tracking, employing algorithms like BotSort (potentially via BoxMOT) to maintain temporary IDs within single camera views.
-            \item Conditional Feature Extraction for Re-ID, using models like CLIP (potentially via BoxMOT) to generate discriminative embeddings.
-            \item Cross-Camera Re-Identification, which compares embeddings against a gallery (managed via Redis for recent/active data and TimescaleDB for historical data) to assign persistent GlobalPersonIDs.
+            \item Person Detection, utilizing RT-DETR (Real-Time DEtection TRansformer) for robust object localization.
+            \item Intra-Camera Tracking, employing ByteTrack algorithm to maintain temporary IDs within single camera views.
+            \item Space-Based Location Prediction, an algorithmic approach for overlapping camera views that converts 3D locations between cameras via 2D floor plan coordinates using homography to assign intra-frame global IDs.
+            \item Feature Extraction for Re-ID, using FastReID to generate discriminative embeddings.
+            \item Cross-Camera Re-Identification, which compares embeddings against a gallery (managed via Redis for recent/active data and TimescaleDB for historical data) to assign persistent GlobalPersonIDs for across-frame matching.
         \end{enumerate}
         The ML pipeline provides track data (including pixel coordinates) which can then be used by the backend for spatial mapping using tools like OpenCV with pre-supplied camera calibration data. The justifications for model choices emphasize accuracy, robustness, and efficiency for retrospective analysis.
 
@@ -247,12 +249,12 @@ This section outlines the strategy for developing, training, and evaluating the 
 
 \subsection{Model Development and Training Strategy}
 \label{subsection:model_dev_train_strat_new}
-The primary AI model for person detection, such as Faster R-CNN with a ResNet-50 backbone and Feature Pyramid Network (FPN), was developed using the PyTorch deep learning framework. The development process prioritized robustness and accuracy for surveillance footage analysis.
+The primary AI model for person detection is RT-DETR (Real-Time DEtection TRansformer), developed using the PyTorch deep learning framework. The development process prioritized robustness and accuracy for surveillance footage analysis.
 Key aspects of the strategy include:
 \begin{itemize}
     \item \textbf{Dataset Utilization:} The MTMMC dataset served as the primary data source for training and fine-tuning. This dataset's diversity in campus and factory environments, lighting conditions, and occlusion levels provides a realistic foundation for developing models intended for real-world scenarios.
-    \item \textbf{Transfer Learning:} To leverage knowledge from broader datasets and accelerate convergence, models were initialized with pre-trained weights (e.g., from ImageNet). The classification head of the detection model was then modified and fine-tuned to specifically address the 'person' class (and background) relevant to the system's objectives.
-    \item \textbf{Data Preprocessing:} A standardized preprocessing pipeline was established. This included image resizing to a consistent input dimension for the model, color space conversion (e.g., BGR to RGB), normalization using established statistics (e.g., ImageNet mean and standard deviation), and conversion to tensor formats suitable for PyTorch. Data augmentation techniques, such as random horizontal flipping, were applied during training to enhance model generalization.
+    \item \textbf{Fine-Tuning Approach:} The RT-DETR model was initialized with default weights and fine-tuned on the MTMMC dataset. The model was trained using an NVIDIA RTX 2060 GPU to specifically address the 'person' class detection relevant to the system's objectives.
+    \item \textbf{Data Preprocessing:} A standardized preprocessing pipeline was established. This included image resizing to a consistent input dimension for the model, color space conversion (e.g., BGR to RGB), normalization using established statistics, and conversion to tensor formats suitable for PyTorch. Data augmentation techniques, such as random horizontal flipping, were applied during training to enhance model generalization.
     \item \textbf{Experiment Management:} A systematic approach to tracking experiments, model configurations, hyperparameters, and performance metrics was employed, often facilitated by tools designed for experiment management (e.g., MLflow). This allowed for methodical comparison of different training runs and model variants.
 \end{itemize}
 This structured approach ensured that the model development lifecycle was organized, reproducible, and geared towards optimizing performance on the target task.
@@ -284,19 +286,19 @@ Rigorous testing and validation were integral to ensure the reliability and effe
 
 \subsection{Performance Results and Justification}
 \label{subsection:model_perf_justify_new}
-The comparative analysis of various person detection models, aided by experiment tracking tools, led to the selection of Faster R-CNN as the baseline architecture for the \usevar{\srsTitle} system. While other models, such as certain RT-DETR variants, demonstrated strengths in specific areas like overall mAP or inference speed, Faster R-CNN presented a compelling balance of characteristics crucial for the system's application in retrospective surveillance analysis.
+The comparative analysis of various person detection models, aided by experiment tracking tools, led to the selection of RT-DETR as the baseline architecture for the \usevar{\srsTitle} system. After evaluating candidates including Faster R-CNN and YOLO variants, RT-DETR presented a compelling balance of characteristics crucial for the system's application in retrospective surveillance analysis.
 
-Key performance observations and the justification for selecting Faster R-CNN include:
+Key performance observations and the justification for selecting RT-DETR include:
 \begin{itemize}
-    \item \textbf{Strong Performance on Medium-Sized Objects:} Faster R-CNN exhibited notably good performance in detecting medium-sized persons, a common scenario in real-world surveillance footage where individuals are neither very close to the camera nor extremely distant. This capability is critical for reliable detection across typical operational distances.
-    \item \textbf{High Recall / Detection Count:} Compared to some alternatives, Faster R-CNN often yielded a higher total number of person detections on the evaluation dataset. This suggests superior recall, which is vital in a tracking system to minimize missed detections (false negatives). A missed detection can lead to a complete loss of a track, which is generally more detrimental than a lower precision if false positives can be managed.
-    \item \textbf{Acceptable Processing Speed:} While not always the fastest model in terms of raw FPS, Faster R-CNN's processing speed was deemed acceptable for the backend batch processing pipeline envisioned for retrospective analysis. The system is not primarily designed for hard real-time, low-latency applications.
-    \item \textbf{Qualitative Stability:} During initial practical tests on video sequences from the dataset, Faster R-CNN generally exhibited good stability, with fewer observed issues related to Non-Maximal Suppression (NMS) resulting in multiple redundant bounding boxes for the same person, compared to some other evaluated models.
+    \item \textbf{End-to-End Detection:} RT-DETR provides end-to-end detection without requiring Non-Maximal Suppression (NMS) post-processing, reducing the complexity of the detection pipeline and eliminating NMS-related artifacts.
+    \item \textbf{Strong Overall Accuracy:} RT-DETR demonstrated competitive mAP scores on the MTMMC validation set, particularly for medium to large-sized persons common in surveillance footage.
+    \item \textbf{Flexible Speed-Accuracy Trade-off:} The transformer-based architecture allows for flexible speed tuning via decoder layers, enabling optimization for the batch processing pipeline.
+    \item \textbf{Robust Feature Learning:} The hybrid encoder architecture enables robust feature extraction across varying lighting conditions and partial occlusions present in the MTMMC dataset.
 \end{itemize}
 
 \subsection{Demonstration on Representative Data (Model Explainability)}
 \label{subsection:model_demo_explain_new}
-To build trust and enable diagnostics, techniques were employed to understand and explain the behavior of the selected person detection model (Faster R-CNN).
+To build trust and enable diagnostics, techniques were employed to understand and explain the behavior of the selected person detection model (RT-DETR).
 
 \textbf{Visual Explanation of Model Focus:}
 Gradient-weighted Class Activation Mapping (Grad-CAM) was utilized to generate visual heatmaps. These heatmaps highlight the regions in an input image that were most influential in the model's decision to classify an area as containing a 'person'. Figure \ref{fig:gradcam_example1} shows such a visualization for an image representative of a factory scene. The heatmap often strongly highlights relevant body parts like the torso and upper legs, aligning well with the subject's silhouette and indicating that the model learned to focus on pertinent visual features for its high-confidence detection. Similar interpretability was observed for campus scenes. For instance, Figure \ref{fig:gradcam_example2} and Figure \ref{fig:gradcam_example3} depict Grad-CAM outputs for persons detected in different campus environments. Even for smaller or more distant individuals, the heatmaps tend to concentrate on the upper body or head regions, demonstrating the model's ability to identify key features contributing to high-confidence scores. These visualizations confirm that the model generally behaves as expected by focusing on semantically relevant parts of a person.
@@ -378,14 +380,14 @@ In essence, the AI transforms raw video data into a structured, quantitative, an
 \label{subsection:deployment_plan_aic}
 \begin{itemize}
     \item \textbf{Deployment Location:}
-        The AI components (e.g., person detection using Faster R-CNN, intra-camera tracking with BotSort, Re-ID feature extraction with CLIP) are integrated within the system's core \textbf{Backend} service. This Backend service, built with FastAPI, along with the entire system infrastructure (Frontend server, databases, caching, reverse proxy), is designed to be deployed in a \textbf{Cloud} environment. This leverages cloud scalability for computational resources and centralized data storage.
+        The AI components (e.g., person detection using RT-DETR, intra-camera tracking with ByteTrack, space-based location prediction algorithm for overlapping views, Re-ID feature extraction with FastReID) are integrated within the system's core \textbf{Backend} service. This Backend service, built with FastAPI, along with the entire system infrastructure (Frontend server, databases, caching, reverse proxy), is designed to be deployed in a \textbf{Cloud} environment. This leverages cloud scalability for computational resources and centralized data storage.
 
     \item \textbf{AI Communication with System Components:}
-        The AI models run embedded within the Python-based FastAPI Backend process. Communication occurs as follows:
+        The AI models and algorithms run embedded within the Python-based FastAPI Backend process. Communication occurs as follows:
         \begin{itemize}
-            \item \textbf{Internal Calls:} The main FastAPI application logic directly invokes the AI models for detection, tracking, feature extraction, and homography transformations using standard Python function calls.
+            \item \textbf{Internal Calls:} The main FastAPI application logic directly invokes the AI models for detection, tracking, space-based matching, feature extraction, and homography transformations using standard Python function calls.
             \item \textbf{Backend to Data Storage/Cache:} The Backend interacts with Redis (for caching Re-ID embeddings/gallery) and TimescaleDB/PostgreSQL (for storing historical tracking events and persistent embeddings) through database client libraries. It fetches video segments from cloud storage (e.g., AWS S3) and caches them locally for processing.
-            \item \textbf{Backend to Frontend (Real-time Metadata):} Processed tracking metadata (bounding boxes, global IDs, map coordinates, frame timestamps) are pushed from the FastAPI Backend to the React Frontend using \textbf{WebSocket} connections. This enables real-time updates for client-side visualization overlays on video playback. The video stream itself is fetched by the client directly (e.g., from S3).
+            \item \textbf{Backend to Frontend (Real-time Metadata):} Processed tracking metadata (bounding boxes, local IDs, global IDs from space-based and Re-ID matching, map coordinates, frame timestamps) are pushed from the FastAPI Backend to the React Frontend using \textbf{WebSocket} connections. This enables real-time updates for client-side visualization overlays on video playback. The video stream itself is fetched by the client directly (e.g., from S3).
             \item \textbf{Frontend to Backend (Control/Queries):} User interactions (e.g., initiating analysis tasks, requesting historical data) are sent from the React Frontend to the FastAPI Backend via \textbf{RESTful APIs}. External communication passes through a reverse proxy like Nginx.
         \end{itemize}
 
@@ -394,7 +396,7 @@ In essence, the AI transforms raw video data into a structured, quantitative, an
         \begin{itemize}
             \item \textit{Containerization \& Orchestration:} \textbf{Docker} for containerizing all services.  \textbf{Docker Compose} for orchestration.
             \item \textit{Backend Framework:} \textbf{FastAPI} for REST APIs, WebSocket handling, and orchestrating the AI processing pipeline.
-            \item \textit{AI Models \& Libraries:} \textbf{PyTorch} as the deep learning framework. Specific models like \textbf{Faster R-CNN} (detection), \textbf{BotSort} (tracking), \textbf{CLIP} (Re-ID feature extraction). Libraries like \textbf{BoxMOT} may be used to integrate these. \textbf{OpenCV} for video processing and image manipulation.
+            \item \textit{AI Models \& Libraries:} \textbf{PyTorch} as the deep learning framework. Specific models like \textbf{RT-DETR} (detection), \textbf{ByteTrack} (tracking), \textbf{FastReID} (Re-ID feature extraction). Space-based location prediction uses homography transformations. \textbf{OpenCV} for video processing and image manipulation.
             \item \textit{Frontend Framework:} \textbf{React} for the user interface.
             \item \textit{Data Storage \& Caching:} Cloud storage like \textbf{AWS S3} for video segments. \textbf{Redis} for caching. \textbf{TimescaleDB} for historical tracking data and embeddings.
             \item \textit{Reverse Proxy:} \textbf{Nginx}.

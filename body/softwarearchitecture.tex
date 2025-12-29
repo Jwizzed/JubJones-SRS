@@ -220,9 +220,9 @@ The AI component of our system is designed to handle object detection, tracking,
 \label{subsubsection:object-detection}
 
 \begin{itemize}
-    \item \textbf{Model Type:} YOLO (You Only Look Once) deep learning model
-    \item \textbf{Architecture:} Employs a backbone network for feature extraction followed by detection layers that predict bounding boxes and class probabilities
-    \item \textbf{Key Features:} Utilizes extended efficient layer aggregation networks (E-ELAN) and dynamic label assignment for improved performance
+    \item \textbf{Model Type:} RT-DETR (Real-Time DEtection TRansformer) deep learning model
+    \item \textbf{Architecture:} Transformer-based detection model with efficient hybrid encoder and uncertainty-minimal query selection
+    \item \textbf{Key Features:} End-to-end detection without NMS post-processing, flexible speed tuning via decoder layers
     \item \textbf{Function:} Responsible for identifying and localizing objects (people) within video frames
 \end{itemize}
 
@@ -236,6 +236,16 @@ The AI component of our system is designed to handle object detection, tracking,
     \item \textbf{Function:} Maintains identity consistency of detected objects across consecutive frames
 \end{itemize}
 
+\subsubsection{Space-Based Location Prediction}
+\label{subsubsection:space-based-matching}
+
+\begin{itemize}
+    \item \textbf{Type:} Algorithmic approach (not pure ML)
+    \item \textbf{Purpose:} Handle overlapping camera views where multiple cameras observe the same physical space from different angles
+    \item \textbf{Method:} Convert 3D location from Camera A into 2D floor plan coordinates using homography, then map back to 3D coordinates in Camera B to predict the person's location
+    \item \textbf{Function:} Enables intra-frame global ID assignment for persons visible in overlapping camera regions
+\end{itemize}
+
 \subsubsection{Re-Identification (Re-ID) System}
 \label{subsubsection:reid-system}
 
@@ -243,7 +253,7 @@ The AI component of our system is designed to handle object detection, tracking,
     \item \textbf{Model Type:} FastReID deep convolutional neural network
     \item \textbf{Architecture:} Specialized deep learning network that extracts discriminative features for person re-identification
     \item \textbf{Key Features:} Supports open-set Re-ID methods, critical for real-world applications where previously unseen identities may appear
-    \item \textbf{Function:} Associates identities across different camera views and non-consecutive frames
+    \item \textbf{Function:} Associates identities across different camera views and non-consecutive frames (across-frame matching)
 \end{itemize}
 
 \subsection{Dataset Information}
@@ -297,9 +307,9 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \label{subsubsection:training-environment}
 
 \begin{itemize}
-    \item \textbf{Hardware:} NVIDIA RTX 4090 GPU
+    \item \textbf{Hardware:} NVIDIA RTX 2060 GPU
     \item \textbf{Software:} PyTorch deep learning framework
-    \item \textbf{Computing Resources:} High-performance computing cluster for parallel training
+    \item \textbf{Computing Resources:} Local workstation for model fine-tuning
 \end{itemize}
 
 \subsubsection{Hyperparameters}
@@ -308,20 +318,20 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \begin{itemize}
     \item \textbf{Learning Rate:} 
     \begin{itemize}
-        \item YOLO: 0.01
+        \item RT-DETR: 0.0001 (default)
         \item ByteTrack and FastReID: 0.001
     \end{itemize}
     \item \textbf{Batch Size:} 
     \begin{itemize}
-        \item YOLO: 32
+        \item RT-DETR: 16
         \item ByteTrack and FastReID: 16
     \end{itemize}
     \item \textbf{Number of Epochs:}
     \begin{itemize}
-        \item YOLO: 100 epochs
+        \item RT-DETR: Fine-tuned on MTMMC dataset
         \item ByteTrack and FastReID: 50 epochs
     \end{itemize}
-    \item \textbf{Optimizer:} Adam with weight decay of 0.0005
+    \item \textbf{Optimizer:} AdamW with weight decay of 0.0001
 \end{itemize}
 
 \subsubsection{Data Augmentation}
@@ -470,4 +480,4 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \subsection{Conclusion}
 \label{subsection:conclusion}
 
-The AI component is a critical element of our system, enabling sophisticated batch processing of video feeds for object detection, tracking, and re-identification. By leveraging state-of-the-art models like YOLO, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The robust training methodology using NVIDIA RTX 4090 GPUs, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The seamless integration with other system components through well-defined APIs and deployment strategies provides a scalable and reliable solution for our users.
+The AI component is a critical element of our system, enabling sophisticated batch processing of video feeds for object detection, tracking, space-based location prediction, and re-identification. By leveraging state-of-the-art models like RT-DETR, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The training methodology using NVIDIA RTX 2060 GPU, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The space-based location prediction algorithm enables intra-frame global ID assignment for overlapping camera views, complementing the Re-ID model for across-frame matching. The seamless integration with other system components through well-defined APIs and deployment strategies provides a scalable and reliable solution for our users.
