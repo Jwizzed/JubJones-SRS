@@ -230,10 +230,10 @@ The AI component of our system is designed to handle object detection, tracking,
 \label{subsubsection:tracking-system}
 
 \begin{itemize}
-    \item \textbf{Model Type:} ByteTrack multi-object tracking algorithm
-    \item \textbf{Architecture:} Built upon StrongSORT tracker with byte-wise tracking capabilities
-    \item \textbf{Key Features:} Effectively handles low-confidence detections and combines appearance features with motion information to track objects across frames
-    \item \textbf{Function:} Maintains identity consistency of detected objects across consecutive frames
+    \item \textbf{Model Type:} Custom ByteTrack Implementation (Multi-Context)
+    \item \textbf{Architecture:} Modified ByteTrack algorithm designed for One-to-Many scalability
+    \item \textbf{Key Features:} Handles multiple camera streams using a single detector instance. It acts as a centralized state manager, maintaining independent tracking histories for infinite camera contexts simultaneously without instantiating separate trackers for each feed.
+    \item \textbf{Function:} Maintains identity consistency of detected objects across consecutive frames for all active cameras efficiently.
 \end{itemize}
 
 \subsubsection{Space-Based Location Prediction}

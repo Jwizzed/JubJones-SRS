@@ -39,21 +39,51 @@ The \usevar{\srsTitle} stands apart from competitors through its unique combinat
 \section{Literature Review}
 \label{section:literature-review}
 
-The development of multi-camera person tracking systems represents a significant advancement in computer vision and surveillance technology, addressing the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. This literature review examines the current state of the art in multi-camera tracking, focusing on the three key technical challenges our system addresses: multi-view person detection, cross-camera re-identification and tracking, and unified spatial mapping.
+The development of our multi-camera person tracking system builds upon established research while making specific architectural decisions to address the limitations of alternative approaches found in recent literature. This review is organized into two categories: foundational works that we directly leverage, and alternative methodologies that we analyzed but ultimately rejected in favor of our proposed pipeline.
 
+\subsection{Foundational Works Leveraged}
+\label{subsection:leveraged-works}
+Our system integrates several state-of-the-art components and datasets that provide the necessary building blocks for robust tracking.
 
-Zhang et al. \cite{bytetrack} introduced ByteTrack, a simple yet effective association method that tracks by associating nearly all detection boxes rather than only high-confidence ones. This approach significantly reduces missed detections and trajectory fragmentation, achieving state-of-the-art performance on multiple tracking benchmarks. While ByteTrack excels in maintaining object identity despite occlusions and low-confidence detections, it lacks our system's cross-camera re-identification capabilities. Our system leverages ByteTrack's comprehensive detection approach while extending it with persistent identity preservation across multiple non-overlapping camera views.
+\paragraph{ByteTrack (Zhang et al. \cite{bytetrack})}
+We leverage ByteTrack's "track-everything" philosophy, which associates low-confidence detection boxes rather than discarding them. This foundational work forms the core of our intra-camera tracking module, allowing our system to maintain trajectory continuity through brief occlusions or lighting changes without the need for complex post-hoc repairs.
 
+\paragraph{FastReID (He et al. \cite{fastreid})}
+For appearance modeling, we utilize the FastReID toolbox. Its modular architecture and powerful backbone networks provide the discriminative feature extraction capabilities essential for our Re-ID stage. We integrate this strictly as a feature extractor within our larger pipeline, separating it from the tracking logic to ensure modularity.
 
-He et al. \cite{fastreid} developed FastReID, a modular and extensible software system for general instance re-identification. Its architecture allows researchers to easily implement and test new ideas without rewriting the codebase, accelerating the transition from research to production. Unlike FastReID, which focuses primarily on the re-identification algorithm itself, our system integrates re-identification as part of a complete tracking solution with spatial awareness and environmental adaptation. Our implementation builds upon FastReID's powerful feature extraction techniques while adding context-aware identity maintenance specifically optimized for campus environments.
+\paragraph{MTMMC Dataset (Woo et al. \cite{mtmmc})}
+The MTMMC dataset serves as our primary training and benchmarking ground. Its diverse real-world scenarios (campus and factory) with multi-modal data provide the realistic conditions necessary to fine-tune our detection and Re-ID models for the specific challenges of our deployment environment.
 
+\paragraph{Modular 3D Tracking (Bredereke et al. \cite{modular3d})}
+We adopt the conceptual framework of modular 3D tracking using RGB cameras. While Bredereke et al. focus on synchronization, we leverage the core idea of mapping 2D tracks to 3D space as a distinct pipeline stage, which informs our Space-based Matching module.
 
-For 3D spatial mapping, Bredereke et al. \cite{modular3d} proposed a modular pipeline that calculates 3D trajectories of multiple objects using RGB cameras. Their approach is adaptable to various settings with multiple time-synchronized stationary cameras, demonstrating the feasibility of creating accurate spatial representations from multi-camera inputs. However, their system requires precise camera synchronization and calibration that limits practical deployment. Our system extends this approach with self-calibrating algorithms that can work with existing heterogeneous camera infrastructure while providing an interactive visualization interface absent in their implementation.
+\subsection{Key Insights and Adaptations from Recent Methodologies}
+\label{subsection:comparative-analysis}
+To ensure our system addresses the complexities of real-world deployment, we analyzed several recent alternative methodologies. Rather than viewing these as competing solutions, we treated them as sources of critical insight, adapting and evolving their core concepts to better suit our modular, privacy-focused architecture.
 
+\subsubsection{From Unified Architectures to Modular Decoupling}
+\textbf{Insight from Literature:} Gautam et al. \cite{yoloreidnet} demonstrated with YOLORe-IDNet that detection and re-identification tasks are deeply interconnected and can be effectively solved within a single computational pass.
+\par
+\textbf{Our Adaptation:} We learned from the efficiency of this coupling but refined the implementation into a \textbf{Decoupled Architecture} (using RT-DETR and FastReID as separate modules). This evolution allows us to retain the benefit of specialized feature extraction while gaining system modularity, enabling us to upgrade the detection engine (e.g., to newer Transformer models) without disrupting the re-identification gallery---a critical requirement for long-term system maintainability.
 
-Woo et al. \cite{mtmmc} presented MTMMC, a comprehensive real-world dataset captured by 16 multi-modal cameras across campus and factory environments under varying conditions. This dataset serves as a valuable benchmark for multi-camera tracking systems and highlights the importance of handling diverse environmental conditions. While MTMMC provides excellent testing data, it doesn't offer a complete tracking solution. Our system utilizes insights from this dataset to develop adaptive algorithms that maintain tracking performance across the varying lighting and environmental conditions typical in campus settings.
+\subsubsection{From Reactive Repair to Proactive Prevention}
+\textbf{Insight from Literature:} Wang et al. \cite{mixed_syn_tracking} rely on a post-hoc cleanup strategy. They allow tracklets to contain mixed identities and subsequently analyze the feature history using Gaussian Mixture Models (GMM). If the GMM detects multi-modal feature distributions (indicating two distinct persons under one ID), the system splits the track.
+\par
+\textbf{Our Adaptation:} We analyzed that these ID switches typically originate from track fragmentation during low-confidence periods (e.g., occlusion). We improved robustness by prioritizing \textbf{Proactive Prevention}. Integrating ByteTrack allows us to associate low-confidence detections, effectively bridging these gaps. Since the track continuity is maintained through the "dip" in confidence, the need for re-identification---and the risk of swapping IDs---is eliminated at the source.
 
+\subsubsection{From Conditional Geometry to Architectural Overlap}
+\textbf{Insight from Literature:} Wu et al. \cite{geom_consist_tracking} proved that 3D geometric constraints are a powerful fallback when visual appearance is unreliable due to occlusion. they implemented this as a conditional state that toggles on during occlusion.
+\par
+\textbf{Our Adaptation:} We validated the importance of geometry but advanced the implementation by making it the \textbf{Primary Architectural Bridge} (Space-Based Matching) rather than a conditional fallback. By continuously projecting all tracks to a unified 3D map, our system naturally bridges occlusions through multi-view spatial overlap, ensuring that geometric consistency is an inherent property of the system rather than a triggered state.
 
-Gautam et al. \cite{yoloreidnet} proposed YOLORe-IDNet, an efficient multi-camera system for person tracking that combines correlation filters and IOU constraints with a deep learning model for cross-camera person re-identification. Their system demonstrates robust performance in security applications, particularly in recovering identities after occlusion. However, YOLORe-IDNet lacks our system's unified spatial mapping and requires significant manual tuning for new environments. Our implementation builds upon their fusion of detection and re-identification while adding trajectory prediction models that maintain identity through blind spots not covered by cameras.
+\subsubsection{From Trajectory Clustering to Sequential Filtering}
+\textbf{Insight from Literature:} Hachiuma et al. \cite{hospital_tracking} showed that in environments with uniform clothing, physical trajectory provided a more reliable signal than visual features, suggesting that appearance can sometimes be a distraction.
+\par
+\textbf{Our Adaptation:} We synthesized this insight with visual matching using a \textbf{Sequential Filtering} approach. Our pipeline applies \textbf{Space-Based Matching} continuously to all tracks, projecting them to a unified map to handle overlapping fields and maintain global consistency. \textbf{Re-Identification} is triggered \textit{conditionally}---only when a valid spatial link suggests a cross-camera transition. This allows us to handle indistinguishable uniforms using spatial logic as the primary filter, while reserving expensive visual matching for necessary confirmations.
+
+\subsubsection{Resource-Aware Scalability in Multi-Camera Pipelines}
+\textbf{Insight from Literature:} Standard multi-camera tracking implementations often deploy independent detection and tracking instances for each camera feed. This 1-to-1 topology results in linear resource scaling, where computational overhead increases directly with the number of cameras, quickly saturating GPU memory.
+\par
+\textbf{Our Adaptation:} We devised a \textbf{One-to-Many} architecture to address this bottleneck. Instead of redundant model instances, we utilize a \textbf{Single Shared Detection Model} that multiplexes frames from all active cameras. This feeds into a \textbf{Custom ByteTrack Implementation} designed to manage independent tracking states for multiple camera contexts within a single execution thread. This design allows our system to scale to additional camera feeds with constant model memory overhead, significantly improving efficiency for campus-wide deployment.
 
 In conclusion, while existing systems have made significant progress in multi-camera tracking, there remains a gap in solutions that effectively integrate persistent identity tracking, environmental adaptation, and interactive spatial mapping for campus applications. Our \usevar{\srsTitle} addresses this gap by combining state-of-the-art computer vision techniques designed for practical deployment in real-world environments.

@@ -9,10 +9,10 @@ The primary AI-driven workflow resides within the system's backend processing co
 \begin{enumerate}
     \item \textbf{Person Detection:} Identifying individuals within each camera frame using high-performance detection models (e.g., RT-DETR).
     \item \textbf{Intra-Camera Tracking:} Maintaining consistent temporary IDs for detected individuals within a single camera's view over consecutive frames, utilizing robust tracking algorithms (e.g., ByteTrack).
-    \item \textbf{Space-Based Location Prediction:} For overlapping camera views, converting 3D location from one camera into 2D floor plan coordinates using homography, then mapping back to another camera's view to predict the person's location and assign intra-frame global IDs.
-    \item \textbf{Feature Extraction for Re-ID:} Generating unique appearance embeddings (features) from detected person images using discriminative feature extraction models (e.g., FastReID).
-    \item \textbf{Cross-Camera Re-Identification (Re-ID):} Matching these appearance embeddings across different camera views and time gaps to assign a persistent global identity for across-frame matching. This involves managing an embedding gallery, potentially using Redis for recent embeddings and TimescaleDB for historical ones.
-    \item \textbf{Spatial Mapping:} Transforming the detected location of individuals from the camera's 2D image plane onto a unified top-down map coordinate system using geometric transformation techniques (e.g., homography matrices).
+    \item \textbf{Space-Based Matching (Continuous):} For every tracked individual, transforming 2D pixel coordinates to a unified 3D map location using homography. This "always-on" step handles overlapping views by geometrically predicting location, allowing the system to bridge tracks spatially before resorting to visual features.
+    \item \textbf{Feature Extraction:} Generating unique appearance embeddings (features) from detected person images using models like FastReID, preparing them for potential identification needs.
+    \item \textbf{Cross-Camera Re-Identification (Conditional):} Triggered only when a target leaves one camera view and enters another (non-overlapping) view. This step matches appearance embeddings against the gallery to confirm identity when spatial continuity alone is insufficient.
+    \item \textbf{Spatial Mapping \& Visualization:} The final 2D map output which visualizes the consolidated tracks, derived from the continuous Space-Based Matching data.
 \end{enumerate}
 These AI components perform the essential visual analysis and identity association. Tracking metadata (bounding boxes, global IDs, map coordinates, frame timestamps) is then compiled and can be streamed to a frontend client via WebSockets for visualization, while historical data is stored in TimescaleDB. Figure \ref{fig:system_architecture} provides a high-level illustration of this system architecture and the integration points for these AI modules.
 \begin{figure}[!htb] % Use !htb to suggest placement: here, top, bottom
@@ -223,14 +223,14 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
         \end{itemize}
 \end{itemize}
 
-Figure \ref{fig:ml_pipeline_stages} visually summarizes the core AI processing stages detailed in the "Processing Approach \& Model Selection (ML Canvas)" item. It outlines the sequential flow, the primary model or tool used, and key evaluation metrics for each stage from Person Detection to Spatial Mapping.
+Figure \ref{fig:ml_pipeline_stages} visually summarizes the core AI processing stages detailed in the "Processing Approach \& Model Selection (ML Canvas)" item. It outlines the sequential flow from Person Detection, Intra-Camera Tracking, and continuous Space-Based Matching, to conditional Cross-Camera Re-ID and Spatial Mapping.
 
 \begin{figure}[!htb]
     \centering
     \makebox[\textwidth][c]{
         \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/ml_pipeline_stages.jpg} 
     }
-    \caption{Core AI Processing Pipeline Stages, Models, and Metrics. This diagram illustrates the sequential flow from Person Detection through Intra-Camera Tracking, Feature Extraction for Re-ID, Cross-Camera Re-ID, and finally to Spatial Mapping, highlighting the primary model/tool and evaluation metrics for each stage.}
+    \caption{Core AI Processing Pipeline Stages, Models, and Metrics. This diagram illustrates the flow from Person Detection and Intra-Camera Tracking to continuous Space-Based Matching, followed by conditional Cross-Camera Re-ID, highlighting the primary model/tool and evaluation metrics for each stage.}
 
     \label{fig:ml_pipeline_stages}
 
