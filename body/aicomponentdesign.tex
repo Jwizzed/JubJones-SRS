@@ -15,6 +15,8 @@ The primary AI-driven workflow resides within the system's backend processing co
     \item \textbf{Spatial Mapping \& Visualization:} The final 2D map output which visualizes the consolidated tracks, derived from the continuous Space-Based Matching data.
 \end{enumerate}
 These AI components perform the essential visual analysis and identity association. Tracking metadata (bounding boxes, global IDs, map coordinates, frame timestamps) is then compiled and can be streamed to a frontend client via WebSockets for visualization, while historical data is stored in TimescaleDB. Figure \ref{fig:system_architecture} provides a high-level illustration of this system architecture and the integration points for these AI modules.
+
+In real-world surveillance environments, maintaining consistent identification of individuals across multiple cameras cannot be achieved through manual monitoring or rule-based systems due to scale, appearance variation, occlusions, and temporal gaps. Artificial Intelligence therefore serves as a core enabler of the SpotOn system rather than an auxiliary feature. By automating person detection, tracking, and cross-camera re-identification, the system transforms fragmented video feeds into coherent identity trajectories and spatial representations. This AI-driven process significantly reduces cognitive load on operators, shortens investigation time, and enhances situational awareness, making AI essential for practical deployment and real-world adoption.
 \begin{figure}[!htb] % Use !htb to suggest placement: here, top, bottom
     \centering
     \makebox[\textwidth][c]{
@@ -303,6 +305,7 @@ To build trust and enable diagnostics, techniques were employed to understand an
 \textbf{Visual Explanation of Model Focus:}
 Gradient-weighted Class Activation Mapping (Grad-CAM) was utilized to generate visual heatmaps. These heatmaps highlight the regions in an input image that were most influential in the model's decision to classify an area as containing a 'person'. Figure \ref{fig:gradcam_example1} shows such a visualization for an image representative of a factory scene. The heatmap often strongly highlights relevant body parts like the torso and upper legs, aligning well with the subject's silhouette and indicating that the model learned to focus on pertinent visual features for its high-confidence detection. Similar interpretability was observed for campus scenes. For instance, Figure \ref{fig:gradcam_example2} and Figure \ref{fig:gradcam_example3} depict Grad-CAM outputs for persons detected in different campus environments. Even for smaller or more distant individuals, the heatmaps tend to concentrate on the upper body or head regions, demonstrating the model's ability to identify key features contributing to high-confidence scores. These visualizations confirm that the model generally behaves as expected by focusing on semantically relevant parts of a person.
 
+Explainability is a critical factor for trust and adoption in AI-driven surveillance systems. In SpotOn, techniques such as Grad-CAM visualization and interpretable performance metrics provide insight into model behavior and decision-making processes. These mechanisms enable operators and system maintainers to understand, validate, and diagnose AI outputs, thereby increasing confidence in automated identity association and supporting responsible real-world deployment.
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=1.0\textwidth,keepaspectratio]{jubjones/s10_c09_000000_explain_gradcam_det1_score1.00.png}
@@ -331,6 +334,7 @@ Beyond visual heatmaps, a mechanism was designed to generate human-understandabl
 This approach provides a practical level of interpretability, allowing users to understand the basis of individual detection decisions by linking the model's confidence to visual evidence of its focus.
 These demonstrations of model explainability serve as valuable tools for verifying expected model behavior, debugging potential issues where the model might focus on irrelevant features, and ultimately fostering greater trust in the AI system's outputs.
 
+The AI models integrated into SpotOn are selected with a strong emphasis on deployment readiness and operational stability. Well-established architectures such as RT-DETR, ByteTrack, and FastReID are employed to ensure robustness, maintainability, and compatibility with standard deep learning frameworks. The system is designed to operate under realistic hardware constraints and prioritizes batch-based retrospective analysis to avoid fragile real-time assumptions. Together with model versioning, performance monitoring, and retraining considerations, these design choices support reliable long-term use in real-world surveillance environments.
 \section{User Experience Design with AI}
 \label{section:ux_design} % This section remains untouched as per request
 
@@ -439,4 +443,4 @@ This PoC successfully validated that the backend service could manage a processi
 
 \section{(Optional) Reflection and Future Development}
 \label{section:reflection} % This section remains untouched as per request
-This section is designated for a comprehensive reflection on the project's development process, outcomes, and lessons learned, alongside an outline of potential avenues for future development and enhancements. The content for this section will be thoughtfully prepared and included upon the final completion of the project.
+This section is designated for a comprehensive reflection on the project’s development process, outcomes, and lessons learned, alongside an outline of potential avenues for future development and enhancements. The content for this section will be thoughtfully prepared and included upon the final completion of the project.
