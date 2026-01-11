@@ -76,8 +76,9 @@ The \usevar{\srsTitle} system is conceptualized to directly address the limitati
 
 While the core techniques employed in SpotOn, such as person detection, tracking, and re-identification, are established within the computer vision domain, the contribution of this project lies in how these components are re-conceptualized as a unified, investigation-oriented surveillance system. Rather than addressing detection, tracking, or re-identification in isolation, SpotOn treats identity continuity across distributed cameras as a system-level problem involving spatial context, temporal gaps, and user interpretability. This problem-driven design directly addresses operational challenges faced by security personnel and facility managers, such as fragmented camera views, manual identity reconciliation, and high cognitive load during investigations. By prioritizing practical identity persistence and spatial coherence, the system is well aligned with real-world campus and factory surveillance workflows.
 
-Beyond system integration, the design of SpotOn emphasizes how AI-generated information is presented and interpreted by users. Instead of exposing raw model outputs, the system translates identity associations into trajectories, spatial maps, and annotated visual elements that support intuitive reasoning about movement and behavior. This design approach creatively bridges complex AI processing with human-centered visualization, ensuring that technical sophistication directly enhances user understanding and decision-making.
+Beyond system integration, the design of SpotOn reflects deliberate AI model selection decisions driven by real-world deployment considerations. Rather than assuming a fixed re-identification solution, multiple Re-ID approaches were evaluated, and the final model was selected based on its robustness under cross-camera variations such as viewpoint changes, lighting differences, and appearance ambiguity. This careful selection allows re-identification to function as a reliable, conditional identity confirmation mechanism within the broader tracking pipeline, ensuring that AI components are not only technically sound but also operationally appropriate for real surveillance environments.
 
+Importantly, this represents an architectural shift from conventional appearance-first pipelines toward a spatially grounded, identity-centric design, which meaningfully alters how multi-camera tracking systems are structured and operated in practice.
 \section{Target User}
 \label{section:target-user}
 
@@ -85,8 +86,6 @@ The \usevar{\srsTitle} enables professionals in security, facility management, a
 The primary users are personnel responsible for monitoring distributed camera networks across large spaces.
 
 Each identified user role is directly mapped to specific system capabilities and use cases, ensuring that functional requirements reflect real operational needs rather than generic surveillance features.
-
-Importantly, this represents an architectural shift from conventional appearance-first pipelines toward a spatially grounded, identity-centric design, which meaningfully alters how multi-camera tracking systems are structured and operated in practice.
 
 \begin{table}[p]
     \centering
