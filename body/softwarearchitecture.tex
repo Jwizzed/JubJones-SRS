@@ -256,6 +256,10 @@ The AI component of our system is designed to handle object detection, tracking,
     \item \textbf{Function:} Associates identities across different camera views and non-consecutive frames (across-frame matching)
 \end{itemize}
 
+The selection of the Re-Identification model was informed by comparative evaluation using standard Re-ID benchmarks on the MTMMC dataset, including Rank-1 accuracy and mean Average Precision (mAP).
+
+Based on this evaluation, FastReID was chosen for its strong discriminative performance and modular design, allowing it to be reliably integrated as a conditional identity confirmation component within the overall tracking pipeline.
+
 \subsection{Dataset Information}
 \label{subsection:dataset-information}
 
