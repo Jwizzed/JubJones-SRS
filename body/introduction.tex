@@ -29,12 +29,12 @@ Our project aims to develop a robust tracking system called \textit{SpotOn} that
 The problem statement for the \usevar{\srsTitle} addresses the fundamental challenge of maintaining consistent identification of individuals as they move through spaces monitored by multiple cameras. In various environments from campuses and factories to public spaces and transportation hubs, the ability to track individuals across camera transitions is critical yet remains largely unsolved. When a person moves from one camera's view to another, current systems frequently lose their identity trail, creating fragmented tracking data that fails during situations requiring continuous monitoring. This tracking discontinuity affects numerous applications—from security monitoring and emergency response to space utilization analysis and research on movement patterns. The consequences include critical delays during time-sensitive situations, incomplete data for operational decision-making, and increased workload for monitoring personnel who must manually reconnect identity fragments across camera boundaries.
 Technically, this challenge manifests in three interconnected problems. First, the multi-view detection problem requires accurately identifying and locating individuals within each camera feed despite visual challenges like occlusions, distance variations, and diverse human appearances across different environments. Second, the cross-camera identity preservation problem involves maintaining consistent person identification during transitions between non-overlapping camera views, where individuals may appear drastically different due to perspective shifts, lighting changes, and temporal gaps. Third, the unified spatial comprehension problem necessitates integrating observations from distributed cameras into a coherent coordinate framework that enables operators to visualize continuous trajectories and understand movement patterns throughout the entire monitored environment. Current systems address these problems in isolation rather than as an integrated challenge, resulting in fragmented surveillance coverage that fails during critical monitoring scenarios.
 
+The design of SpotOn is explicitly driven by this identity continuity problem, with all core components, workflows, and visualizations structured to minimize tracking fragmentation and reduce manual cognitive effort for operators.
 
 \section{Solution Overview}
 \label{section:solution-overview}
 
-The \usevar{\srsTitle} addresses multi-camera person tracking challenges through an integrated computer vision platform with three core technical components:
-
+The \usevar{\srsTitle} system is conceptualized to directly address the limitations identified in current multi-camera surveillance workflows. Rather than treating camera feeds as independent data sources, the system focuses on maintaining consistent identity information as individuals move through monitored environments. To achieve this, SpotOn employs an integrated computer vision platform composed of three core technical components:
 \subsection{Prominent Features}
 \label{subsection:main-features}
 
@@ -74,11 +74,19 @@ The \usevar{\srsTitle} addresses multi-camera person tracking challenges through
     \item \textbf{Automatic Environment Mapping:} System that creates spatial representations based on observed movement patterns, automatically identifying walkways, intersections, and common routes without requiring manual mapping of the environment.
 \end{enumerate}
 
+While the core techniques employed in SpotOn, such as person detection, tracking, and re-identification, are established within the computer vision domain, the contribution of this project lies in how these components are re-conceptualized as a unified, investigation-oriented surveillance system. Rather than addressing detection, tracking, or re-identification in isolation, SpotOn treats identity continuity across distributed cameras as a system-level problem involving spatial context, temporal gaps, and user interpretability. This problem-driven design directly addresses operational challenges faced by security personnel and facility managers, such as fragmented camera views, manual identity reconciliation, and high cognitive load during investigations. By prioritizing practical identity persistence and spatial coherence, the system is well aligned with real-world campus and factory surveillance workflows.
+
+Beyond system integration, the design of SpotOn emphasizes how AI-generated information is presented and interpreted by users. Instead of exposing raw model outputs, the system translates identity associations into trajectories, spatial maps, and annotated visual elements that support intuitive reasoning about movement and behavior. This design approach creatively bridges complex AI processing with human-centered visualization, ensuring that technical sophistication directly enhances user understanding and decision-making.
+
 \section{Target User}
 \label{section:target-user}
 
 The \usevar{\srsTitle} enables professionals in security, facility management, and emergency response to maintain consistent identification of individuals across multiple camera views in complex environments, enhancing safety, optimizing operations, and improving response times.
 The primary users are personnel responsible for monitoring distributed camera networks across large spaces.
+
+Each identified user role is directly mapped to specific system capabilities and use cases, ensuring that functional requirements reflect real operational needs rather than generic surveillance features.
+
+Importantly, this represents an architectural shift from conventional appearance-first pipelines toward a spatially grounded, identity-centric design, which meaningfully alters how multi-camera tracking systems are structured and operated in practice.
 
 \begin{table}[p]
     \centering
