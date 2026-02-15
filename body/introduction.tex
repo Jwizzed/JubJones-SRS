@@ -21,7 +21,8 @@
 In large campus and factory environments, tracking people across multiple cameras is crucial for safety, security, and operational efficiency. Security teams need to quickly locate individuals involved in incidents like theft or unauthorized access. Factory managers require clear understanding of worker movements to ensure safety protocol compliance. Emergency responders need to pinpoint locations during evacuations. Without effective multi-camera tracking, blind spots and identification failures lead to delayed responses and compromised safety \cite{wangetal:2021}.
 When individuals transition between camera views, maintaining their identity becomes challenging. Existing systems often fail during these handoffs, creating fragmented surveillance coverage. For example, a student moving from an outdoor courtyard to a building lobby might be lost during transition, making it difficult to determine if they later entered a restricted area. This problem is particularly significant in sprawling campuses with numerous buildings or complex factory layouts where cameras operate independently.
 Environmental factors further complicate tracking. Lighting differences between bright outdoor areas and dim hallways alter appearances significantly. Crowded periods during class changes or shift rotations create frequent occlusions. Cameras at varying heights and angles provide drastically different perspectives of the same person, hindering accurate matching across views - a bag visible from the side might be completely hidden from the front.
-Our project aims to develop a robust tracking system called \textit{SpotOn} that consistently identifies and tracks individuals across camera networks, providing uninterrupted coverage in campus and factory settings. By solving the identity maintenance challenge across camera transitions, our solution will enhance security monitoring, expedite emergency responses, and provide valuable data for facility management and resource optimization.
+
+This is a cross-disciplinary project that aligns end-users, engineering capabilities, and security policy. Our project aims to develop a robust tracking system called \textit{SpotOn} that consistently identifies and tracks individuals across camera networks, providing uninterrupted coverage in campus and factory settings. The system was designed systematically using a hypothesis $\rightarrow$ test $\rightarrow$ iterate approach. By solving the identity maintenance challenge across camera transitions, our solution will enhance security monitoring, expedite emergency responses, and provide valuable data for facility management and resource optimization.
 
 \section{Problem Statement}
 \label{section:problem-statement}
@@ -50,7 +51,12 @@ The \usevar{\srsTitle} system is conceptualized to directly address the limitati
 \label{subsection:optional-features}
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{LLM-Powered Person Selection:} A natural language interface that allows users to identify individuals based on descriptive prompts (e.g., "Find the person wearing a black jacket and jeans who passed through the main entrance at 2:30 PM"), with an interactive confirmation step where users select the correct person from highlighted candidates.
+    \item \textbf{Agentic LLM Interface with Tool-Calling:}
+    \begin{itemize} [topsep=0pt, partopsep=0pt, itemsep=0pt, parsep=0pt] 
+        \item The LLM utilizes RAG (Retrieval-Augmented Generation) to fetch real-time tracked person metadata and uses tool-calling to autonomously trigger camera switches or Re-ID queries based on user prompts.
+        \item Implemented LLMOps practices, including prompt guardrails to prevent system hallucinations, and integrated observability/monitoring for the LLM agent.
+        \item The backend uses dynamic routing and model selection to choose between lightweight and heavy LLM models based on the complexity of the user's query.
+    \end{itemize}
 
     \item \textbf{Multi-Person Tracking:} Capability to simultaneously maintain identity and location data for multiple individuals across the camera network, preserving each person's unique identity despite occlusions, varying viewing angles, or extended periods where individuals are not visible in any camera.
 
@@ -125,8 +131,11 @@ The cross-camera re-identification solves the identity preservation problem by m
 The unified spatial mapping creates a comprehensive environmental understanding by integrating all camera feeds into a single coordinate system, allowing operators to visualize movement patterns spanning multiple buildings and zones.
 These capabilities translate to 70\% reduced manual tracking workload, faster incident response times, more effective resource allocation, and comprehensive situational awareness across the entire monitored environment.
 
-\section{Timeline}
+\section{Timeline and Competency-Based Learning Pathway}
 \label{section:timeline}
+
+This project serves as a capstone portfolio output demonstrating fast learning and skill transfer from academic CV research to practical application.
+
 
 \begin{figure}[!htb]
     \centering
@@ -145,6 +154,8 @@ Technical stack research extended from February to November 2025, while UX/UI de
 An internship period ran from June to November 2025. LLM integration for person selection was completed in December 2025, while perspective transformation, backend development, and frontend development all occurred from December 2025 to February 2026.
 
 System integration testing and user acceptance testing were conducted in February 2026. Deployment and containerization followed from February to March 2026, with final documentation and handover scheduled for completion in April 2026.
+
+Throughout the project, we run small experiments to validate skills and use feedback and metrics (e.g., rubric scores, completion rates, and skill evidence) to continuously adapt our learning strategy. We also conduct AAR-style (After Action Review) reflections at the end of each milestone to assess risks, impacts, and improve processes.
 
 
 \section{Terminology}

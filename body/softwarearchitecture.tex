@@ -404,7 +404,7 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
     \item \textbf{Data Updates:} Periodic dataset updates with new data to keep models current
     \item \textbf{Model Fine-tuning:} Regular model adjustments to adapt to changes in data distribution
     \item \textbf{Performance Monitoring:} Continuous evaluation of model performance on validation data
-    \item \textbf{Feedback Loop:} Incorporation of user feedback to improve model accuracy
+    \item \textbf{Feedback Loop:} Retrieval accuracy is continuously improved through automated measurement and feedback loops based on user confirmations.
 \end{itemize}
 
 \subsubsection{Ethical Considerations}
@@ -450,13 +450,13 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
     \end{itemize}
     \item \textbf{Orchestration:} 
     \begin{itemize}
-        \item Kubernetes for container orchestration
+        \item The backend is deployed using a modular architecture with Docker containerization, orchestrated via Kubernetes to ensure scalability at scale.
         \item Horizontal Pod Autoscaling for handling varying loads
     \end{itemize}
     \item \textbf{CI/CD Pipeline:} 
     \begin{itemize}
-        \item Automated testing and deployment using Jenkins
-        \item Blue-green deployment strategy for zero-downtime updates
+        \item Automated testing and deployment using GitHub CI/CD
+        \item The CI/CD pipeline enforces evaluation-driven development, automatically running unit tests, regression tests, and load/performance tests before any Blue-Green deployment.
     \end{itemize}
 \end{itemize}
 
@@ -464,10 +464,14 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \label{subsubsection:database-caching}
 
 \begin{itemize}
-    \item \textbf{TimescaleDB:} 
+    \item \textbf{Scalable Knowledge Base:} 
     \begin{itemize}
-        \item Stores time-series data such as tracking events
-        \item Schema optimized for efficient querying of temporal data
+        \item The system implements a scalable knowledge base using hybrid search, combining keyword filtering (time/location) with vector search (FastReID embeddings stored in a vector database).
+        \item Stores time-series data such as tracking events.
+    \end{itemize}
+    \item \textbf{Data Governance:}
+    \begin{itemize}
+        \item The system enforces strict metadata governance and maintains data lineage for all captured video segments to ensure security compliance.
     \end{itemize}
     \item \textbf{Redis:} 
     \begin{itemize}
