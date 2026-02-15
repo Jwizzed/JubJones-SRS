@@ -5,7 +5,7 @@
 \label{section:business_context}
 \usevar{\srsTitle} tackles the complex challenge of tracking individuals across multiple camera views in environments like campuses and factories. The core task requires recognizing and associating individuals as they move between potentially non-overlapping camera fields, often amidst changing appearances, viewpoints, lighting conditions, and occlusions. This inherent complexity and real-world variability make manual tracking labor-intensive, error-prone, and difficult to address effectively with traditional rule-based programming. Artificial Intelligence is therefore central to \usevar{\srsTitle}, providing the automation necessary to significantly improve this process.
 
-The primary AI-driven workflow resides within the system's backend processing core, designed as a service-oriented architecture. This backend, built with FastAPI, orchestrates a pipeline for **real-time analysis of live video streams**. Video data allows for immediate ingestion from IP cameras (e.g., via RTSP) and processed in-memory for low-latency analysis. The AI pipeline involves several key steps for each frame extracted from these real-time feeds:
+The primary AI-driven workflow resides within the system's backend processing core, designed as a service-oriented architecture. This backend, built with FastAPI, orchestrates a pipeline for \textbf{real-time analysis of live video streams}. Video data allows for immediate ingestion from IP cameras (e.g., via RTSP) and processed in-memory for low-latency analysis. The AI pipeline involves several key steps for each frame extracted from these real-time feeds:
 \begin{enumerate}
     \item \textbf{Person Detection:} Identifying individuals within each camera frame using high-performance detection models (e.g., RT-DETR).
     \item \textbf{Intra-Camera Tracking:} Maintaining consistent temporary IDs for detected individuals within a single camera's view over consecutive frames, utilizing robust tracking algorithms (e.g., ByteTrack).
@@ -251,11 +251,12 @@ This section outlines the strategy for developing, training, and evaluating the 
 
 \subsection{Model Development and Training Strategy}
 \label{subsection:model_dev_train_strat_new}
-The primary AI model for person detection is RT-DETR (Real-Time DEtection TRansformer), developed using the PyTorch deep learning framework. The development process prioritized robustness and accuracy for surveillance footage analysis.
+The primary AI model for person detection is RT-DETR (Real-Time Detection Transformer), developed using the PyTorch deep learning framework. The development process prioritized robustness and accuracy for surveillance footage analysis.
 Key aspects of the strategy include:
 \begin{itemize}
+
     \item \textbf{Dataset Utilization:} The MTMMC dataset served as the primary data source for training and fine-tuning. This dataset's diversity in campus and factory environments, lighting conditions, and occlusion levels provides a realistic foundation for developing models intended for real-world scenarios.
-    \item \textbf{Fine-Tuning Approach:} The RT-DETR model was initialized with default weights and fine-tuned on the MTMMC dataset. The model was trained using an NVIDIA RTX 2060 GPU to specifically address the 'person' class detection relevant to the system's objectives.
+    \item \textbf{Fine-Tuning Approach:} The RT-DETR model was initialized with default weights and fine-tuned on the MTMMC dataset. The model was trained using an NVIDIA RTX 4060 GPU to specifically address the 'person' class detection relevant to the system's objectives.
     \item \textbf{Data Preprocessing:} A standardized preprocessing pipeline was established. This included image resizing to a consistent input dimension for the model, color space conversion (e.g., BGR to RGB), normalization using established statistics, and conversion to tensor formats suitable for PyTorch. Data augmentation techniques, such as random horizontal flipping, were applied during training to enhance model generalization.
     \item \textbf{Experiment Management:} A systematic approach to tracking experiments, model configurations, hyperparameters, and performance metrics was employed, often facilitated by tools designed for experiment management (e.g., MLflow). This allowed for methodical comparison of different training runs and model variants.
 \end{itemize}
@@ -305,7 +306,7 @@ To build trust and enable diagnostics, techniques were employed to understand an
 \textbf{Visual Explanation of Model Focus:}
 Gradient-weighted Class Activation Mapping (Grad-CAM) was utilized to generate visual heatmaps. These heatmaps highlight the regions in an input image that were most influential in the model's decision to classify an area as containing a 'person'. Figure \ref{fig:gradcam_example1} shows such a visualization for an image representative of a factory scene. The heatmap often strongly highlights relevant body parts like the torso and upper legs, aligning well with the subject's silhouette and indicating that the model learned to focus on pertinent visual features for its high-confidence detection. Similar interpretability was observed for campus scenes. For instance, Figure \ref{fig:gradcam_example2} and Figure \ref{fig:gradcam_example3} depict Grad-CAM outputs for persons detected in different campus environments. Even for smaller or more distant individuals, the heatmaps tend to concentrate on the upper body or head regions, demonstrating the model's ability to identify key features contributing to high-confidence scores. These visualizations confirm that the model generally behaves as expected by focusing on semantically relevant parts of a person.
 
-Explainability is a critical factor for trust and adoption in AI-driven surveillance systems. In SpotOn, techniques such as Grad-CAM visualization and interpretable performance metrics provide insight into model behavior and decision-making processes. These visualizations allow us to communicate evaluation, quality, and risk results to non-technical stakeholders, driving evidence-based decisions. These mechanisms enable operators and system maintainers to understand, validate, and diagnose AI outputs, thereby increasing confidence in automated identity association and supporting responsible real-world deployment.
+Explainability is a critical factor for trust and adoption in AI-driven surveillance systems. In SpotOn, techniques such as Grad-CAM visualization and interpretable performance metrics provide insight into model behavior and decision-making processes. The team will systematically \textbf{communicate evaluation, quality, and risk results} to advisors, ensuring all architectural choices are \textbf{evidence-based decisions}. These mechanisms enable operators and system maintainers to understand, validate, and diagnose AI outputs, thereby increasing confidence in automated identity association and supporting responsible real-world deployment.
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=1.0\textwidth,keepaspectratio]{jubjones/s10_c09_000000_explain_gradcam_det1_score1.00.png}
@@ -340,7 +341,7 @@ The AI models integrated into SpotOn are selected with a strong emphasis on depl
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth,keepaspectratio]{assets/jubjones/ai_mockup_bbox.png}
+    \includegraphics[width=1.0\textwidth,keepaspectratio]{assets/jubjones/UI_ETC/pure_feed.jpeg}
     \caption{AI-Annotated Multi-Camera View with Person Detection.}
     \label{fig:ai_mockup_bbox}
 \end{figure}
@@ -350,7 +351,7 @@ When the AI identifies a person within a camera's field of view, it annotates th
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[width=1.0\textwidth,keepaspectratio]{assets/jubjones/ai_mockup_map.png}
+    \includegraphics[width=1.0\textwidth,keepaspectratio]{assets/jubjones/UI_ETC/map.png}
     \caption{AI-Generated Trajectory Map for Multi-Person Tracking.}
     \label{fig:ai_mockup_map}
 \end{figure}
@@ -361,21 +362,21 @@ The map display itself is an AI-driven annotation. The lines and markers on the 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1.0\textwidth,keepaspectratio]{assets/jubjones/ai_mockup_data.png}
+    \includegraphics[width=1.0\textwidth,keepaspectratio]{assets/jubjones/UI/DETECTED_PEOPLE.jpeg}
     \caption{Detailed AI-Annotated Tracking Information and Movement Analytics.}
     \label{fig:ai_mockup_data}
 \end{figure}
 
-The system employs Artificial Intelligence in an Annotate interaction style to provide users with detailed, actionable insights into the behavior and history of tracked individuals, as shown in the focused panel for "Person Id: 1". This detailed view is a direct result of the AI's continuous processing and analysis of surveillance data.
-The AI is responsible for initially detecting the person in a camera feed, assigning them a unique ID (Person Id: 1), and then persistently tracking their movements across time and potentially across different cameras. The "Position Tracking" table is populated by AI-derived annotations:
-\begin{itemize}
-    \item   \textbf{Status (Active/Lost):} The AI determines if the person is currently visible or if their track has been temporarily lost.
-    \item   \textbf{Coordinate:} The AI calculates the person's location (likely map coordinates derived via homography from camera views).
-    \item   \textbf{Confidence:} The AI provides a confidence score for its detection and tracking at each point in time.
-    \item   \textbf{Timestamp:} Each recorded state is timestamped, allowing for a chronological review of the person's movements. 
-\end{itemize}
-Furthermore, the "Movement Analytics" section, displaying "Current speed" and "Average speed," is also an AI-driven annotation. The AI calculates these metrics based on the changes in the person's position over time. Information like "First Detected," "Current tracking duration," and "Location" are all data points collated and maintained by the AI's tracking algorithms.
-In essence, the AI transforms raw video data into a structured, quantitative, and qualitative summary for each tracked person. This annotated information allows operators to quickly understand a person's history, assess their current state, and gain insights into their movement patterns without needing to manually review hours of footage or perform complex calculations. The AI annotates the interface with this rich data, empowering the user with a deeper understanding of the events unfolding in the monitored environment.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth,keepaspectratio]{assets/jubjones/UI_ETC/meta.png}
+    \caption{AI-Extracted Metadata and Re-Identification Features.}
+    \label{fig:ai_meta_data}
+\end{figure}
+
+The system further enhances understanding through detailed metadata extraction, as illustrated in Figure \ref{fig:ai_meta_data}. The AI analyses the visual appearance of detected individuals to extract attribute metadata such as \textbf{upper body clothing color} (e.g., "black") and \textbf{lower body clothing color} (e.g., "blue"). These attributes, along with the person's estimated \textbf{gender} (e.g., "Male"), are automatically cataloged and associated with the tracked identity. This granular level of detail supports advanced query capabilities, allowing operators to search for individuals based on physical descriptions (e.g., "Show all males wearing black shirts"). This feature relies on the AI's ability to not only detect and track but also to semantically understand the visual content within the bounding boxes.
 
 \section{Deployment Strategy}
 \label{section:deployment_aic} % Renumbered section
@@ -391,8 +392,12 @@ In essence, the AI transforms raw video data into a structured, quantitative, an
         \begin{itemize}
             \item \textbf{Internal Calls:} The main FastAPI application logic directly invokes the AI models for detection, tracking, space-based matching, feature extraction, and homography transformations using standard Python function calls.
             \item \textbf{Backend to Data Storage/Cache:} The Backend interacts with Redis (for caching Re-ID embeddings/gallery) and TimescaleDB/PostgreSQL (for storing historical tracking events and persistent embeddings) through database client libraries. It fetches video segments from cloud storage (e.g., AWS S3) and caches them locally for processing.
-            \item \textbf{Backend to Frontend (Real-time Metadata):} Processed tracking metadata (bounding boxes, local IDs, global IDs from space-based and Re-ID matching, map coordinates, frame timestamps) are pushed from the FastAPI Backend to the React Frontend using \textbf{WebSocket} connections. This enables real-time updates for client-side visualization overlays on video playback. The video stream itself is fetched by the client directly (e.g., from S3).
-            \item \textbf{Frontend to Backend (Control/Queries):} User interactions (e.g., initiating analysis tasks, requesting historical data) are sent from the React Frontend to the FastAPI Backend via \textbf{RESTful APIs}. External communication passes through a reverse proxy like Nginx.
+            \item \textbf{Backend to Frontend (Real-time Video \& Metadata):}
+                \begin{itemize}
+                    \item \textbf{MJPEG Streaming:} The backend streams raw video frames directly to the frontend using the \textbf{MJPEG} protocol. This ensures low-latency video playback without requiring intermediate cloud storage for live feeds.
+                    \item \textbf{WebSocket:} Processed tracking metadata (bounding boxes, local IDs, global IDs from space-based and Re-ID matching, map coordinates, frame timestamps) are pushed from the FastAPI Backend to the React Frontend using \textbf{WebSocket} connections. This enables real-time updates for client-side visualization overlays on top of the MJPEG video stream.
+                \end{itemize}
+            \item \textbf{Frontend to Backend (Control/Queries):} User interactions (e.g., initiating analysis tasks, requesting historical data, system configuration) are sent from the React Frontend to the FastAPI Backend via \textbf{RESTful APIs}. External communication passes through a reverse proxy like Nginx.
         \end{itemize}
 
     \item \textbf{Tools and Frameworks Used:}
@@ -414,6 +419,11 @@ In essence, the AI transforms raw video data into a structured, quantitative, an
             \item \textit{Security:} Nginx acts as a gateway for security measures (HTTPS, etc.). Containerization provides isolation. Proper cloud security configurations (IAM roles, network policies) are essential.
             \item \textit{Maintainability:} Docker ensures consistent environments. Modular backend services and clear API definitions aid management. Centralized logging/metrics simplify troubleshooting.
             \item \textit{Scalability:} Cloud deployment allows resource scaling. Stateless FastAPI backend instances can be scaled horizontally. Databases and caches can be scaled using cloud services or native features. The processing pipeline is designed for batch analysis of pre-split video segments.
+        \end{itemize}
+    \item \textbf{MLOps \& Governance:}
+        \begin{itemize}
+            \item \textbf{Observability:} The system includes production-grade \textbf{observability and monitoring} to track model accuracy and concept drift.
+            \item \textbf{Risk Management:} Deployment includes \textbf{guardrails} for low-confidence detections and \textbf{incident playbooks} for handling tracking failures.
         \end{itemize}
 \end{itemize}
 

@@ -197,40 +197,69 @@ This diagram provides a high-level overview of who uses the system and for what 
 \label{section:user-interface-design}
 
 The user interface for the multi-camera tracking system is designed to offer a clear, intuitive, and efficient experience for security personnel, facility managers, and other stakeholders, focusing on retrospective analysis of recorded video feeds.  The interface prioritizes the visualization of movement patterns, easy access to detailed tracking information.
-% Mockup Start
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/mockup/Dashboard.png}
-    \caption{Mockup of Landing Page}
-    \label{fig:mockup-landing-page}
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/UI/LANDING.jpeg}
+    \caption{Landing Page}
+    \label{fig:ui-landing}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/mockup/Dashboard - Select toggle.png}
-    \caption{Mockup of Landing Page (Date Selection)}
-        \label{fig:mockup-landing-page-datetime}
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/UI/ENV_SELECTION.png}
+    \caption{Environment Selection}
+    \label{fig:ui-env-selection}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/mockup/Group view.png}
-    \caption{Mockup of Group View Page (Overview)}
-    \label{fig:mockup-group-view}
+    \includegraphics[width=0.8\textwidth,keepaspectratio]{jubjones/UI/VIDEO_FEED.jpeg}
+    \caption{Video Feed Overview}
+    \label{fig:ui-video-feed}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.8\textwidth, keepaspectratio]{jubjones/mockup/Detail view - expand.png} %Added height constraint
-    \caption{Mockup of Group View Page (Expanded - Single Camera View)}
-    \label{fig:mockup-group-view-expanded}
+    \includegraphics[width=0.8\textwidth, keepaspectratio]{jubjones/UI/TRACK_ONE.jpeg} 
+    \caption{Tracking View}
+    \label{fig:ui-track-one}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth, keepaspectratio]{jubjones/UI/ANALYTIC_01.png} 
+    \caption{Analytics Dashboard - Overview}
+    \label{fig:ui-analytic-01}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth, keepaspectratio]{jubjones/UI/ANALYTIC_02.png} 
+    \caption{Analytics Dashboard - Detailed Metrics}
+    \label{fig:ui-analytic-02}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth, keepaspectratio]{jubjones/UI/ANALYTIC_03.png} 
+    \caption{Analytics Dashboard - Trends}
+    \label{fig:ui-analytic-03}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth, keepaspectratio]{jubjones/UI/HELP.png} 
+    \caption{Help and Documentation}
+    \label{fig:ui-help}
 \end{figure}
 \clearpage
 
-The user interface presents an intuitive flow across multiple views as illustrated in the mockups. The Landing Page (Figure \ref{fig:mockup-landing-page}) offers users a choice between campus and factory views, followed by a date selection interface (Figure \ref{fig:mockup-landing-page-datetime}) to access specific video feed timeframes. Once a selection is made, the Group View Page (Figure \ref{fig:mockup-group-view}) displays all cameras with detected individuals, presenting a comprehensive map that visualizes tracking paths and shows detection counts per camera. This page features multiple tabs, including an overview tab showing all camera feeds simultaneously and individual tabs for specific views. For more detailed analysis, the Expanded Group View (Figure \ref{fig:mockup-group-view-expanded}) displays camera feeds with identification markers for each detected person, listing cropped images of all detected individuals below the video feed. Users can select specific individuals to focus tracking exclusively on them, viewing detailed information such as position tracking status, coordinates, confidence levels, timestamps, first detection time, current tracking duration, and movement analysis.
+The user interface presents a streamlined workflow designed for efficiency. The process begins at the \textbf{Landing Page} (Figure \ref{fig:ui-landing}), which serves as the entry point. Users then proceed to \textbf{Environment Selection} (Figure \ref{fig:ui-env-selection}), where they choose the specific campus or factory environment to analyze.
 
-% Mockup End
+Once an environment is selected, the \textbf{Video Feed} (Figure \ref{fig:ui-video-feed}) displays the real-time or recorded camera streams, offering a comprehensive operational view. From here, users can enter the \textbf{Tracking View} (Figure \ref{fig:ui-track-one}), which allows for the specific monitoring of individuals across multiple cameras, utilizing the system's re-identification capabilities.
+
+For deeper insights, the \textbf{Analytics Dashboard} (Figures \ref{fig:ui-analytic-01}, \ref{fig:ui-analytic-02}, \ref{fig:ui-analytic-03}) provides data-driven visualizations of movement patterns, detection statistics, and other key metrics. Finally, the \textbf{Help} section (Figure \ref{fig:ui-help}) offers documentation and support resources to assist users in navigating the system capabilities.
 \newpage
 
 \section{Target and Development System}

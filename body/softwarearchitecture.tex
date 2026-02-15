@@ -211,7 +211,13 @@
 \subsection{Overview of the AI Component}
 \label{subsection:ai-component-overview}
 
-The AI component of our system is designed to handle object detection, tracking, and re-identification (Re-ID) for **real-time** processing of video feeds. This component serves as the core intelligence of the application, enabling it to recognize and track objects across multiple camera views live. The system prioritizes **low-latency real-time processing** to support immediate situational awareness, optimized for high-throughput concurrency using our **One-to-Many** architecture. The AI component integrates with other system modules by streaming analysis through WebSocket connections, supporting the system's overall objectives of accurate object tracking and identificaiton in real-time.
+The AI component of our system is designed to handle object detection, tracking, and re-identification (Re-ID) for \textbf{real-time} processing of video feeds. This component serves as the core intelligence of the application, enabling it to recognize and track objects across multiple camera views live. The system prioritizes \textbf{low-latency real-time processing} to support immediate situational awareness, optimized for high-throughput concurrency using our \textbf{One-to-Many} architecture. The AI component integrates with other system modules by streaming analysis through the following primary communication methods:
+\begin{itemize}
+    \item \textbf{MJPEG Streaming:} For delivering raw video frames to the frontend with minimal latency.
+    \item \textbf{WebSocket:} For pushing real-time detection and tracking metadata overlays.
+    \item \textbf{REST API:} For handling control commands and configuration requests.
+\end{itemize}
+This multi-protocol approach supports the system's overall objectives of accurate object tracking and identification in real-time.
 
 \subsection{AI Model Description}
 \label{subsection:ai-model-description}
@@ -220,8 +226,7 @@ The AI component of our system is designed to handle object detection, tracking,
 \label{subsubsection:object-detection}
 
 \begin{itemize}
-    \item \textbf{Model Type:} RT-DETR (Real-Time DEtection TRansformer) deep learning model
-    \item \textbf{Architecture:} Transformer-based detection model with efficient hybrid encoder and uncertainty-minimal query selection
+    \item \textbf{Detection Model:} RT-DETR (Real-Time Detection Transformer) - Selected for its balance of speed and accuracy, specifically its ability to handle crowded scenes better than traditional YOLO-based approaches. This model is responsible for identifying "person" objects within each camera frame.
     \item \textbf{Key Features:} End-to-end detection without NMS post-processing, flexible speed tuning via decoder layers
     \item \textbf{Function:} Responsible for identifying and localizing objects (people) within video frames
 \end{itemize}
@@ -311,7 +316,7 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \label{subsubsection:training-environment}
 
 \begin{itemize}
-    \item \textbf{Hardware:} NVIDIA RTX 2060 GPU
+    \item \textbf{Hardware:} NVIDIA RTX 4060 GPU
     \item \textbf{Software:} PyTorch deep learning framework
     \item \textbf{Computing Resources:} Local workstation for model fine-tuning
 \end{itemize}
@@ -404,7 +409,7 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
     \item \textbf{Data Updates:} Periodic dataset updates with new data to keep models current
     \item \textbf{Model Fine-tuning:} Regular model adjustments to adapt to changes in data distribution
     \item \textbf{Performance Monitoring:} Continuous evaluation of model performance on validation data
-    \item \textbf{Feedback Loop:} Retrieval accuracy is continuously improved through automated measurement and feedback loops based on user confirmations.
+    \item \textbf{Feedback Loop:} Retrieval accuracy will be improved using \textbf{measurement and feedback loops} from system operators.
 \end{itemize}
 
 \subsubsection{Ethical Considerations}
@@ -450,13 +455,15 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
     \end{itemize}
     \item \textbf{Orchestration:} 
     \begin{itemize}
-        \item The backend is deployed using a modular architecture with Docker containerization, orchestrated via Kubernetes to ensure scalability at scale.
+        \item To handle real-time processing of multiple camera feeds at scale, the system uses \textbf{Kubernetes} for service orchestration.
+        \item The system features a \textbf{modular architecture} where detection and tracking services are containerized using \textbf{Docker}.
+        \item We conducted a \textbf{risk and impact assessment} regarding the privacy implications and computational bottlenecks of multi-camera tracking.
         \item Horizontal Pod Autoscaling for handling varying loads
     \end{itemize}
     \item \textbf{CI/CD Pipeline:} 
     \begin{itemize}
         \item Automated testing and deployment using GitHub CI/CD
-        \item The CI/CD pipeline enforces evaluation-driven development, automatically running unit tests, regression tests, and load/performance tests before any Blue-Green deployment.
+        \item Development will follow an \textbf{evaluation-driven development} approach, incorporating automated test cases, \textbf{regression testing} for the models, and \textbf{load/performance tests} to ensure real-time latency.
     \end{itemize}
 \end{itemize}
 
@@ -488,4 +495,4 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \subsection{Conclusion}
 \label{subsection:conclusion}
 
-The AI component is a critical element of our system, enabling sophisticated **real-time** processing of video feeds for object detection, tracking, space-based location prediction, and re-identification. By leveraging state-of-the-art models like RT-DETR, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The training methodology using NVIDIA RTX 2060 GPU, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The space-based location prediction algorithm enables intra-frame global ID assignment for overlapping camera views, complementing the Re-ID model for across-frame matching. The seamless integration with other system components continuous WebSocket streaming provides a scalable and reliable real-time solution for our users.
+The AI component is a critical element of our system, enabling sophisticated \textbf{real-time} processing of video feeds for object detection, tracking, space-based location prediction, and re-identification. By leveraging state-of-the-art models like RT-DETR, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The training methodology using NVIDIA RTX 4060 GPU, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The space-based location prediction algorithm enables intra-frame global ID assignment for overlapping camera views, complementing the Re-ID model for across-frame matching. The seamless integration with other system components via MJPEG, WebSocket, and REST APIs provides a scalable and reliable real-time solution for our users.
