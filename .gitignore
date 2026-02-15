@@ -2,3 +2,29 @@ out/
 
 # SVG Package related
 svg-*
+
+body/abstract.aux
+body/acknowledgement.aux
+body/aicomponentdesign.aux
+body/appendix.aux
+body/conclusion.aux
+body/deliverable.aux
+body/introduction.aux
+body/reference.aux
+body/relatedworks.aux
+body/requirementanalysis.aux
+body/softwarearchitecture.aux
+body/softwaredevelopment.aux
+document.aux
+document.bbl
+document.blg
+document.fdb_latexmk
+document.fls
+document.lof
+document.log
+document.lot
+document.out
+document.toc
+partials/cover.aux
+partials/innercover.aux
+assets/jubjones/.DS_Store

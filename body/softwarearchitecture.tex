@@ -1,17 +1,65 @@
 \chapter{Software Architecture Design}
 \label{chap:software-architecture-design}
 
-\section{Domain Model}
-\label{section:domain-model}
+\section{Software Architecture}
+\label{section:software-architecture}
 
-% \begin{figure}[h!]
-%     \centering
-%     % \includesvg[width=1\textwidth]{kueater/domain_model.svg}
-%     \caption{Domain Model of KU Eater}
-%     \label{fig:domain-model}
-% \end{figure}
+The \usevar{\srsTitle} backend is built upon a \textbf{Layered Architecture} pattern using the \textbf{FastAPI} framework. This design promotes separation of concerns, maintainability, and scalability. The system is structured into clearly defined layers, each responsible for specific aspects of the data processing pipeline, from handling HTTP/WebSocket requests to executing complex AI logic and managing data persistence.
 
-% The domain model of KU Eater (Figure \ref{fig:domain-model}) shows the business knowledge, any technicalities are abstracted into their most simplest form. (Recommendation Engine for example)
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/jubjones/layer_architecture.png}
+    \caption{Layered Architecture Diagram}
+    \label{fig:backend-layers}
+\end{figure}
+
+The architecture consists of the following key layers:
+
+\subsection{API Layer (Presentation)}
+\label{subsection:api-layer}
+The API Layer is the entry point for all external interactions. It is responsible for routing requests, validating input data using Pydantic schemas, and handling authentication/authorization.
+\begin{itemize}
+    \item \textbf{Technology:} FastAPI Routers (`APIRouter`), WebSockets.
+    \item \textbf{Responsibilities:}
+    \begin{itemize}
+        \item \textbf{HTTP Endpoints:} RESTful APIs for environment management, analytics queries, and system control.
+        \item \textbf{WebSocket Endpoints:} Real-time bi-directional communication for pushing detection metadata and receiving client heartbeats.
+        \item \textbf{Middleware:} Handles cross-cutting concerns such as CORS, logging, and security headers.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Service Layer (Application Logic)}
+\label{subsection:service-layer}
+The Service Layer contains the core business logic and orchestrates the data flow between the API and Infrastructure layers. This is where the AI processing pipeline resides.
+\begin{itemize}
+    \item \textbf{Key Components:}
+    \begin{itemize}
+        \item \textbf{DetectionVideoService:} The central orchestrator that manages video stream processing, invoking object detectors (RT-DETR) and trackers.
+        \item \textbf{HomographyService:} Manages the transformation of 2D camera coordinates to 2D map coordinates using pre-computed homography matrices.
+        \item \textbf{FeatureExtractionService:} Wraps the FastReID model to extract appearance embeddings for person re-identification.
+        \item \textbf{AnalyticsEngine:} Aggregates real-time data into meaningful metrics (e.g., people counting, dwell time).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Infrastructure Layer (Data Access)}
+\label{subsection:infrastructure-layer}
+The Infrastructure Layer abstracts the underlying data storage technologies, providing a clean API for the Service Layer to persist and retrieve data.
+\begin{itemize}
+    \item \textbf{Components:}
+    \begin{itemize}
+        \item \textbf{Repositories:} The `TrackingRepository` manages CRUD operations for tracking data, abstracting SQL queries.
+        \item \textbf{Database:} \textbf{TimescaleDB} (PostgreSQL extension) is used for efficient storage and querying of time-series tracking data.
+        \item \textbf{Cache:} \textbf{Redis} is utilized for high-speed caching of Re-ID embeddings and transient application state.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Domain/Model Layer}
+\label{subsection:domain-model-layer}
+This layer defines the data structures and business entities used throughout the application, ensuring type safety and consistency.
+\begin{itemize}
+    \item \textbf{Pydantic Models:} Used for data validation and serialization in the API layer (e.g., `Detection`, `Track`, `AnalyticsSummary`).
+    \item \textbf{SQLAlchemy Models:} Mapped to database tables for ORM-based data access.
+\end{itemize}
 
 % However, some clarification may be needed as to help readers understand:
 
@@ -38,172 +86,168 @@
 \section{Sequence Diagram}
 \label{section:sequence-diagram}
 
-% % Sequence diagrams visualize interaction between the user and the system. The figures below show how components in the system will interact with
-% % each other and the end-user, while the users can dispatch messages or inputs into KU Eater.
+The sequence diagram visualizes the real-time interaction between system components during the tracking process. It illustrates how data flows from the video source through the AI processing pipeline and finally to the user interface.
 
-% \subsection{Default Recommendation Process}
-% \begin{figure}[h!]
-%     \centering
-%     % \includesvg[width=\textwidth,height=0.4\textheight,keepaspectratio]{kueater/sequence_diagram_anonymous_recommendations.svg}
-%     \caption{Sequence Diagram for Default Recommendation Process}
-%     \label{fig:seq-default-recommendation-process}
-% \end{figure}
+\subsection{Real-Time Tracking Process}
+% Mermaid Source:
+% sequenceDiagram
+%     participant Camera as Camera Feed
+%     participant VideoSvc as Video Service
+%     participant Detector as Object Detector (RT-DETR)
+%     participant Tracker as Tracker (ByteTrack)
+%     participant HomoSvc as Homography Service
+%     participant ReIDSvc as Re-ID Service
+%     participant Redis as Redis Cache
+%     participant WSManager as WebSocket Manager
+%     participant Client as Client UI
+%
+%     loop Every Frame
+%         Camera->>VideoSvc: Stream Frame (MJPEG/RTSP)
+%         VideoSvc->>Detector: Input Frame
+%         Detector-->>VideoSvc: Detections (BBox, Conf)
+%         
+%         VideoSvc->>Tracker: Update Tracks(Detections)
+%         Tracker-->>VideoSvc: Temporal IDs
+%         
+%         par Spatial Mapping
+%             VideoSvc->>HomoSvc: Map(Pixel Coords)
+%             HomoSvc-->>VideoSvc: Floor Plan Coords (x,y)
+%         and Re-Identification (If Needed)
+%             opt New Track or Zone Crossing
+%                 VideoSvc->>ReIDSvc: Extract Features(Crop)
+%                 ReIDSvc->>Redis: Query Gallery(Embedding)
+%                 Redis-->>ReIDSvc: Global ID Match/New ID
+%                 ReIDSvc-->>VideoSvc: Global ID
+%             end
+%         end
+%
+%         VideoSvc->>WSManager: Publish Metadata (GlobalID, XY, BBox)
+%         WSManager->>Client: WebSocket Update
+%         Client->>Client: Render Overlay & Map
+%     end
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth,height=0.6\textheight,keepaspectratio]{assets/jubjones/sequence_diagram.png}
+    \caption{Sequence Diagram for Real-Time Multi-Camera Tracking}
+    \label{fig:seq-tracking-process}
+\end{figure}
 
-% Figure \ref{fig:seq-default-recommendation-process} represents a sequence diagram for a process when a guest user is browsing KU Eater. When a user
-% starts to use KU Eater, the controller in the application layer will invoke the machine learning layer without specific parameters and generate new recommendations.
+Figure \ref{fig:seq-tracking-process} depicts the flow when a detection task is active:
+1.  The \textbf{Video Service} ingests frames from the camera feed.
+2.  Frames are passed to the \textbf{Object Detector} (RT-DETR) to identify individuals.
+3.  Detections are sent to the \textbf{Tracker} (ByteTrack) to assign temporal IDs.
+4.  The \textbf{Homography Service} maps pixel coordinates to the 2D floor plan.
+5.  If a track crosses into a new zone or camera view, the \textbf{Re-ID Service} extracts features and queries the \textbf{Redis} cache for a global identity match.
+6.  The aggregated tracking metadata (Global ID, Location, Bounding Box) is pushed to the \textbf{WebSocket Manager}.
+7.  The \textbf{Client UI} receives the update and renders the bounding boxes and map markers in real-time.
 
-% Once the recommendations are finished generating, the application requests list of recommendations and renders them back to user.
-
-% \subsection{User Recommendation Process}
-% \begin{figure}[h!]
-%     \centering
-%     % \includesvg[width=\textwidth,height=0.4\textheight,keepaspectratio]{kueater/sequence_diagram_user_recommendations.svg}
-%     \caption{Sequence Diagram for Authenticated User Recommendation Process}
-%     \label{fig:seq-user-recommendation-process}
-% \end{figure}
-
-% Figure \ref{fig:seq-user-recommendation-process} represents a sequence diagram for a process when authenticated user logs on to browse on KU Eater.
-% When a user, starts to use KU Eater, the controller in the application layer will fetch the user profile from the domain layer and pass the attributes in the profile to
-% the machine learning layer with user profile as the parameters. The recommendation engine will generate a list of possible recommendations.
-
-% Once the recommendations are finished generating, it is re-ranked, filtered and evaluated by considering the properties in user profile: Liked menu items, reviewed menu items, disliked menu items and dietary restrictions. The final set of recommendations is rendered back to user.
-
-% %\section{Algorithm}
-% %\label{section:algorithm}
-% %<TIP: Optional, If you are working on a research project that proposes a new
-% %algorithm, you can describe your algorithm here. It can be in the form of
-% %pseudocode or any diagram that you deem appropriate./>
-
-% \newpage
+\newpage
 
 \section{Pipeline}
 \label{section:pipeline}
 
-% \subsection{Modelling the Recommendation Engine}
-% \begin{figure}[h!]
-%     \centering
-%     % \includesvg[height=0.3\textheight,keepaspectratio]{kueater/algo_modelling.svg}
-%     \caption{Pipeline for Modelling the Recommendation Engine}
-%     \label{fig:pipeline-for-modelling}
-% \end{figure}
+\subsection{AI Processing Pipeline}
+% Mermaid Source:
+% flowchart TD
+%     %% Nodes
+%     A[Ingestion] --> B[Object Detection]
+%     B --> C[Intra-Camera Tracking]
+%     C --> D{Zone Crossing?}
+%     
+%     %% Spatial Mapping Path
+%     C --> E[Spatial Mapping]
+%     E --> G[Broadcast & Persistence]
+%
+%     %% Re-ID Path
+%     D -- Yes --> F[Re-Identification]
+%     D -- No --> G
+%     
+%     F --> F1[Feature Extraction]
+%     F1 --> F2[Gallery Matching]
+%     F2 --> G
+%
+%     %% Descriptions
+%     A:::stage
+%     B:::stage
+%     C:::stage
+%     E:::stage
+%     F:::stage
+%     G:::stage
+%
+%     classDef stage fill:#f9f,stroke:#333,stroke-width:2px;
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth,height=0.4\textheight,keepaspectratio]{assets/jubjones/pipeline.png}
+    \caption{Data Processing Pipeline for SpotOn}
+    \label{fig:pipeline-processing}
+\end{figure}
 
-% Our recommendation engine uses content-based filtering and item-based collaborative filtering
-% with K-nearest neighbor (kNN) as the backbone of the engine. \cite{singhanddwivedi:2023}
-% The model needs to be fed relevant data such as Menu Categories, Menu Items and Stalls in which they exist in
-% the database. As shown in, figure \ref{fig:pipeline-for-modelling}.
+The \usevar{\srsTitle} system employs a strictly ordered pipeline to transform raw video data into actionable tracking insights. As shown in Figure \ref{fig:pipeline-processing}, the pipeline consists of the following stages:
 
-% The following data types are used in the modelling process:
-
-% \begin{enumerate}[leftmargin=80pt]
-%     \item \textbf{Menu items:} A structured data type containing menu name, ingredients and cooking method.
-%     \item \textbf{Menu categories:} A set of keywords that corresponds to menu item types, cuisines, cooking method etc.
-%     The categories are used to tag the menu items to further enhance decision making for model and simplify its
-%     similarity calculation.
-%     \item \textbf{Stalls:} A structured data type containing stall name, menu items a stall offers etc.
-%     It is used to multiply menu entries to a number of stalls, so that we can further score specific item from reviews.
-% \end{enumerate}
-
-% The main objective of this recommendation system is to figure out what food items are relevant with inputted food items that user interacted with.
-% In order to build the proper system, we must start with finding relevance between menu items by using \textit{Content-Based Filtering}.
-
-% \begin{enumerate}[leftmargin=80pt]
-%     \item We compile a table of menu items which has the following attributes, menu name, a list of ingredients and cooking method as a string.
-%     \item The tags from Menu categories will automatically populate within each menu item.
-%     \item We use cosine similarity technique to match any string-based attributes.
-%     \item We turn ingredients feature into binary (Exists, Non-exists), in that way we can score the similarity of food items with existence of each ingredients.
-%     \item Finally, we can then use cosine similarity measure to find distances between all food items.
-% \end{enumerate}
-
-% After having a precomputed similarity vectors of each food item, we can use them to determine recommendations for a user;
-% by using \textit{Item-Based Collaborative Filtering}.
-
-% \begin{enumerate}[leftmargin=80pt]
-%     \item Once a user required new recommendations, a list of food items and stall is used to generate all possible recommendations.
-%     \item Using the list of similarity scores from CBF, we can determine the most similar menu items from user preferences with cosine similarity.
-%     \item We can take ratings of observed menu items and construct a user-item correlation set.
-%     \item Using cosine similarity, we can determine the nearest neighbors which are other users with similar preferences.
-%     \item We can use those other users' profile to see what menu item they're most likely to interact with, and use those as recommendations.
-% \end{enumerate}
-
-% \subsection{Predicting the Recommendations}
-% \begin{figure}[h!]
-%     \centering
-%     % \includesvg[width=\textwidth,height=0.2\textheight,keepaspectratio]{kueater/algo_prediction.svg}
-%     \caption{Pipeline for Predicting Recommendations}
-%     \label{fig:pipeline-for-predicting}
-% \end{figure}
-
-% User profile contains information that can be used to predict their preferences: Items that user recently looked, items reviewed by user, items liked by user.
-% These properties are used in the recommendation engine to predict an unordered list of possible recommendations.
-
-% However, the recommendations are not refined towards user, so additional properties are used externally: Disliked items and dietary restrictions.
-% "Disliked items" is used to reduce the appearance of disliked items, while "Dietary restrictions" is used to remove items from the list that users
-% cannot have. As shown in, figure \ref{fig:pipeline-for-predicting}.
+\begin{enumerate}[leftmargin=80pt]
+    \item \textbf{Ingestion:} Video frames are extracted from source files or streams (RTSP/MJPEG) and pre-processed (resized, normalized) for model input.
+    \item \textbf{Object Detection:} The RT-DETR model analyzes each frame to output bounding boxes and confidence scores for all detected persons.
+    \item \textbf{Intra-Camera Tracking:} The ByteTrack algorithm processes detections to maintain identity consistency across consecutive frames within a single camera view, handling short-term occlusions.
+    \item \textbf{Spatial Mapping:} The center point of each tracked person's foot-box is transformed using a homography matrix to obtain real-world $(x, y)$ coordinates on the facility's floor plan.
+    \item \textbf{Re-Identification (Re-ID):}
+    \begin{itemize}
+        \item \textbf{Feature Extraction:} For tracks crossing camera boundaries, the FastReID model extracts high-dimensional appearance embeddings.
+        \item \textbf{Matching:} These embeddings are compared against a gallery of active tracks in Redis (using cosine similarity) to determine if the person matches a known Global ID.
+    \end{itemize}
+    \item \textbf{Broadcast \& Persistence:} The final resolved track data (Global ID, Map Coordinates) is persisted to TimescaleDB for history and broadcast via WebSocket for real-time visualization.
+\end{enumerate}
 
 \section{Schemas}
 \label{section:data-schema}
 
-% KU Eater requires a lot of data from many sources as mentioned in \ref{subsection:data-acquisition}. In order to standardize and streamline the
-% data acquisition and processing phases, schemas for each important data type must be clear. The following are the schemas for specific data types:
+To ensure consistent data exchange between the Python backend, the AI models, and the React frontend, \usevar{\srsTitle} defines strict data schemas. The following are the core schemas used in the system:
 
-% \subsection{Menu Item}
-% \label{schema:menu-item}
-% \begin{verbatim}
-%     menu_id: uid,
-    
-%     menu_name: string,
+\subsection{Person Track}
+\label{schema:person-track}
+The fundamental unit of tracking data, representing a detected individual at a specific point in time.
+\begin{verbatim}
+{
+    "track_id": int,
+    "global_id": string,
+    "bbox_xyxy": [
+        float, float, float, float 
+    ],
+    "confidence": float,
+    "map_coords": [
+        float, float
+    ],
+    "is_focused": boolean
+}
+\end{verbatim}
 
-%     price: double,
-    
-%     ingredients: int<Ingredient>[],
-%     # refers to ingredients in database.
-    
-%     tags: int[]
-%     # refers to menu categories in database.
-% \end{verbatim}
+\subsection{Environment Configuration}
+\label{schema:environment}
+Defines the setup for a tracking location (e.g., Campus or Factory).
+\begin{verbatim}
+{
+    "environment_id": string,
+    "name": string,
+    "camera_count": int,
+    "zone_count": int,
+    "has_data": boolean,
+    "last_updated": string
+}
+\end{verbatim}
 
-% \subsection{Ingredient}
-% \label{schema:ingredient}
-% \begin{verbatim}
-%     ingredient_id: uid,
-    
-%     ingredient_name: string
-% \end{verbatim}
-
-% \subsection{Stall}
-% \label{schema:stall}
-% \begin{verbatim}
-%     stall_id: uid,
-
-%     stall_name: string,
-
-%     items: uid<MenuItem>[]
-%     # refers to what items they are selling.
-% \end{verbatim}
-
-% \subsection{User Profile}
-% \label{schema:user-profile}
-% \begin{verbatim}
-%     profile_id: uid,
-    
-%     name: string,
-    
-%     liked: uid<MenuItem>[],
-%     # refers to liked menu items.
-
-%     disliked: uid<MenuItem>[],
-%     # refers to disliked menu items.
-
-%     restrictions: DietaryRestriction
-% \end{verbatim}
-
-% \subsection{Dietary Restriction}
-% \label{schema:dietary-restriction}
-% \begin{verbatim}
-%     blacklist: uid<Ingredient>[]
-%     # refers to ingredients prohibited
-%     for consumption.
-% \end{verbatim}
+\subsection{WebSocket Tracking Update}
+\label{schema:ws-update}
+The payload sent to the frontend for real-time visualization.
+\begin{verbatim}
+{
+    "type": "tracking_update",
+    "task_id": "uuid",
+    "camera_id": "string",
+    "timestamp": "ISO 8601 String",
+    "camera_data": {
+        "tracks": [ PersonTrack, ... ]
+    }
+}
+\end{verbatim}
 
 \section{AI Component}
 \label{section:ai-component}
