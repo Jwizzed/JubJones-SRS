@@ -3,102 +3,253 @@
 
 \section{Software Development Methodology}
 \label{section:software-development-methodology}
-% For earlier stages of KU Eater development, we insisted in separating our project's components' responsibilities.
-% Each of the components, Backend, Frontend and Recommendation Engine are done in separated repositories, and will come together in a form of a microservices architecture.
 
-% For the methodology in doing so, we decided to do bi-weekly sprints of which we called "milestones." We hold regular meetings on every 1st and 16th on each month.
-% We also have impromptu meetings out of schedule as well, if we encountered problems or require affirmation from each team member.
-Project management and version control are handled via \textbf{GitHub Issues and PRs} to ensure transparency. Algorithm tuning will rely on strict \textbf{data and quality metrics}, and the team will improve the system through formal \textbf{AAR-style (After-Action Review) reflections} at the end of each development sprint.
+\subsection{Chosen Methodology}
+For the development of SpotOn, we chose an iterative and incremental approach, specifically adapting principles from Agile and Feature-Driven Development (FDD). This methodology focuses on building and delivering structured, working features in manageable increments. It was selected because it:
+\begin{itemize}
+    \item Emphasizes delivering working features frequently.
+    \item Supports structured design and planning for complex AI and system integrations.
+    \item Ensures continuous progress tracking with feature-based milestones.
+\end{itemize}
+Our development approach follows a phased process: defining core tracking and AI functions, designing the scalable architecture, and developing the frontend and backend iteratively. Regular sprint meetings are held to perform After-Action Reviews (AARs) and plan next steps, alongside strict evaluation of data and quality metrics.
 
-% Contacting with our advisor is also encouraged if there's any serious matter that's need to be discussed.
+\subsection{Work Process}
+The work process outlines the systematic approach to ensure SpotOn is developed efficiently, meets performance expectations (especially real-time latency), and aligns with project goals. The process is divided into key stages:
+\begin{enumerate}
+    \item \textbf{Defining Features}: Analyze user needs to determine essential video analytics features, focusing on robust tracking and Re-ID capabilities.
+    \item \textbf{System Design}: Plan the overall structure, focusing heavily on asynchronous I/O and shared inference engines to support scalability across multiple cameras. Create intuitive UI designs for the frontend.
+    \item \textbf{Development Process}: Build the core logic (backend and ML pipelines) to ensure data stability and real-time processing. Concurrently, develop the frontend to ingest real-time WebSockets and provide seamless interactions.
+    \item \textbf{Document Writing}: Regularly update project documentation, including system changes, architectural updates, and API specifications.
+\end{enumerate}
 
 \section{Technology Stack}
-% \label{section:technology-stack}
-% Our technology stack has been briefly covered in section \ref{section:development-system}, the following is a figure that shows a bigger picture of KU Eater's technical implementations.
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=\textwidth,height=0.3\textheight,keepaspectratio]{kueater/tech_stack.png}
-%     \caption{Technology Stack for KU Eater}
-%     \label{fig:tech-stack}
-% \end{figure}
-% From figure \ref{fig:tech-stack}, we have separate the responsibilities of technologies to five different groups: Data Collection, Database, Recommendations, Backend and Frontend.
+\label{section:technology-stack}
 
-% \subsection{Data Collection}
-% \begin{itemize}[leftmargin=80pt]
-%     \item \textbf{Google Sheets:} A spreadsheet tool where we use to record interview results from stalls. Data includes stall information, list of menu items,
-%     prices of menu items etc. This tool is used in stages where data collection needs to be easy and fast. Moreover, since this is on cloud it can be used in later
-%     development stages where we require our spreadsheet to be primary data source.
-%     \item \textbf{OpenAI ChatGPT:} A chat tool running on large language models, it allows us to be able to infer a list of ingredients for menu items we recorded.
-%     The tool allows us to fill in the gaps of missing data.
-% \end{itemize}
+To develop SpotOn, we utilize a highly synergistic technology stack designed for high-performance video processing, scalable deep learning inference, and responsive real-time user interfaces. The stack is categorized as follows:
 
-% \subsection{Database}
-% \begin{itemize}[leftmargin=80pt]
-%     \item \textbf{PostgreSQL:} Our choice of relational database system with plethora of features that reduce usage of complex queries
-%     and an extensible ecosystem.
-%     \item \textbf{pgvector:} An extension for PostgreSQL that allows our database to store and compare data vectors.
-% \end{itemize}
+\subsection{Frontend}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{React:} The core JavaScript library used for building interactive and component-based user interfaces.
+    \item \textbf{Zustand:} A small, fast, and scalable bearbones state management solution used to handle complex frontend state with minimalistic boilerplate.
+\end{itemize}
 
-% \subsection{Recommendations and Backend}
-% \begin{itemize}[leftmargin=80pt]
-%     \item \textbf{Rust:} A general-purpose programming language that emphasizes on type safety and performance. It has a large ecosystem of tools required for building KU Eater.
-%     \item \textbf{Tonic:} A gRPC server/client implementation for Rust with asynchronous support. It also has codegen tools to automatically build systems from protocol buffers.
-%     \item \textbf{SQLx:} A generic asynchronous SQL library for Rust.
-%     \item \textbf{Polars:} A dataframe library that can load from multiple data sources, including full SQL support.
-%     \item \textbf{Huggingface's Libraries:} We use Candle from Huggingface to create native-Rust AI models.
-% \end{itemize}
+\subsection{Backend (The Core Logic)}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{FastAPI:} A modern, fast (high-performance) web framework for building APIs with Python, enabling asynchronous handling of video streams and API requests.
+    \item \textbf{PyTorch:} The primary deep learning framework utilized for model development, training, and inference.
+    \item \textbf{Ultralytics:} Utilized specifically for state-of-the-art YOLO (You Only Look Once) object detection models.
+    \item \textbf{OpenCV:} The foundational computer vision library used for image processing and frame manipulation.
+    \item \textbf{Boxmot:} A specialized library integrated into the pipeline for robust multi-object spatial tracking.
+\end{itemize}
 
-% \subsection{Frontend}
-% \begin{itemize}[leftmargin=80pt]
-%     \item \textbf{React Native:} A web application framework that runs as native applications on mobile platforms. It allows an application to elevate
-%     its ability to use native components on your phone (e.g. storage, GPS)
-%     \item \textbf{Expo:} An extension to React Native framework with rapid prototyping support and contains extra implementations of native components.
-% \end{itemize}
+\subsection{Data Storage \& Cache}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Redis:} An in-memory data store utilized heavily for low-latency caching and as a high-speed message broker for real-time video analytics streams.
+    \item \textbf{PostgreSQL:} The primary relational database system used for storing persistent application metadata and configurations.
+    \item \textbf{TimescaleDB:} A powerful PostgreSQL extension specifically optimized for handling and querying time-series data generated by analytics metrics.
+\end{itemize}
+
+\subsection{MLOps (Model Lifecycle)}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{MLflow:} An open-source platform utilized for managing the end-to-end machine learning lifecycle, facilitating rigorous experimentation and metric tracking.
+    \item \textbf{DagsHub:} A collaborate platform tailored for data science, used for dataset versioning (DVC) and Git integrations during the model training phase.
+\end{itemize}
+
+\subsection{Deployment \& Infrastructure}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Docker:} Containerization of all system services to ensure consistency across development, testing, and production environments.
+    \item \textbf{Kubernetes (K8s):} Container orchestration employed to manage the scaling of backend microservices and shared inference engine nodes.
+    \item \textbf{Nginx:} Acts as the primary reverse proxy and load balancer to securely route traffic to the appropriate containerized services.
+\end{itemize}
+
+\subsection{Data Source}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Amazon S3:} Highly scalable object storage used for archiving large datasets and storing exported model weights securely in the cloud.
+\end{itemize}
+
+\subsection{Monitoring \& Logging}
+\begin{itemize}[leftmargin=80pt]
+    \item \textbf{Prometheus:} An open-source systems monitoring and alerting toolkit used extensively for real-time metrics collection from our infrastructure and applications.
+    \item \textbf{Grafana:} A multi-platform open-source analytics and interactive visualization web application utilized for building comprehensive monitoring dashboards.
+\end{itemize}
 
 \section{Coding Standards}
-% \label{section:coding-standards}
-% For naming conventions in any language, we try to stick to the convention which is default for each language.
-% For Rust implementations, it needs to conform to RFC 430 from the Rust Lang Style Guide. \cite{rustlangstyleguide}
-% For React Native implementations, it should respect the style guide created by Airbnb. \cite{airbnbreactstyleguide}
-% For Protocol Buffers, it needs to follow the style guide provided by Google. \cite{protobufstyleguide}
+\label{section:coding-standards}
 
-% In communications between each components in our architecture, the communication protocol used is gRPC. It is a Remote Call Procedure framework made by Google that can be run
-% in any modern environment including web applications. It allows us to define our service by using Protocol Buffers language, then it can generate source code for
-% any programming languages to implement those services.
-% The advantages of using gRPC is that we will have a consistent routing pattern for our services, it is more performant than typical REST APIs
-% since the underlying data is transported in binary form.
+Coding standards provide a set of guidelines that prioritize consistency, readability, and maintainability throughout the development process. As this project heavily leverages AI-assisted development tools for rapid prototyping and implementation, aligning our standards with best-practice patterns (often generated by such tools) is crucial. By adhering to these established patterns, we produce code that is modular, easier to understand, and highly scalable.
+
+For SpotOn, the coding standards cover general practices, backend Python development, and frontend React development to ensure a cohesive, reliable architecture across the entire stack.
+
+\subsection{General Coding Practices}
+\begin{itemize}[leftmargin=40pt]
+    \item \textbf{Consistent Naming Conventions:}
+    \begin{itemize}
+        \item Variables and functions use \texttt{snake\_case} in Python and \texttt{camelCase} in JavaScript/TypeScript.
+        \item Global Constants use \texttt{UPPER\_CASE}.
+        \item Classes and React Components follow \texttt{PascalCase}.
+    \end{itemize}
+    \item \textbf{Use of Environment Variables:}
+    \begin{itemize}
+        \item All sensitive credentials, API keys, and configurations are exclusively stored in \texttt{.env} files.
+        \item Hardcoded secrets inside the source code are strictly prohibited to ensure security.
+    \end{itemize}
+    \item \textbf{Type Safety:}
+    \begin{itemize}
+        \item Strong typing and type hinting are utilized across both backend (Python Type Hints) and frontend (TypeScript interfaces/types) to reduce runtime errors.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Backend Coding Standards}
+\begin{itemize}[leftmargin=40pt]
+    \item \textbf{Modular Python Structure:} The backend strictly adheres to PEP 8 standards. API routes, database models, ML inference pipelines, and core configurations are thoroughly separated into logical modules and packages.
+    \item \textbf{Error Handling \& Logging:}
+    \begin{itemize}
+        \item Robust `try-except` blocks are paired with configured Python loggers avoiding raw `print()` statements for production monitoring.
+        \item FastAPI Exception Handlers are used to standardize HTTP error responses and appropriate status codes.
+    \end{itemize}
+    \item \textbf{FastAPI Best Practices:}
+    \begin{itemize}
+        \item Employs Pydantic models extensively for request parsing and automated data validation.
+        \item Adheres to RESTful design patterns for standard CRUD operations while utilizing native WebSockets for asynchronous video framing.
+    \end{itemize}
+    \item \textbf{Database Interactions:} Queries are handled safely using integrated ORMs (like SQLAlchemy or SQLModel) to mitigate SQL injection vulnerabilities and manage connections efficiently.
+\end{itemize}
+
+\subsection{Frontend Coding Standards}
+\begin{itemize}[leftmargin=40pt]
+    \item \textbf{Component-Based Architecture:} The User Interface strictly utilizes functional components intertwined with React Hooks for side effects and data fetching.
+    \item \textbf{State Management:} 
+    \begin{itemize}
+        \item Local UI state leverages \texttt{useState} and \texttt{useReducer}.
+        \item Global, complex application state relies gracefully on Zustand for performant sharing without boilerplate overhead.
+    \end{itemize}
+    \item \textbf{Styling and Structure:}
+    \begin{itemize}
+        \item Styling relies on isolated CSS/Tailwind modules to prevent global style pollution.
+        \item Focuses structurally on highly semantic, reusable elements using descriptive naming implementations to aid long-term maintainability.
+    \end{itemize}
+    \item \textbf{Formatting Tools:} Prettier and ESLint standards are enforced to ensure clean, consistent indentation and formatting logic across all client-side files.
+\end{itemize}
 
 \section{Progress Tracking Report}
-% \label{section:progress-tracking-report}
-% \subsection{Current Situation}
-% We have been working on our project and trying to follow the timeline (\ref{section:timeline}) we laid out. However, it is come to clear that
-% we've been working too much on proof of concept especially for backend part, the result is not to be happy with.
+\label{section:progress-tracking-report}
 
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.5\textwidth]{kueater/frontend-contribution.png}
-%     \caption{Frontend Contribution Graph as of 16/02/2025}
-%     \label{fig:frontend-contribution}
-% \end{figure}
+To maintain visibility over the development lifecycle, we track our progress across three primary pillars: Machine Learning, Backend, and Frontend. The tables below outline the progression of completed and upcoming tasks across key development milestones.
 
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.5\textwidth]{kueater/backend-contribution.png}
-%     \caption{Backend Contribution Graph as of 16/02/2025}
-%     \label{fig:backend-contribution}
-% \end{figure}
+\subsection{Milestone 1: January 16, 2026}
+During the first major milestone, the foundational infrastructure and real-time visualization systems were established, along with a functional real-time detection model. 
 
-% From figure \ref{fig:frontend-contribution}, there has been significant proof of work on frontend as seen in the contribution graph.
-% However from figure \ref{fig:backend-contribution}, there has been a large gap before the work can actually start. This is because, the backend
-% is more takes more time for working and studying in a sandbox rather being developed. Extra repositories like shared protocol buffers, Docker image registries and
-% embedding model also require time from backend development to be allotted into them. This could be a disadvantage of microservice architecture where
-% we need to focus on multiple components at once.
+\begin{table}[H]
+    \centering
+    \caption{Project Progress as of January 16, 2026}
+    \begin{tabularx}{\textwidth}{|X|X|X|}
+        \hline
+        \textbf{Machine Learning} & \textbf{Backend} & \textbf{Frontend} \\
+        \hline
+        \textcolor{DarkGreen}{\textbullet~Fine-tuned detection model (real-time)} & \textcolor{DarkGreen}{\textbullet~Infrastructure \& core systems} & \textcolor{DarkGreen}{\textbullet~UI \& real-time visualization} \\
+        & \textcolor{DarkGreen}{\textbullet~Video pipeline setup} & \textcolor{DarkGreen}{\textbullet~Individual tracking system} \\
+        & \textcolor{DarkGreen}{\textbullet~Detection/tracking integration} & \textcolor{DarkGreen}{\textbullet~2D Mapping} \\
+        & & \textcolor{DarkGreen}{\textbullet~Backend integration} \\
+        \hline
+        \multicolumn{3}{|c|}{\textbf{Upcoming Tasks (Next Phase)}} \\
+        \hline
+        \textcolor{red}{\textbullet~Fine-tune ReID model} & \textcolor{red}{\textbullet~2D mapping logic} & \textcolor{red}{\textbullet~Comprehensive testing} \\
+        \textcolor{red}{\textbullet~ReID Proof of Concept} & \textcolor{red}{\textbullet~ReID PoC integration} & \textcolor{red}{\textbullet~User feedback loop} \\
+        \hline
+    \end{tabularx}
+\end{table}
 
-% \subsection{Extra Tools}
-% We used a project management tool called Linear in order to track our tasks.
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=\textwidth]{kueater/linear.png}
-%     \caption{Project Task Board for KU Eater}
-%     \label{fig:linear}
-% \end{figure}
+\subsection{Milestone 2: February 20, 2026}
+By the second milestone, significant advancements were made in the Machine Learning and Backend components, specifically with the completion of the Re-ID model fine-tuning and spatial matching logic. Focus has shifted towards testing and new model evaluations.
+
+\begin{table}[H]
+    \centering
+    \caption{Project Progress as of February 20, 2026}
+    \begin{tabularx}{\textwidth}{|X|X|X|}
+        \hline
+        \textbf{Machine Learning} & \textbf{Backend} & \textbf{Frontend} \\
+        \hline
+        \textcolor{DarkGreen}{\textbullet~Fine-tuned detection model (real-time)} & \textcolor{DarkGreen}{\textbullet~Infrastructure \& core systems} & \textcolor{DarkGreen}{\textbullet~UI \& real-time visualization} \\
+        \textcolor{DarkGreen}{\textbullet~Fine-tune Re-ID model} & \textcolor{DarkGreen}{\textbullet~Video pipeline setup} & \textcolor{DarkGreen}{\textbullet~Individual tracking system} \\
+        \textcolor{DarkGreen}{\textbullet~ReID proof of concept} & \textcolor{DarkGreen}{\textbullet~Detection/tracking integration} & \textcolor{DarkGreen}{\textbullet~2D Mapping} \\
+        & \textcolor{DarkGreen}{\textbullet~Spatial Matching} & \textcolor{DarkGreen}{\textbullet~Backend integration} \\
+        \hline
+        \multicolumn{3}{|c|}{\textbf{Upcoming Tasks (Next Phase)}} \\
+        \hline
+        \textcolor{red}{\textbullet~New detection model (new)} & \textcolor{red}{\textbullet~Re-ID integration} & \textcolor{red}{\textbullet~User feedback loop} \\
+        & & \textcolor{red}{\textbullet~Comprehensive testing} \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{Overall Task Completion (GitHub Board)}
+In addition to specific feature milestones, the team utilizes GitHub Projects to monitor the continuous progress and completion of tasks. The project workspace provides multiple perspectives to track development velocity, issue resolution, and sprint planning. As illustrated below, the Kanban board view (Figure \ref{fig:github-board-view}) offers a clear visual progression of tasks from backlog to completion. The Roadmap view (Figure \ref{fig:github-roadmap-view}) visually aligns these tasks against chronological milestones to ensure timely delivery, while the detailed Table view (Figure \ref{fig:github-table-view}) permits granular tracking of assigned priorities, component labels, and active statuses across all project domains.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/Progress/board_view.png}
+    \caption{Kanban board view tracking task status progression}
+    \label{fig:github-board-view}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/Progress/roadmap_view.png}
+    \caption{Project roadmap view illustrating the timeline of key milestones}
+    \label{fig:github-roadmap-view}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/Progress/table_view.png}
+    \caption{Detailed table view of project tasks and their assigned attributes}
+    \label{fig:github-table-view}
+\end{figure}
+
+\section{Rebuttal to Committee Review}
+\label{section:rebuttal-to-committee-review}
+
+This section outlines the questions and feedback provided by the examiners during the evaluations. It details the issues raised, explains the project's responses—spanning system architectural improvements, documented metrics, and methodological clarifications—and clearly states the reasoning behind decisions regarding system changes.
+
+\begin{table}[H]
+    \centering
+    \caption{Committee Review Feedback and Responses (Part 1 of 2)}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabularx}{\textwidth}{|>{\hsize=0.5\hsize\raggedright}X|>{\hsize=1.5\hsize\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Issue Raised} & \textbf{Response \& Action Taken} \\
+        \hline
+        \textbf{Focus on real-time performance — what are the measurement metrics, such as latency?} &
+        \textbf{Implemented:} We have explicitly defined comprehensive measurement metrics for evaluating real-time performance to provide transparency about system latency and throughput. The documentation now covers: \newline
+        $\bullet$ \textit{API Metrics:} Response Time, RPS, and Error Rate. \newline
+        $\bullet$ \textit{Pipeline Performance:} Glass-to-Glass Latency, Stream Initialization, WebSocket Message Latency, and Frame Drops. \newline
+        $\bullet$ \textit{UI Metrics:} TTFB, LCP, TTI, and UI FPS. \\
+        \hline
+        \textbf{Scaling: more cameras increase load and complexity?} &
+        \textbf{Mitigated:} To circumvent issues where adding cameras exponentially increases load, we optimized component workloads. \newline
+        $\bullet$ \textit{Shared Inference Engine:} Processing resources are distributed effectively rather than dedicating isolated pipelines per camera. \newline
+        $\bullet$ \textit{Decoupled Pipeline (Async I/O):} The core video processing operates completely asynchronously, minimizing blocking operations. \newline
+        $\bullet$ \textit{Vector Search Centralization:} A centralized, scaleable capability handles spatial tracking uniformly and globally. \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Committee Review Feedback and Responses (Part 2 of 2)}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabularx}{\textwidth}{|>{\hsize=0.5\hsize\raggedright}X|>{\hsize=1.5\hsize\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Issue Raised} & \textbf{Response \& Action Taken} \\
+        \hline
+        \textbf{Find a way to copy the map to reduce processing time.} &
+        \textbf{Clarified (Already Supported):} Since the homography configuration software was custom-developed by our team, we possess full control over the mapping data. We can directly accommodate this by reusing the generated calibration files, effectively removing the need for manual recreation across different environmental nodes. \\
+        \hline
+        \textbf{Could we remove spatial matching in some specific scenarios?} &
+        \textbf{Not Changed (Reasoning):} While removing it to reduce pipeline scope seems plausible, relying exclusively on Appearance Re-ID requires running computationally heavy neural networks for every bounding box continuously. Spatial tracking acts as an essential algorithmic gatekeeper that inherently lowers the execution frequency of the Re-ID functions through spatial heuristics (like IoU and SORT), making it resource-critical to retain. \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\section{Conclusion}
+The SpotOn project's rigorous adherence to these software development methodologies, combined with a comprehensive testing framework and continuous incorporation of committee feedback, positions the system for robust and scalable real-world deployment. As the system continues to mature, future iterations will build upon these foundational practices, focusing heavily on rigorous system integration and expanded longitudinal analytics.

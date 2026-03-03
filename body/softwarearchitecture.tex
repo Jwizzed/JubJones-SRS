@@ -428,6 +428,36 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
     \item \textbf{Cumulative Matching Characteristic (CMC) Curve:} Measures the probability of finding the correct match within the top-k matches
 \end{itemize}
 
+\subsubsection{System and API Health Metrics}
+\label{subsubsection:system-api-metrics}
+
+\begin{itemize}
+    \item \textbf{API Response Time (p50, p95, p99):} Average and peak times required for REST endpoints to return data, ensuring responsiveness for historical and analytical queries
+    \item \textbf{Throughput (Requests Per Second - RPS):} The volume of concurrent requests the API and WebSocket services can handle before performance degrades
+    \item \textbf{Error Rate:} The percentage of failed HTTP requests (4xx, 5xx) and dropped WebSocket connections over time
+\end{itemize}
+
+\subsubsection{Real-Time Processing Performance}
+\label{subsubsection:real-time-performance}
+
+\begin{itemize}
+    \item \textbf{Glass-to-Glass Latency:} The total time delay from an event occurring in the physical world to its visualization on the user's dashboard with AI overlays
+    \item \textbf{Pipeline Processing Latency:} The duration for the backend to ingest a video frame, execute detection and tracking pipelines, and emit the resulting metadata
+    \item \textbf{Stream Initialization Time:} The time elapsed between a user requesting a camera feed and the first video frame rendering on the interface
+    \item \textbf{WebSocket Message Latency:} The delivery delay of tracking coordinate updates from backend emission to frontend reception
+    \item \textbf{Frame Drop Rate:} The percentage of video frames dropped due to backend processing overload or frontend rendering constraints
+\end{itemize}
+
+\subsubsection{Frontend User Experience Metrics}
+\label{subsubsection:frontend-ux-metrics}
+
+\begin{itemize}
+    \item \textbf{Time to First Byte (TTFB):} The delay between the browser's request and receiving the first byte of data from the server
+    \item \textbf{Largest Contentful Paint (LCP):} The render time of the largest visual element, primarily the video player or the spatial map
+    \item \textbf{Time to Interactive (TTI):} The time taken for the dashboard to become fully responsive and capable of handling user interactions reliably
+    \item \textbf{UI Frame Rate (FPS):} The rendering speed of the client application, ensuring smooth visualization of moving bounding boxes and spatial markers
+\end{itemize}
+
 \subsection{Best Practices}
 \label{subsection:best-practices}
 

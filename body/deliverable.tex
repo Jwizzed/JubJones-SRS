@@ -3,7 +3,67 @@
 
 \section{Software Solution}
 \label{section:software-solution}
-Soon.
+
+The delivered SpotOn system comprises a fully functional web-based tracking dashboard and a robust computer vision backend pipeline. The software deliverables successfully unify real-time AI inference with an accessible user interface tailored for security and facility management. The solution is divided into three core pillars:
+
+\subsection{Frontend Web Application}
+Developed using React with Vite and utilizing Tailwind CSS, the frontend provides an intuitive, high-performance command center. The key pages delivered are detailed below.
+\newpage
+
+\subsubsection{Landing Page}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/UI/LANDING.jpeg}
+    \caption{SpotOn Landing Page Interface}
+    \label{fig:ui-landing}
+\end{figure}
+The Landing Page is the initial entry point of the application. It provides users with a high-level overview of the SpotOn system's capabilities and serves as a gateway to securely access the core tracking environments.
+\newpage
+
+\subsubsection{Live Video Feed}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/UI/VIDEO_FEED.jpeg}
+    \caption{Live Video Feed Interface with Real-Time Data}
+    \label{fig:ui-videofeed}
+\end{figure}
+The Live Video Feed serves as the core operational dashboard. It simultaneously renders real-time tracking streams adjacent to a 2D topographical floor plan. The interface actively translates individual bounding boxes from the video perspective into persistent, unified coordinates directly on the map.
+\newpage
+
+\subsubsection{Analytics Page}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/UI/ANALYTIC_01.png}
+    \caption{Analytics Dashboard showing insights and trends}
+    \label{fig:ui-analytics}
+\end{figure}
+The Analytics Page is a dedicated reporting module summarizing historical operational metrics. It visualizes critical data such as zone traffic densities, peak activity times, localized dwell durations, and trajectory heatmaps based on the securely stored tracking data.
+\newpage
+
+\subsubsection{Help Page}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/UI/HELP.png}
+    \caption{Help Page providing documentation and system guides}
+    \label{fig:ui-help}
+\end{figure}
+The Help Page acts as a comprehensive support module containing user guides, system documentation, and troubleshooting steps to assist operators in navigating the dashboard and effectively understanding the AI tracking outputs.
+\newpage
+
+\subsection{Real-Time Backend Services}
+A FastAPI-driven service architecture operates as the central controller, designed for high throughput and low latency.
+\begin{itemize}
+    \item \textbf{Data Ingestion \& Streaming:} Efficient handling of continuous video feeds connected through internal deployment channels, parsing streams frame-by-frame.
+    \item \textbf{Asynchronous Dispatch:} Using WebSockets to instantaneously broadcast bounding box coordinates, unique tracking IDs, and system status markers back to the connected frontend clients without blocking the main event loops.
+    \item \textbf{State Persistence:} Integrating PostgreSQL and TimescaleDB to securely log tracking metadata and system events, ensuring the analytics pipeline retains temporally accurate data.
+\end{itemize}
+
+\subsection{AI Models \& Inference Pipeline}
+The intelligence driving the physical tracking relies on a multi-stage computer vision workflow integrated directly into the backend.
+\begin{itemize}
+    \item \textbf{Object Detection \& Spatial Tracking:} Utilizing YOLO-based models for high-speed pedestrian detection, tightly coupled with SORT-driven algorithms to maintain short-term, single-camera spatial continuity.
+    \item \textbf{Cross-Camera Re-Identification (Re-ID):} An implementation of an OSNet-based neural network architecture capable of extracting deep appearance embeddings. This enables the system to re-identify subjects across disjointed camera views by comparing feature vectors, mitigating the limitations of blind spots.
+\end{itemize}
 
 \section{Test Report}
 \label{section:test-report}
