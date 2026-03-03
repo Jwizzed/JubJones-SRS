@@ -15,7 +15,7 @@ Developed using React with Vite and utilizing Tailwind CSS, the frontend provide
     \centering
     \includegraphics[width=\textwidth]{jubjones/UI/LANDING.jpeg}
     \caption{SpotOn Landing Page Interface}
-    \label{fig:ui-landing}
+    \label{fig:deliv-landing}
 \end{figure}
 The Landing Page is the initial entry point of the application. It provides users with a high-level overview of the SpotOn system's capabilities and serves as a gateway to securely access the core tracking environments.
 \newpage
@@ -25,7 +25,7 @@ The Landing Page is the initial entry point of the application. It provides user
     \centering
     \includegraphics[width=\textwidth]{jubjones/UI/VIDEO_FEED.jpeg}
     \caption{Live Video Feed Interface with Real-Time Data}
-    \label{fig:ui-videofeed}
+    \label{fig:deliv-videofeed}
 \end{figure}
 The Live Video Feed serves as the core operational dashboard. It simultaneously renders real-time tracking streams adjacent to a 2D topographical floor plan. The interface actively translates individual bounding boxes from the video perspective into persistent, unified coordinates directly on the map.
 \newpage
@@ -35,7 +35,7 @@ The Live Video Feed serves as the core operational dashboard. It simultaneously 
     \centering
     \includegraphics[width=\textwidth]{jubjones/UI/ANALYTIC_01.png}
     \caption{Analytics Dashboard showing insights and trends}
-    \label{fig:ui-analytics}
+    \label{fig:deliv-analytics}
 \end{figure}
 The Analytics Page is a dedicated reporting module summarizing historical operational metrics. It visualizes critical data such as zone traffic densities, peak activity times, localized dwell durations, and trajectory heatmaps based on the securely stored tracking data.
 \newpage
@@ -45,7 +45,7 @@ The Analytics Page is a dedicated reporting module summarizing historical operat
     \centering
     \includegraphics[width=\textwidth]{jubjones/UI/HELP.png}
     \caption{Help Page providing documentation and system guides}
-    \label{fig:ui-help}
+    \label{fig:deliv-help}
 \end{figure}
 The Help Page acts as a comprehensive support module containing user guides, system documentation, and troubleshooting steps to assist operators in navigating the dashboard and effectively understanding the AI tracking outputs.
 \newpage
@@ -65,6 +65,130 @@ The intelligence driving the physical tracking relies on a multi-stage computer 
     \item \textbf{Cross-Camera Re-Identification (Re-ID):} An implementation of an OSNet-based neural network architecture capable of extracting deep appearance embeddings. This enables the system to re-identify subjects across disjointed camera views by comparing feature vectors, mitigating the limitations of blind spots.
 \end{itemize}
 
-\section{Test Report}
-\label{section:test-report}
-Soon.
+The reliability and performance of the SpotOn system were validated through a series of rigorous tests covering both frontend interface interactions and backend service logic. The following tables summarize the test cases and their respective execution statuses.
+
+\subsection{Frontend Component Testing}
+The frontend test suite focuses on page rendering, user navigation, real-time data visualization, and accessibility across various device viewports.
+
+\begin{longtable}{|c|p{4cm}|p{4cm}|p{4cm}|c|}
+\caption{SpotOn Frontend Test Summary} \label{tab:frontend_tests} \\
+\hline
+\textbf{\#} & \textbf{Test Case Name} & \textbf{Description} & \textbf{Expected Result} & \textbf{Status} \\ \hline
+\endfirsthead
+\multicolumn{5}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{\#} & \textbf{Test Case Name} & \textbf{Description} & \textbf{Expected Result} & \textbf{Status} \\ \hline
+\endhead
+\hline \multicolumn{5}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+1 & Landing Page Rendering & Visit the landing page & Displays branding, status cards, and action buttons & Passed \\ \hline
+2 & Header Navigation & Click header links (Help, About, Analytics) & Navigates to correct pages and returns via logo & Passed \\ \hline
+3 & Backend Status & Check connection indicator & Shows ``Connected'' with green indicator when backend is healthy & Passed \\ \hline
+4 & Mobile Navigation & Set viewport to mobile size & Displays mobile navigation and adapted layout & Passed \\ \hline
+5 & Environment List & Visit /environments page & Displays all pre-configured monitoring environments & Passed \\ \hline
+6 & Environment Selection & Click an environment card & Environment is highlighted and ``Continue'' button appears & Passed \\ \hline
+7 & Environment Details & Click environment for details & Shows camera list and specific configuration for that environment & Passed \\ \hline
+8 & Navigation to Tracking & Select environment and click Continue & Navigates to /group-view with correct environment ID & Passed \\ \hline
+9 & Multi-Camera Grid & Load tracking view for environment & All associated cameras are displayed in a 2x2 grid layout & Passed \\ \hline
+10 & Camera Focus Mode & Click on a specific camera & Camera expands to focus mode, others are minimized & Passed \\ \hline
+11 & Real-time Data Feed & Dispatch tracking-update event & Bounding boxes are rendered on relevant camera feeds & Passed \\ \hline
+12 & Layout Controls & Change grid layout to 1x4 & Grid adjusts to single column layout with 4 rows & Passed \\ \hline
+13 & Playback Controls & Click pause/play buttons & UI state reflects playback status (paused/playing) & Passed \\ \hline
+14 & WebSocket Recovery & Simulate WebSocket disconnect & Shows ``Reconnecting'' status and resumes on reconnect & Passed \\ \hline
+15 & Camera Error Handling & Mock 404 for camera frame & Specific camera shows ``Frame not available'' error state & Passed \\ \hline
+16 & Person Highlighting & Click on a person bounding box & Bounding box is highlighted across all cameras and map & Passed \\ \hline
+17 & Person Details Panel & Select a person & Details panel opens with ID, confidence, and timeline & Passed \\ \hline
+18 & Cross-Camera Tracking & Move person from c01 to c02 & Person disappears from c01 and appears in c02 with same ID & Passed \\ \hline
+19 & High-Frequency Load & Send 100 rapid tracking updates & UI remains responsive and renders tracks without lag & Passed \\ \hline
+20 & Map Rendering & Load group view & Tracking map is visible with proper dimensions & Passed \\ \hline
+21 & Camera Markers & Check map content & Camera positions are correctly marked on the map & Passed \\ \hline
+22 & Person Markers & Update tracking data & Person marker appears on map at correct coordinates & Passed \\ \hline
+23 & Map Interaction & Zoom and pan the map & Map responds to mouse wheel and drag interactions & Passed \\ \hline
+24 & Analytics Rendering & Visit /analytics page & Displays total detections, active tracks, and uptime metrics & Passed \\ \hline
+25 & Chart Visualization & Check analytics content & Time-series charts are rendered and visible & Passed \\ \hline
+26 & Data Export & Click export button & Displays format options (CSV, JSON, PDF) & Passed \\ \hline
+27 & Settings Page & Visit /settings page & Shows camera, detection, alert, and system sections & Passed \\ \hline
+28 & Threshold Adjustment & Fill confidence threshold input & Value is updated and persistence logic is triggered & Passed \\ \hline
+29 & Camera Toggling & Toggle a camera switch & Camera state updates and reflects in UI & Passed \\ \hline
+30 & Search Functionality & Enter query in search bar & Filters help topics based on search text & Passed \\ \hline
+31 & FAQ Interaction & Click an FAQ question & Question expands to show answer and collapses on second click & Passed \\ \hline
+32 & Section Navigation & Click section links & Navigates to Getting Started, Features, Troubleshooting, etc. & Passed \\ \hline
+33 & API Status Check & Call getSystemHealth() & Returns healthy status from backend & Passed \\ \hline
+34 & Task Management & Call startProcessingTask() & Task is created successfully with WebSocket URL & Passed \\ \hline
+35 & WebSocket Service & Connect to WebSocket & Connection established and message handlers registered & Passed \\ \hline
+36 & Error Boundary & Trigger component crash & Renders fallback error UI instead of breaking the app & Passed \\ \hline
+37 & Accessibility & Check ARIA labels and roles & Interactive elements have accessible names and semantic roles & Passed \\ \hline
+38 & Responsive Utils & Change screen dimensions & Breakpoints correctly detect mobile/tablet/desktop states & Passed \\ \hline
+\end{longtable}
+
+\subsection{Backend Service Testing}
+The backend test report covers API availability, environment management, real-time detection tasks, and critical AI components such as Re-Identification and Identity merging.
+
+\begin{longtable}{|c|l|p{3cm}|p{3.5cm}|p{3.5cm}|c|}
+\caption{SpotOn Backend Test Summary} \label{tab:backend_tests} \\
+\hline
+\textbf{\#} & \textbf{ID} & \textbf{Name} & \textbf{Description} & \textbf{Expected Result} & \textbf{Status} \\ \hline
+\endfirsthead
+\multicolumn{6}{c}%
+{{\bfseries \tablename\ \thetable{} -- continued from previous page}} \\
+\hline
+\textbf{\#} & \textbf{ID} & \textbf{Name} & \textbf{Description} & \textbf{Expected Result} & \textbf{Status} \\ \hline
+\endhead
+\hline \multicolumn{6}{|r|}{{Continued on next page}} \\ \hline
+\endfoot
+\hline
+\endlastfoot
+1 & HLT-001 & Root Welcome & GET \texttt{/} & Returns 200 and welcome message & Passed \\ \hline
+2 & HLT-002 & Basic Health & GET \texttt{/health} & Returns 200 with status field & Passed \\ \hline
+3 & HLT-003 & Deep Health & GET \texttt{/health/deep} & Returns 200/503/500 with component status & Passed \\ \hline
+4 & HLT-004 & Liveness Probe & GET \texttt{/health/live} & Returns 200 ``alive'' & Passed \\ \hline
+5 & HLT-005 & WS Module & GET \texttt{/ws/health} & Returns 200 status & Passed \\ \hline
+6 & ENV-001 & List environments & GET \texttt{/api/v1/environments/} & Returns 200 list & Passed \\ \hline
+7 & ENV-002 & Env metadata & GET valid ID & Returns 200 details & Passed \\ \hline
+8 & ENV-003 & Unknown Env & GET invalid ID & Returns 404 & Passed \\ \hline
+9 & ENV-004 & List cameras & GET cameras & Returns 200 camera list & Passed \\ \hline
+10 & ENV-005 & List zones & GET zones & Returns 200 zone list & Passed \\ \hline
+11 & ENV-006 & Create session & POST no data & Returns 400 when no data exists & Passed \\ \hline
+12 & ENV-007a & Get pref & GET preferences & Returns 200 with user\_id & Passed \\ \hline
+13 & ENV-007b & Update pref & PUT preferences & Updates user data successfully & Passed \\ \hline
+14 & TSK-001 & Create task & POST valid body & Returns 202 accepted & Passed \\ \hline
+15 & TSK-002 & Task (Invalid) & POST empty body & Returns 422 validation error & Passed \\ \hline
+16 & TSK-003 & Task Details & GET unknown ID & Returns 404 not found & Passed \\ \hline
+17 & TSK-004 & Poll status & GET unknown ID & Returns 404 for unknown task & Passed \\ \hline
+18 & TSK-005 & List tasks & GET all tasks & Returns 200 list of tasks & Passed \\ \hline
+19 & TSK-006 & Stop task & DELETE unknown & Returns 404 for unknown task & Passed \\ \hline
+20 & ANL-001 & Dashboard sum & GET dashboard & Dashboard responds successfully & Passed \\ \hline
+21 & ANL-002 & RT metrics & GET real-time & Metrics respond successfully & Passed \\ \hline
+22 & ANL-003 & Behavior anal & POST analysis & Analysis responds successfully & Passed \\ \hline
+23 & ANL-004 & Hist summary & POST summary & Summary responds successfully & Passed \\ \hline
+24 & ANL-005 & System stats & GET statistics & Statistics respond successfully & Passed \\ \hline
+25 & PLY-001 & Pause proc & POST pause & Exercises routing and pauses task & Passed \\ \hline
+26 & PLY-002 & Resume proc & POST resume & Exercises routing and resumes task & Passed \\ \hline
+27 & PLY-003 & Seek in stream & POST seek & Exercises routing and seeks offset & Passed \\ \hline
+28 & STR-001 & MJPEG Feed & GET multipart & Returns valid multipart JPEG stream & Passed \\ \hline
+29 & STR-002 & Disconnection & Stream disconnect & Server closes connection cleanly & Passed \\ \hline
+30 & STR-003 & Invalid Task & Request stream & Handles invalid task ID correctly & Passed \\ \hline
+31 & WS-001 & Telemetry & WS tracking & WebSocket connection accepted & Passed \\ \hline
+32 & WS-002 & Frame Meta & WS frames & WebSocket connection accepted & Passed \\ \hline
+33 & WS-003 & System Events & WS system & WebSocket connection accepted & Passed \\ \hline
+34 & WS-004 & Live Analytics & WS analytics & WebSocket connection accepted & Passed \\ \hline
+35 & WS-005 & Drop handling & WS disconnect & Abrupt disconnect handled without crash & Passed \\ \hline
+36 & WS-006 & Client message & Send JSON focus & JSON processed correctly by server & Passed \\ \hline
+37 & PERF-API-001 & API Latency & Measure p99 & Latencies within acceptable thresholds & Passed \\ \hline
+38 & PERF-API-002 & Throughput & Baseline RPS & Meets required sequential throughput & Passed \\ \hline
+39 & PERF-API-003 & Error Rate & Normal load & 4xx/5xx fraction remains minimal & Passed \\ \hline
+40 & PERF-RT-001 & Proc Latency & Frame handler & Overhead remains under 30ms & Passed \\ \hline
+41 & PERF-RT-002 & Init Time & MJPEG TTFB & Stream starts in under 500ms & Passed \\ \hline
+42 & PERF-RT-003 & WS Latency & Round-trip & Latency remains under target threshold & Passed \\ \hline
+43 & PERF-RT-004 & Drop Rate & Consumption & Minimal frame drops under load & Passed \\ \hline
+44 & PERF-RT-000 & Glass-to-Glass & End-to-end & Orchestration within design spec & Passed \\ \hline
+45 & REID-001 & Feature Ext & Extraction & Produces 512-dim embeddings & Passed \\ \hline
+46 & REID-002 & Handoff Match & Matching & Match found across camera views & Passed \\ \hline
+47 & REID-003 & Handoff Expiry & Expiry logic & Records expire after time window & Passed \\ \hline
+48 & REG-001 & Assignment & Identity alloc & Assigns global ID to local track & Passed \\ \hline
+49 & REG-002 & Identity Merge & ID Merging & Merging global IDs updates all tracks & Passed \\ \hline
+50 & REG-003 & Shared Check & Identity check & Detects subjects across multiple cams & Passed \\ \hline
+\end{longtable}

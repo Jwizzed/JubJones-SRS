@@ -1,4 +1,48 @@
 \chapter{Conclusion and Discussion}
 \label{chap:conclusion-and-discussion}
 
-Soon.
+\section{Conclusion}
+\label{section:conclusion}
+
+The SpotOn project successfully delivered a fully functional, AI-powered multi-camera tracking system, addressing the fundamental challenge of maintaining consistent identity of individuals as they transition between non-overlapping camera views in campus and factory environments. This final deliverable demonstrates the viability of integrating state-of-the-art computer vision techniques within a practical, web-accessible surveillance platform.
+
+The system was built upon three core technical pillars that collectively realize the project's central objective of identity continuity:
+
+\begin{enumerate}[leftmargin=80pt]
+    \item \textbf{Multi-Stage AI Pipeline:} The backend integrates RT-DETR for high-accuracy person detection, ByteTrack for intra-camera temporal identity preservation, and a FastReID-based Re-Identification module for cross-camera identity resolution. Together, these components form a coherent and ordered processing pipeline that transforms raw video frames into structured tracking metadata.
+
+    \item \textbf{Real-Time Infrastructure:} A FastAPI-driven backend architecture leverages MJPEG streaming and WebSocket protocols to deliver sub-second visual feedback to the operator dashboard. The use of TimescaleDB ensures temporal integrity of tracking logs, while Redis provides the low-latency caching required for embedding-based matching in real-time.
+
+    \item \textbf{Unified Spatial Mapping:} Homography-based perspective transformations enable the system to project detections from all camera image planes into a synchronized 2D floor plan. This capability provides operators with a coherent, bird's-eye view of individual trajectories throughout the entire monitored environment, making cross-camera movement immediately interpretable.
+\end{enumerate}
+
+All 38 frontend test cases and 50 backend test cases were verified and passed, confirming the system's functional completeness and reliability. Two key AI models, RT-DETR and FastReID (OSNet backbone), were fine-tuned and evaluated against the MTMMC dataset, and selected based on a principled comparison of performance metrics including mAP, Rank-1 accuracy, and inference latency.
+
+From an engineering perspective, this project required the team to navigate complex interdisciplinary challenges at the intersection of computer vision, real-time systems, and human-computer interaction. The use of modular, layered architecture, combined with CI/CD practices and Docker-based containerization, ensured that the system remained maintainable and extensible throughout all stages of development.
+
+From an educational perspective, the project successfully demonstrated the team's capacity for \textbf{fast, competency-based learning} as outlined in the project's learning pathway. Skills in AI model training, MLOps practices, full-stack development, and software testing were developed and applied concurrently within a real-world problem context.
+
+\section{Discussion}
+\label{section:discussion}
+
+While the delivered system successfully meets the core requirements of the project, several technical challenges and design trade-offs were encountered throughout development that offer valuable insights for future work.
+
+\textbf{Re-Identification Performance Under Challenging Conditions.}
+The OSNet-based FastReID model shows effective cross-camera re-identification under typical conditions. However, its performance degrades noticeably in scenarios involving extreme viewpoint changes (e.g., camera angles directly above subjects), significant occlusion, or drastic lighting differences between adjacent zones. The current approach relies primarily on visual appearance features, making it susceptible to appearance-matching failures in edge cases. Future iterations could explore integrating Spatio-Temporal reasoning, where if a person exits a zone near Camera A, the system can give higher prior probability to re-identification candidates entering adjacent Camera B within a plausible time window. This spatial constraint would significantly reduce the search space and improve matching accuracy, particularly in dense crowds.
+
+\textbf{ByteTrack and Short-Term Identity Switches.}
+The ByteTrack algorithm demonstrated robust intra-camera tracking in controlled scenarios. In practice, highly dynamic scenes with rapidly moving individuals or severe inter-person occlusion resulted in occasional identity switches within a single camera view. This upstream fragmentation can propagate errors to the Re-ID stage. A potential improvement is to incorporate appearance features directly into the intra-camera tracking stage (as done by DeepSORT and its successors), allowing the tracker to be more resilient against these identity switches even before cross-camera matching.
+
+\textbf{System Scalability.}
+The current deployment architecture is validated for a small number of simultaneous cameras. Each camera stream requires its own processing context, and while the One-to-Many ByteTrack design shares the detector, the overall CPU and GPU memory requirements scale linearly with the number of active streams. For large-scale deployments, horizontal scaling and potentially asynchronous batch processing or dedicated per-camera micro-services would need to be evaluated. This is recognized as an area requiring further profiling and infrastructure investment for production-grade systems.
+
+\textbf{Homography and Map Accuracy.}
+The spatial mapping relies on pre-calibrated homography matrices. Calibration accuracy is inherently tied to the physical stability of the cameras and the precision of the manual calibration process. Any camera tilt, zoom, or physical movement invalidates the existing calibration, requiring a re-calibration step. In a production deployment, it would be beneficial to implement an \textbf{automatic re-calibration} mechanism, potentially triggered by detecting significant outliers in projected coordinates.
+
+\textbf{Privacy Considerations.}
+The system's capability to continuously track individuals raises important ethical and legal considerations. In a real deployment, compliance with relevant data protection regulations (such as PDPA in Thailand) is mandatory. The current system stores bounding box metadata, not raw video, for long-term analytics. Future work should formalize a data governance framework covering data retention policies, access controls, audit logging, and consent mechanisms for monitored individuals.
+
+\section{Feedback from the EXPO}
+\label{section:expo-feedback}
+
+(To be updated after the EXPO.)
