@@ -34,7 +34,7 @@ The Service Layer contains the core business logic and orchestrates the data flo
 \begin{itemize}
     \item \textbf{Key Components:}
     \begin{itemize}
-        \item \textbf{DetectionVideoService:} The central orchestrator that manages video stream processing, invoking object detectors (RT-DETR) and trackers.
+        \item \textbf{DetectionVideoService:} The central orchestrator that manages video stream processing, invoking object detectors (YOLO26m) and trackers.
         \item \textbf{HomographyService:} Manages the transformation of 2D camera coordinates to 2D map coordinates using pre-computed homography matrices.
         \item \textbf{FeatureExtractionService:} Wraps the FastReID model to extract appearance embeddings for person re-identification.
         \item \textbf{AnalyticsEngine:} Aggregates real-time data into meaningful metrics (e.g., people counting, dwell time).
@@ -93,7 +93,7 @@ The sequence diagram visualizes the real-time interaction between system compone
 % sequenceDiagram
 %     participant Camera as Camera Feed
 %     participant VideoSvc as Video Service
-%     participant Detector as Object Detector (RT-DETR)
+%     participant Detector as Object Detector (YOLO26m)
 %     participant Tracker as Tracker (ByteTrack)
 %     participant HomoSvc as Homography Service
 %     participant ReIDSvc as Re-ID Service
@@ -134,7 +134,7 @@ The sequence diagram visualizes the real-time interaction between system compone
 
 Figure \ref{fig:seq-tracking-process} depicts the flow when a detection task is active:
 1.  The \textbf{Video Service} ingests frames from the camera feed.
-2.  Frames are passed to the \textbf{Object Detector} (RT-DETR) to identify individuals.
+2.  Frames are passed to the \textbf{Object Detector} (YOLO26m) to identify individuals.
 3.  Detections are sent to the \textbf{Tracker} (ByteTrack) to assign temporal IDs.
 4.  The \textbf{Homography Service} maps pixel coordinates to the 2D floor plan.
 5.  If a track crosses into a new zone or camera view, the \textbf{Re-ID Service} extracts features and queries the \textbf{Redis} cache for a global identity match.
@@ -186,7 +186,7 @@ The \usevar{\srsTitle} system employs a strictly ordered pipeline to transform r
 
 \begin{enumerate}[leftmargin=80pt]
     \item \textbf{Ingestion:} Video frames are extracted from source files or streams (RTSP/MJPEG) and pre-processed (resized, normalized) for model input.
-    \item \textbf{Object Detection:} The RT-DETR model analyzes each frame to output bounding boxes and confidence scores for all detected persons.
+    \item \textbf{Object Detection:} The YOLO26m model analyzes each frame to output bounding boxes and confidence scores for all detected persons.
     \item \textbf{Intra-Camera Tracking:} The ByteTrack algorithm processes detections to maintain identity consistency across consecutive frames within a single camera view, handling short-term occlusions.
     \item \textbf{Spatial Mapping:} The center point of each tracked person's foot-box is transformed using a homography matrix to obtain real-world $(x, y)$ coordinates on the facility's floor plan.
     \item \textbf{Re-Identification (Re-ID):}
@@ -270,7 +270,7 @@ This multi-protocol approach supports the system's overall objectives of accurat
 \label{subsubsection:object-detection}
 
 \begin{itemize}
-    \item \textbf{Detection Model:} RT-DETR (Real-Time Detection Transformer) - Selected for its balance of speed and accuracy, specifically its ability to handle crowded scenes better than traditional YOLO-based approaches. This model is responsible for identifying "person" objects within each camera frame.
+    \item \textbf{Detection Model:} YOLO26m (Real-Time Detection Transformer) - Selected for its balance of speed and accuracy, specifically its ability to handle crowded scenes better than traditional YOLO-based approaches. This model is responsible for identifying "person" objects within each camera frame.
     \item \textbf{Key Features:} End-to-end detection without NMS post-processing, flexible speed tuning via decoder layers
     \item \textbf{Function:} Responsible for identifying and localizing objects (people) within video frames
 \end{itemize}
@@ -371,17 +371,17 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \begin{itemize}
     \item \textbf{Learning Rate:} 
     \begin{itemize}
-        \item RT-DETR: 0.0001 (default)
+        \item YOLO26m: 0.0001 (default)
         \item ByteTrack and FastReID: 0.001
     \end{itemize}
     \item \textbf{Batch Size:} 
     \begin{itemize}
-        \item RT-DETR: 16
+        \item YOLO26m: 16
         \item ByteTrack and FastReID: 16
     \end{itemize}
     \item \textbf{Number of Epochs:}
     \begin{itemize}
-        \item RT-DETR: Fine-tuned on MTMMC dataset
+        \item YOLO26m: Fine-tuned on MTMMC dataset
         \item ByteTrack and FastReID: 50 epochs
     \end{itemize}
     \item \textbf{Optimizer:} AdamW with weight decay of 0.0001
@@ -569,4 +569,4 @@ The MTMMC (Multi-Target Multi-Camera) dataset is utilized for training and evalu
 \subsection{Conclusion}
 \label{subsection:conclusion}
 
-The AI component is a critical element of our system, enabling sophisticated \textbf{real-time} processing of video feeds for object detection, tracking, space-based location prediction, and re-identification. By leveraging state-of-the-art models like RT-DETR, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The training methodology using NVIDIA RTX 4060 GPU, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The space-based location prediction algorithm enables intra-frame global ID assignment for overlapping camera views, complementing the Re-ID model for across-frame matching. The seamless integration with other system components via MJPEG, WebSocket, and REST APIs provides a scalable and reliable real-time solution for our users.
+The AI component is a critical element of our system, enabling sophisticated \textbf{real-time} processing of video feeds for object detection, tracking, space-based location prediction, and re-identification. By leveraging state-of-the-art models like yolo26m, ByteTrack, and FastReID, trained on the comprehensive MTMMC dataset, our system achieves high accuracy even in challenging scenarios. The training methodology using NVIDIA RTX 4060 GPU, combined with continuous learning approaches and ethical considerations, ensures that the AI component remains effective and responsible. The space-based location prediction algorithm enables intra-frame global ID assignment for overlapping camera views, complementing the Re-ID model for across-frame matching. The seamless integration with other system components via MJPEG, WebSocket, and REST APIs provides a scalable and reliable real-time solution for our users.

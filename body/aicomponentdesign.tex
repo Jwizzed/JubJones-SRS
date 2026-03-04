@@ -7,7 +7,7 @@
 
 The primary AI-driven workflow resides within the system's backend processing core, designed as a service-oriented architecture. This backend, built with FastAPI, orchestrates a pipeline for \textbf{real-time analysis of live video streams}. Video data allows for immediate ingestion from IP cameras (e.g., via RTSP) and processed in-memory for low-latency analysis. The AI pipeline involves several key steps for each frame extracted from these real-time feeds:
 \begin{enumerate}
-    \item \textbf{Person Detection:} Identifying individuals within each camera frame using high-performance detection models (e.g., RT-DETR).
+    \item \textbf{Person Detection:} Identifying individuals within each camera frame using high-performance detection models (e.g., YOLO26m).
     \item \textbf{Intra-Camera Tracking:} Maintaining consistent temporary IDs for detected individuals within a single camera's view over consecutive frames, utilizing robust tracking algorithms (e.g., ByteTrack).
     \item \textbf{Space-Based Matching (Continuous):} For every tracked individual, transforming 2D pixel coordinates to a unified 3D map location using homography. This "always-on" step handles overlapping views by geometrically predicting location, allowing the system to bridge tracks spatially before resorting to visual features.
     \item \textbf{Feature Extraction:} Generating unique appearance embeddings (features) from detected person images using models like FastReID, preparing them for potential identification needs.
@@ -203,7 +203,7 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
     \item \textbf{Processing Approach \& Model Selection (ML Canvas):}
         Central to the design is a backend-driven batch processing pipeline orchestrated by FastAPI. This pipeline integrates key AI steps in sequence:
         \begin{enumerate}[label=(\Alph*)]
-            \item Person Detection, utilizing RT-DETR (Real-Time DEtection TRansformer) for robust object localization.
+            \item Person Detection, utilizing YOLO26m (Real-Time DEtection TRansformer) for robust object localization.
             \item Intra-Camera Tracking, employing ByteTrack algorithm to maintain temporary IDs within single camera views.
             \item Space-Based Location Prediction, an algorithmic approach for overlapping camera views that converts 3D locations between cameras via 2D floor plan coordinates using homography to assign intra-frame global IDs.
             \item Feature Extraction for Re-ID, using FastReID to generate discriminative embeddings.
@@ -225,14 +225,14 @@ Figure \ref{fig:ml_canvas} illustrates the comprehensive ML Canvas design specif
         \end{itemize}
 \end{itemize}
 
-Figure \ref{fig:ml_pipeline_stages} visually summarizes the core AI processing stages detailed in the "Processing Approach \& Model Selection (ML Canvas)" item. It outlines the sequential flow from Person Detection, Intra-Camera Tracking, and continuous Space-Based Matching, to conditional Cross-Camera Re-ID and Spatial Mapping.
+Figure \ref{fig:ml_pipeline_stages} visually summarizes the core AI processing stages detailed in the "Processing Approach \& Model Selection (ML Canvas)" item. It outlines the sequential data flow from Ingestion and Object Detection through Intra-Camera Tracking, incorporating a conditional Zone Crossing decision point that routes processing to either Re-ID or Spatial Mapping, before concluding with Broadcast \& Persistence.
 
 \begin{figure}[!htb]
     \centering
     \makebox[\textwidth][c]{
-        \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/ml_pipeline_stages.jpg} 
+        \includegraphics[width=1.0\textwidth, keepaspectratio]{jubjones/dataflow_diagram.jpg} 
     }
-    \caption{Core AI Processing Pipeline Stages, Models, and Metrics. This diagram illustrates the flow from Person Detection and Intra-Camera Tracking to continuous Space-Based Matching, followed by conditional Cross-Camera Re-ID, highlighting the primary model/tool and evaluation metrics for each stage.}
+    \caption{Core AI Processing Data Flow. This diagram illustrates the sequence from Ingestion and Object Detection to Intra-Camera Tracking, highlighting the conditional Zone Crossing decision that directs the flow toward either Re-ID or Spatial Mapping before culminating in Broadcast \& Persistence.}
 
     \label{fig:ml_pipeline_stages}
 
@@ -241,7 +241,7 @@ Figure \ref{fig:ml_pipeline_stages} visually summarizes the core AI processing s
 
 This detailed ML Canvas provides a comprehensive blueprint for the development and evaluation of this intelligent surveillance analysis system.
 
-\subsection{(Optional) Innovation}
+\subsection{Innovation}
 \label{subsection:innovation_aic}
 While \usevar{\srsTitle} builds upon established techniques in person detection, tracking, and re-identification, its creative contribution lies in how these components are conceptualized and orchestrated as a unified, system-level experience for multi-camera identity persistence. Rather than treating detection, tracking, and re-identification as isolated technical processes, SpotOn reframes continuous identity preservation across distributed cameras as a human-centered, integrated problem involving spatial consistency, temporal reasoning, and operational usability. This design-driven perspective shifts the focus from isolated model outputs to end-to-end identity continuity expressed through visual trajectories, spatial maps, and annotated views, enabling users to intuitively interpret complex surveillance data. As a result, the system creatively transforms established computer vision techniques into an investigation-oriented, visually grounded tracking experience tailored for real-world campus and factory environments.
 
@@ -251,12 +251,12 @@ This section outlines the strategy for developing, training, and evaluating the 
 
 \subsection{Model Development and Training Strategy}
 \label{subsection:model_dev_train_strat_new}
-The primary AI model for person detection is RT-DETR (Real-Time Detection Transformer), developed using the PyTorch deep learning framework. The development process prioritized robustness and accuracy for surveillance footage analysis.
+The primary AI model for person detection is YOLO26m (Real-Time Detection Transformer), developed using the PyTorch deep learning framework. The development process prioritized robustness and accuracy for surveillance footage analysis.
 Key aspects of the strategy include:
 \begin{itemize}
 
     \item \textbf{Dataset Utilization:} The MTMMC dataset served as the primary data source for training and fine-tuning. This dataset's diversity in campus and factory environments, lighting conditions, and occlusion levels provides a realistic foundation for developing models intended for real-world scenarios.
-    \item \textbf{Fine-Tuning Approach:} The RT-DETR model was initialized with default weights and fine-tuned on the MTMMC dataset. The model was trained using an NVIDIA RTX 4060 GPU to specifically address the 'person' class detection relevant to the system's objectives.
+    \item \textbf{Fine-Tuning Approach:} The YOLO26m model was initialized with default weights and fine-tuned on the MTMMC dataset. The model was trained using an NVIDIA RTX 4060 GPU to specifically address the 'person' class detection relevant to the system's objectives.
     \item \textbf{Data Preprocessing:} A standardized preprocessing pipeline was established. This included image resizing to a consistent input dimension for the model, color space conversion (e.g., BGR to RGB), normalization using established statistics, and conversion to tensor formats suitable for PyTorch. Data augmentation techniques, such as random horizontal flipping, were applied during training to enhance model generalization.
     \item \textbf{Experiment Management:} A systematic approach to tracking experiments, model configurations, hyperparameters, and performance metrics was employed, often facilitated by tools designed for experiment management (e.g., MLflow). This allowed for methodical comparison of different training runs and model variants.
 \end{itemize}
@@ -267,7 +267,7 @@ This structured approach ensured that the model development lifecycle was organi
 Rigorous testing and validation were integral to ensure the reliability and effectiveness of the AI models. The approach encompassed several layers:
 \begin{itemize}
     \item \textbf{Quantitative Evaluation on Benchmark Data:} The primary method for assessing model performance involved testing against a dedicated validation split of the MTMMC dataset. Standard COCO-style metrics were employed, particularly mean Average Precision (mAP) at various Intersection over Union (IoU) thresholds (e.g., mAP@.50, mAP@[.50:.95]). The Average Precision (AP) specifically for the 'person' class served as a critical performance indicator.
-    \item \textbf{Comparative Model Analysis:} To select the most suitable baseline detection model for the system, a comparative analysis of different candidate architectures was performed. This involved training and evaluating several models (e.g., Faster R-CNN, RT-DETR variants) under consistent conditions. Performance was assessed based on quantitative accuracy metrics (like mAP), inference speed (Frames Per Second - FPS), and qualitative observations of detection stability on representative video data. The process of comparing models, including visualization of performance trade-offs (as conceptually illustrated in Figure \ref{fig:mlflow_comparison_1}) and tabular summaries of key metrics (conceptually represented by Figure \ref{fig:mlflow_comparison_2}), guided the selection.
+    \item \textbf{Comparative Model Analysis:} To select the most suitable baseline detection model for the system, a comparative analysis of different candidate architectures was performed. This involved training and evaluating several models (e.g., Faster R-CNN, YOLO26m variants) under consistent conditions. Performance was assessed based on quantitative accuracy metrics (like mAP), inference speed (Frames Per Second - FPS), and qualitative observations of detection stability on representative video data. The process of comparing models, including visualization of performance trade-offs (as conceptually illustrated in Figure \ref{fig:mlflow_comparison_1}) and tabular summaries of key metrics (conceptually represented by Figure \ref{fig:mlflow_comparison_2}), guided the selection.
     \item \textbf{Unit Testing of Core Components:} Key software components within the training and evaluation pipeline, such as dataset loading mechanisms, annotation parsing utilities, metric calculation functions, and model instantiation logic, were subjected to unit tests. This helped ensure the correctness and reliability of the underlying codebase supporting the AI model lifecycle.
     \item \textbf{Fairness Considerations:} An initial analysis of potential biases in the training data (MTMMC) and model behavior was considered. This involved identifying potential sources of bias (e.g., demographic imbalances, environmental variations) and discussing conceptual mitigation strategies (e.g., targeted data augmentation, fairness-aware training if feasible, transparency). While a full quantitative fairness audit requires specific demographic ground truth often unavailable, this proactive consideration is crucial for responsible AI development.
 \end{itemize}
@@ -289,19 +289,19 @@ Rigorous testing and validation were integral to ensure the reliability and effe
 
 \subsection{Performance Results and Justification}
 \label{subsection:model_perf_justify_new}
-The comparative analysis of various person detection models, aided by experiment tracking tools, led to the selection of RT-DETR as the baseline architecture for the \usevar{\srsTitle} system. After evaluating candidates including Faster R-CNN and RT-DETR variants, RT-DETR presented a compelling balance of characteristics crucial for the system's application in retrospective surveillance analysis.
+The comparative analysis of various person detection models, aided by experiment tracking tools, led to the selection of YOLO26m as the baseline architecture for the \usevar{\srsTitle} system. After evaluating candidates including Faster R-CNN and YOLO26m variants, YOLO26m presented a compelling balance of characteristics crucial for the system's application in retrospective surveillance analysis.
 
-Key performance observations and the justification for selecting RT-DETR include:
+Key performance observations and the justification for selecting YOLO26m include:
 \begin{itemize}
-    \item \textbf{End-to-End Detection:} RT-DETR provides end-to-end detection without requiring Non-Maximal Suppression (NMS) post-processing, reducing the complexity of the detection pipeline and eliminating NMS-related artifacts.
-    \item \textbf{Strong Overall Accuracy:} RT-DETR demonstrated competitive mAP scores on the MTMMC validation set, particularly for medium to large-sized persons common in surveillance footage.
+    \item \textbf{End-to-End Detection:} YOLO26m provides end-to-end detection without requiring Non-Maximal Suppression (NMS) post-processing, reducing the complexity of the detection pipeline and eliminating NMS-related artifacts.
+    \item \textbf{Strong Overall Accuracy:} YOLO26m demonstrated competitive mAP scores on the MTMMC validation set, particularly for medium to large-sized persons common in surveillance footage.
     \item \textbf{Flexible Speed-Accuracy Trade-off:} The transformer-based architecture allows for flexible speed tuning via decoder layers, enabling optimization for the batch processing pipeline.
     \item \textbf{Robust Feature Learning:} The hybrid encoder architecture enables robust feature extraction across varying lighting conditions and partial occlusions present in the MTMMC dataset.
 \end{itemize}
 
 \subsection{Demonstration on Representative Data (Model Explainability)}
 \label{subsection:model_demo_explain_new}
-To build trust and enable diagnostics, techniques were employed to understand and explain the behavior of the selected person detection model (RT-DETR).
+To build trust and enable diagnostics, techniques were employed to understand and explain the behavior of the selected person detection model (YOLO26m).
 
 \textbf{Visual Explanation of Model Focus:}
 Gradient-weighted Class Activation Mapping (Grad-CAM) was utilized to generate visual heatmaps. These heatmaps highlight the regions in an input image that were most influential in the model's decision to classify an area as containing a 'person'. Figure \ref{fig:gradcam_example1} shows such a visualization for an image representative of a factory scene. The heatmap often strongly highlights relevant body parts like the torso and upper legs, aligning well with the subject's silhouette and indicating that the model learned to focus on pertinent visual features for its high-confidence detection. Similar interpretability was observed for campus scenes. For instance, Figure \ref{fig:gradcam_example2} and Figure \ref{fig:gradcam_example3} depict Grad-CAM outputs for persons detected in different campus environments. Even for smaller or more distant individuals, the heatmaps tend to concentrate on the upper body or head regions, demonstrating the model's ability to identify key features contributing to high-confidence scores. These visualizations confirm that the model generally behaves as expected by focusing on semantically relevant parts of a person.
@@ -335,7 +335,7 @@ Beyond visual heatmaps, a mechanism was designed to generate human-understandabl
 This approach provides a practical level of interpretability, allowing users to understand the basis of individual detection decisions by linking the model's confidence to visual evidence of its focus.
 These demonstrations of model explainability serve as valuable tools for verifying expected model behavior, debugging potential issues where the model might focus on irrelevant features, and ultimately fostering greater trust in the AI system's outputs.
 
-The AI models integrated into SpotOn are selected with a strong emphasis on deployment readiness and operational stability. Well-established architectures such as RT-DETR, ByteTrack, and FastReID are employed to ensure robustness, maintainability, and compatibility with standard deep learning frameworks. The system is designed to operate under realistic hardware constraints and prioritizes batch-based retrospective analysis to avoid fragile real-time assumptions. Together with model versioning, performance monitoring, and retraining considerations, these design choices support reliable long-term use in real-world surveillance environments.
+The AI models integrated into SpotOn are selected with a strong emphasis on deployment readiness and operational stability. Well-established architectures such as YOLO26m, ByteTrack, and FastReID are employed to ensure robustness, maintainability, and compatibility with standard deep learning frameworks. The system is designed to operate under realistic hardware constraints and prioritizes batch-based retrospective analysis to avoid fragile real-time assumptions. Together with model versioning, performance monitoring, and retraining considerations, these design choices support reliable long-term use in real-world surveillance environments.
 \section{User Experience Design with AI}
 \label{section:ux_design} % This section remains untouched as per request
 
@@ -385,7 +385,7 @@ The system further enhances understanding through detailed metadata extraction, 
 \label{subsection:deployment_plan_aic}
 \begin{itemize}
     \item \textbf{Deployment Location:}
-        The AI components (e.g., person detection using RT-DETR, intra-camera tracking with ByteTrack, space-based location prediction algorithm for overlapping views, Re-ID feature extraction with FastReID) are integrated within the system's core \textbf{Backend} service. This Backend service, built with FastAPI, along with the entire system infrastructure (Frontend server, databases, caching, reverse proxy), is designed to be deployed in a \textbf{Cloud} environment. This leverages cloud scalability for computational resources and centralized data storage.
+        The AI components (e.g., person detection using YOLO26m, intra-camera tracking with ByteTrack, space-based location prediction algorithm for overlapping views, Re-ID feature extraction with FastReID) are integrated within the system's core \textbf{Backend} service. This Backend service, built with FastAPI, along with the entire system infrastructure (Frontend server, databases, caching, reverse proxy), is designed to be deployed in a \textbf{Cloud} environment. This leverages cloud scalability for computational resources and centralized data storage.
 
     \item \textbf{AI Communication with System Components:}
         The AI models and algorithms run embedded within the Python-based FastAPI Backend process. Communication occurs as follows:
@@ -405,7 +405,7 @@ The system further enhances understanding through detailed metadata extraction, 
         \begin{itemize}
             \item \textit{Containerization \& Orchestration:} \textbf{Docker} for containerizing all services.  \textbf{Docker Compose} for orchestration.
             \item \textit{Backend Framework:} \textbf{FastAPI} for REST APIs, WebSocket handling, and orchestrating the AI processing pipeline.
-            \item \textit{AI Models \& Libraries:} \textbf{PyTorch} as the deep learning framework. Specific models like \textbf{RT-DETR} (detection), \textbf{ByteTrack} (tracking), \textbf{FastReID} (Re-ID feature extraction). Space-based location prediction uses homography transformations. \textbf{OpenCV} for video processing and image manipulation.
+            \item \textit{AI Models \& Libraries:} \textbf{PyTorch} as the deep learning framework. Specific models like \textbf{YOLO26m} (detection), \textbf{ByteTrack} (tracking), \textbf{FastReID} (Re-ID feature extraction). Space-based location prediction uses homography transformations. \textbf{OpenCV} for video processing and image manipulation.
             \item \textit{Frontend Framework:} \textbf{React} for the user interface.
             \item \textit{Data Storage \& Caching:} Cloud storage like \textbf{AWS S3} for video segments. \textbf{Redis} for caching. \textbf{TimescaleDB} for historical tracking data and embeddings.
             \item \textit{Reverse Proxy:} \textbf{Nginx}.
