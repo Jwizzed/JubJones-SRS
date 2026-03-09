@@ -96,31 +96,24 @@
                     \fi}
 % adjust spaces on top and bottom, change font size
 \def\@makechapterhead#1{%
-    \begin{center}%
-        \vspace*{0.5in}%
-        {\parindent \z@ \normalfont
-            \ifnum \c@secnumdepth >\m@ne
-                \large\bfseries \@chapapp\space \thechapter
-                \par\nobreak
-                \vskip 10\p@
-            \fi
-            \interlinepenalty\@M
-            \moderate \bfseries #1\par\nobreak
-            \vskip 40\p@
-        }
-    \end{center}
+    { \parindent \z@ \centering \normalfont
+        \ifnum \c@secnumdepth >\m@ne
+            \large\bfseries \@chapapp\space \thechapter
+            \par\nobreak
+            \vskip 10\p@
+        \fi
+        \interlinepenalty\@M
+        \moderate \bfseries #1\par\nobreak
+        \vskip 40\p@
+    }
 }
 % change font size
 \def\@makeschapterhead#1{%
-    \begin{center}%
-        \vspace*{0.5in}%
-        {\parindent \z@
-            \normalfont
-            \interlinepenalty\@M
-            \Large \bfseries  #1\par\nobreak
-            \vskip 40\p@
-        }
-    \end{center}
+    { \parindent \z@ \centering \normalfont
+        \interlinepenalty\@M
+        \Large \bfseries  #1\par\nobreak
+        \vskip 40\p@
+    }
 }
 
 % section-level
