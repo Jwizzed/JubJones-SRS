@@ -192,3 +192,44 @@ The backend test report covers API availability, environment management, real-ti
 49 & REG-002 & Identity Merge & ID Merging & Merging global IDs updates all tracks & Passed \\ \hline
 50 & REG-003 & Shared Check & Identity check & Detects subjects across multiple cams & Passed \\ \hline
 \end{longtable}
+
+\section{System Performance Benchmarks}
+\label{section:system-performance-benchmarks}
+
+To validate the theoretical capabilities outlined in the system architecture and AI design chapters, the SpotOn system underwent rigorous empirical benchmarking. The following results quantify both the accuracy of the underlying AI models and the real-time processing capabilities of the backend architecture. 
+
+\subsection{AI Accuracy Metrics}
+The primary objective of the AI pipeline is to maintain high accuracy in dynamic, crowded scenarios. The detection model (YOLOv26m) and Re-Identification model (FastReID/OSNet) were evaluated against the MTMMC validation dataset. The key metrics reflect the system's ability to minimize identity fragmentation and accurately localize subjects.
+
+\begin{table}[H]
+    \centering
+    \caption{AI Model Accuracy Evaluation}
+    \label{tab:ai_accuracy_metrics}
+    \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Metric} & \textbf{Achieved Result} \\ \hline
+    mAP (Detection) & XX.X\% \\ \hline
+    Rank-1 Accuracy (Re-ID) & XX.X\% \\ \hline
+    mAP (Re-ID) & XX.X\% \\ \hline
+    MOTA (Overall Tracking) & XX.X\% \\ \hline
+    IDF1 (Identity Preservation) & XX.X\% \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Operations and Real-Time Pipeline Metrics}
+To guarantee situational awareness without disruptive lag, the system's streaming and inference loops were load-tested to measure latency, throughput, and consistency. These metrics determine the true ``real-time'' capability of the SpotOn dashboard.
+
+\begin{table}[H]
+    \centering
+    \caption{System Latency and Throughput Benchmarks}
+    \label{tab:ops_performance_metrics}
+    \begin{tabular}{|l|c|}
+    \hline
+    \textbf{Performance Attribute} & \textbf{Measured Result} \\ \hline
+    Pipeline Processing Latency (End-to-End) & XX ms \\ \hline
+    Inference Speed (FPS / Stream) & XX FPS \\ \hline
+    WebSocket Delivery Latency & XX ms \\ \hline
+    MJPEG Stream Initialization (TTFB) & XX ms \\ \hline
+    Backend API Throughput & XX RPS \\ \hline
+    \end{tabular}
+\end{table}
