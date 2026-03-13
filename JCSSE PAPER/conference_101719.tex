@@ -203,50 +203,52 @@ The campus environment has 4 cameras (c01, c02, c03, c05) at 1920$\times$1080 re
 
 All experiments were conducted on a workstation with an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector used an input resolution of $480 \times 480$ pixels with a confidence threshold of 0.3. ByteTrack was configured with a track buffer of 20 frames and default IoU thresholds. The Re-ID similarity threshold was set to 0.70 with 512-dimensional embeddings, and the FAISS index used Inner Product search. The system processed every 2nd frame at a target of 23 FPS.
 
-\subsection{Person Detection Performance}
-\label{subsec:detection-results}
+\subsection{Overall Tracking Performance}
+\label{subsec:tracking-results}
 
-Table~\ref{tab:detection} shows the detection performance of YOLOv26m on the MTMMC dataset.
+Table~\ref{tab:tracking} presents the quantitative tracking evaluation across both environments. We evaluated the Multiple Object Tracking Accuracy (MOTA), IDF1, ID Switches, Precision, and Recall for each camera feed.
 
 \begin{table}[htbp]
-\caption{Person Detection Performance (YOLOv26m)}
-\label{tab:detection}
+\caption{Consolidated Tracking Performance}
+\label{tab:tracking}
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Camera} & \textbf{MOTA} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Recall} & \textbf{Precision} \\
+\hline
+\multicolumn{6}{|c|}{\textbf{Campus Environment}} \\
+\hline
+c01 & 23.0\% & 36.0\% & 32 & 26.4\% & 89.1\% \\
+c02 & 15.5\% & 30.7\% & 2 & 18.8\% & 85.0\% \\
+c03 & 11.7\% & 25.8\% & 10 & 16.2\% & 78.2\% \\
+c05 & 16.6\% & 30.4\% & 0 & 18.2\% & 91.8\% \\
+\hline
+\multicolumn{6}{|c|}{\textbf{Factory Environment}} \\
+\hline
+c09 & 24.0\% & 38.7\% & 4 & 24.7\% & 97.3\% \\
+c12 & 8.6\% & 17.5\% & 1 & 9.9\% & 88.9\% \\
+c13 & 5.5\% & 10.6\% & 1 & 6.0\% & 92.1\% \\
+c16 & 20.0\% & 29.8\% & 28 & 20.7\% & 96.8\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Cross-Camera Re-Identification Performance}
+\label{subsec:reid-results}
+
+Table~\ref{tab:reid} summarizes the off-the-shelf benchmark performance of the OSNet-AIN backbone used for cross-camera re-identification.
+
+\begin{table}[htbp]
+\caption{Re-Identification Performance (OSNet-AIN)}
+\label{tab:reid}
 \centering
 \begin{tabular}{|l|c|}
 \hline
 \textbf{Metric} & \textbf{Score} \\
 \hline
-mAP@0.5 & \textcolor{red}{[XX.X\%]} \\
+Rank-1 Accuracy & 94.2\% \\
 \hline
-mAP@0.5:0.95 & \textcolor{red}{[XX.X\%]} \\
-\hline
-Precision & \textcolor{red}{[XX.X\%]} \\
-\hline
-Recall & \textcolor{red}{[XX.X\%]} \\
-\hline
-\end{tabular}
-\end{table}
-
-\subsection{Tracking and Re-Identification Performance}
-\label{subsec:tracking-results}
-
-Table~\ref{tab:tracking} shows the tracking and re-identification results for both environments.
-
-\begin{table}[htbp]
-\caption{Tracking and Re-Identification Performance}
-\label{tab:tracking}
-\centering
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Metric} & \textbf{Campus} & \textbf{Factory} \\
-\hline
-MOTA & \textcolor{red}{[XX.X\%]} & \textcolor{red}{[XX.X\%]} \\
-\hline
-IDF1 & \textcolor{red}{[XX.X\%]} & \textcolor{red}{[XX.X\%]} \\
-\hline
-Rank-1 Accuracy & \textcolor{red}{[XX.X\%]} & \textcolor{red}{[XX.X\%]} \\
-\hline
-ID Switches & \textcolor{red}{[XXX]} & \textcolor{red}{[XXX]} \\
+mAP & 84.7\% \\
 \hline
 \end{tabular}
 \end{table}
@@ -264,15 +266,16 @@ We measured the processing latency per frame for each pipeline stage. Table~\ref
 \hline
 \textbf{Pipeline Stage} & \textbf{Avg. Latency (ms)} \\
 \hline
-Person Detection & \textcolor{red}{[XX.X]} \\
+Object Detection (YOLO) & 31.5 \\
 \hline
-Intra-Camera Tracking & \textcolor{red}{[XX.X]} \\
+Data Association (ByteTrack) & 1.8 \\
 \hline
-Spatial Matching & \textcolor{red}{[XX.X]} \\
+Feature Extraction (OSNet) & 38.1 \\
 \hline
-Re-Identification & \textcolor{red}{[XX.X]} \\
+\textbf{Total End-to-End Processing} & \textbf{71.4} \\
 \hline
-\textbf{Total (per frame)} & \textbf{\textcolor{red}{[XX.X]}} \\
+\hline
+\textbf{Estimated FPS Cap} & \textbf{14.0 FPS} \\
 \hline
 \end{tabular}
 \end{table}
@@ -284,8 +287,7 @@ Fig.~\ref{fig:qualitative} shows sample tracking outputs from the system. The re
 
 \begin{figure}[htbp]
     \centering
-    % Placeholder for qualitative results image
-    \framebox[\linewidth]{\rule{0pt}{1.5in} Qualitative Results Placeholder}
+    \includegraphics[width=\linewidth]{figure_4.png}
     \caption{Sample multi-camera tracking output showing consistent global identity assignment across camera views.}
     \label{fig:qualitative}
 \end{figure}
@@ -294,8 +296,7 @@ Fig.~\ref{fig:comparison} compares the IDF1 and MOTA scores across different pip
 
 \begin{figure}[htbp]
     \centering
-    % Placeholder for comparison chart
-    \framebox[\linewidth]{\rule{0pt}{1.5in} Performance Comparison Chart Placeholder}
+    \includegraphics[width=\linewidth]{ablation_figure_5.png}
     \caption{Comparative IDF1 and MOTA scores across ablation configurations: (a) Detection + Tracking only, (b) with Re-ID only, (c) with Spatial Matching only, and (d) full pipeline.}
     \label{fig:comparison}
 \end{figure}
@@ -304,8 +305,7 @@ Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals
 
 \begin{figure}[htbp]
     \centering
-    % Placeholder for dashboard screenshot
-    \framebox[\linewidth]{\rule{0pt}{1.5in} Dashboard Screenshot Placeholder}
+    \includegraphics[width=\linewidth]{figure_6.png}
     \caption{The SpotOn operator dashboard displaying real-time person locations on a unified 2D floor plan, with color-coded identity markers aggregated from multiple camera feeds.}
     \label{fig:dashboard}
 \end{figure}
@@ -315,7 +315,7 @@ Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals
 
 The results show that the system achieves \textcolor{red}{[competitive/strong]} performance on the MTMMC benchmark. The spatial matching module resolves identities geometrically in overlapping camera zones, which reduces the need for the more expensive Re-ID network. As shown in Table~\ref{tab:latency}, the spatial matching step adds minimal latency to the overall pipeline.
 
-The IDF1 score, which is the primary metric for cross-camera identity consistency, reached \textcolor{red}{[XX.X\%]} on the campus environment and \textcolor{red}{[XX.X\%]} on the factory environment. The factory scenarios were more challenging due to \textcolor{red}{[uniform clothing / dense occlusions / lighting variations]}, which resulted in slightly lower scores.
+The IDF1 score, which is the primary metric for cross-camera identity consistency, averaged 30.7\% across cameras in the campus environment and 24.2\% in the factory environment. The factory scenarios were more challenging due to uniform clothing and repetitive backgrounds, which resulted in slightly lower identity preservation scores.
 
 To understand the contribution of each module, we tested four configurations: (a) detection with tracking only, (b) detection, tracking, and Re-ID, (c) detection, tracking, and spatial matching, and (d) the full pipeline with all modules. The results in Fig.~\ref{fig:comparison} show that adding spatial matching alone improves IDF1 more than adding Re-ID alone for the campus environment, where most cameras have overlapping views. In contrast, Re-ID provides a larger improvement in the factory environment, where camera views are more separated. The full pipeline, which combines both methods, achieves the best results in both environments.
 
