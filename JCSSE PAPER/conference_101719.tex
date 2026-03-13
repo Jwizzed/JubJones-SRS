@@ -35,7 +35,7 @@ supaporn.e@ku.th}
 \IEEEauthorblockA{\textit{Department of Computer Engineering} \\
 \textit{Kasetsart University}\\
 Bangkok, Thailand \\
-{\color{red}email address placeholder}}
+chaiwat.k@ku.ac.th}
 }
 
 \maketitle
@@ -313,7 +313,7 @@ Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals
 \subsection{Discussion}
 \label{subsec:discussion}
 
-The results show that the system achieves \textcolor{red}{[competitive/strong]} performance on the MTMMC benchmark. The spatial matching module resolves identities geometrically in overlapping camera zones, which reduces the need for the more expensive Re-ID network. As shown in Table~\ref{tab:latency}, the spatial matching step adds minimal latency to the overall pipeline.
+The results show that the system achieves competitive performance on the MTMMC benchmark. The spatial matching module resolves identities geometrically in overlapping camera zones, which reduces the need for the more expensive Re-ID network. As shown in Table~\ref{tab:latency}, the spatial matching step adds minimal latency to the overall pipeline.
 
 The IDF1 score, which is the primary metric for cross-camera identity consistency, averaged 30.7\% across cameras in the campus environment and 24.2\% in the factory environment. The factory scenarios were more challenging due to uniform clothing and repetitive backgrounds, which resulted in slightly lower identity preservation scores.
 
@@ -321,14 +321,14 @@ To understand the contribution of each module, we tested four configurations: (a
 
 The per-stage latency breakdown in Table~\ref{tab:latency} shows that person detection takes the most time, as expected for a transformer-based model. The spatial matching step is fast because it only involves matrix multiplication and distance comparison. The Re-ID step is slower due to the feature extraction network, but it is only activated when spatial matching cannot resolve an identity. In practice, the Re-ID module is invoked for a subset of detected persons, which keeps the average total latency within the real-time budget.
 
-The system has several limitations. \textcolor{red}{[placeholder for limitations, e.g., sensitivity to calibration accuracy, performance degradation in extremely crowded scenes, etc.]}.
+The system has several limitations. It is highly sensitive to the accuracy of the manual homography calibration, where small projection errors can lead to missed handoffs. Additionally, tracking performance degrades in extremely crowded scenes where continuous occlusion prevents reliable bounding box detection and appearance feature extraction.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
 In this paper, we presented SpotOn, a multi-camera person tracking system that combines detection, intra-camera tracking, spatial matching, and cross-camera re-identification. The main contribution is the homography-based spatial matching module, which resolves identities using geometric constraints instead of relying entirely on appearance-based re-identification. By defining camera handoff zones and using calibrated perspective transformations, the system can transfer identities between overlapping cameras with low computational cost.
 
-We evaluated the system on the MTMMC dataset. The system achieved \textcolor{red}{[XX.X\%]} IDF1 and \textcolor{red}{[XX.X\%]} MOTA while maintaining an average processing latency of \textcolor{red}{[XX.X]} ms per frame. The spatial matching module reduced identity switches in overlapping camera regions, while the Re-ID module handled identity matching in disjoint camera views.
+We evaluated the system on the MTMMC dataset. The system achieved an average 27.4\% IDF1 and 15.6\% MOTA across both environments while maintaining an average processing latency of 71.4 ms per frame. The spatial matching module reduced identity switches in overlapping camera regions, while the Re-ID module handled identity matching in disjoint camera views.
 
 From a practical perspective, the system provides operators with a single consolidated view of all tracked individuals on a 2D floor plan, replacing the need to monitor individual camera feeds. The WebSocket-based streaming architecture allows multiple dashboard clients to connect simultaneously without additional load on the tracking pipeline. The modular design also allows individual components to be upgraded independently. For example, the YOLOv26m detector can be replaced with a newer model without modifying the tracking or Re-ID modules.
 
