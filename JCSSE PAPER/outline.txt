@@ -1,0 +1,29 @@
+INTRODUCTION (~0.75 pages)
+a. Background and Motivation
+b. Problem Statement
+c. Main Contributions
+
+RELATED WORK (~0.50 pages)
+a. Existing Solutions
+b. AI Techniques in Video Analytics
+
+DATASET AND METHODOLOGY (~0.50 pages)
+a. Data Source and Collection
+b. Data Preprocessing and Annotation
+c. Ethical Considerations
+
+PROPOSED SYSTEM ARCHITECTURE (~2.0 pages)
+a. System Overview
+b. AI/ML Module Design
+c. Backend and Video Processing Pipeline
+d. Frontend and Analytics Dashboard
+
+EXPERIMENTAL RESULTS AND DISCUSSIONS (~1.5 pages)
+a. Experimental Setup and Evaluation Metrics
+b. AI Model Performance
+c. System Performance and Scalability
+d. Case Study
+
+CONCLUSION AND FUTURE WORK (~0.50 pages)
+a. Conclusion
+b. Future Work

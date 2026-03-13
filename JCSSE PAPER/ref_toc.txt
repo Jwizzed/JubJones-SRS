@@ -1,0 +1,16 @@
+II. R ELATED WORKS
+A. MobileNet SSD v2
+I. INTRODUCTION
+B. Previous Research
+B. Ay [5] addresses the challenge of hologram authenticity
+D. Soukup and R. Huber-M ¨ork [6] proposed creating real-
+S. Gonzalez, A. V alenzuela, and J. Tapia [7] aimed to detect
+III. M ETHODOLOGY
+A. Model Selection
+B. Dataset and Preprocessing
+C. Training and Transfer Learning
+D. Model Evaluation
+E. Video and Preprocessing
+IV. E XPERIMENTAL RESULTS
+V. C ONCLUSION
+C. Berg, “SSD: Single Shot MultiBox Detector,” 2016, Available from:
