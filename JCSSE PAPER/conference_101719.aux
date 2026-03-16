@@ -1,24 +1,25 @@
 \relax 
-\citation{yolov26m}
-\citation{bytetrack}
-\citation{torchreid}
+\citation{mtmmc}
 \citation{mtmmc}
 \citation{yolov26m}
 \citation{bytetrack}
 \citation{torchreid}
-\citation{mtmmc}
 \@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
 \newlabel{sec:introduction}{{I}{1}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {II}Related Works}{1}{}\protected@file@percent }
 \newlabel{sec:related-works}{{II}{1}{}{}{}}
-\citation{bytetrack}
-\citation{fastreid}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Foundational Components}{1}{}\protected@file@percent }
+\newlabel{subsec:foundational-works}{{\mbox  {II-A}}{1}{}{}{}}
+\citation{deepsort}
+\citation{strongsort}
 \citation{yoloreidnet}
 \citation{mixed_syn_tracking}
 \citation{geom_consist_tracking}
 \citation{hospital_tracking}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Foundational Components}{2}{}\protected@file@percent }
-\newlabel{subsec:foundational-works}{{\mbox  {II-A}}{2}{}{}{}}
+\citation{yolov26m}
+\citation{bytetrack}
+\citation{torchreid}
+\citation{faiss}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Previous Research}{2}{}\protected@file@percent }
 \newlabel{subsec:previous-research}{{\mbox  {II-B}}{2}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {III}Methodology}{2}{}\protected@file@percent }
@@ -27,63 +28,54 @@
 \newlabel{subsec:system-overview}{{\mbox  {III-A}}{2}{}{}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Overview of the proposed multi-camera tracking pipeline.}}{2}{}\protected@file@percent }
 \newlabel{fig:pipeline}{{1}{2}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Real-Time Streaming}{2}{}\protected@file@percent }
-\newlabel{subsec:real-time-streaming}{{\mbox  {III-B}}{2}{}{}{}}
-\citation{yolov26m}
-\citation{bytetrack}
-\citation{torchreid}
-\citation{torchreid}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Person Detection}{3}{}\protected@file@percent }
-\newlabel{subsec:person-detection}{{\mbox  {III-C}}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Intra-Camera Tracking}{3}{}\protected@file@percent }
-\newlabel{subsec:intra-camera-tracking}{{\mbox  {III-D}}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Spatial Matching and Mapping}{3}{}\protected@file@percent }
-\newlabel{subsec:spatial-matching}{{\mbox  {III-E}}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}1}Homography Transformation}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Homography transformation mapping a camera view (left) to a 2D floor plan (right) using calibrated correspondence points.}}{3}{}\protected@file@percent }
-\newlabel{fig:homography}{{2}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {\mbox  {III-E}2}Continuous Spatial Matching}{3}{}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Camera handoff zones. Marginal regions (5\%) along the boundaries trigger Re-ID feature extraction for cross-camera association.}}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Person Detection}{2}{}\protected@file@percent }
+\newlabel{subsec:person-detection}{{\mbox  {III-B}}{2}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Intra-Camera Tracking}{2}{}\protected@file@percent }
+\newlabel{subsec:intra-camera-tracking}{{\mbox  {III-C}}{2}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Spatial Matching and Mapping}{2}{}\protected@file@percent }
+\newlabel{subsec:spatial-matching}{{\mbox  {III-D}}{2}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Homography transformation mapping a camera view to a 2D floor plan using calibrated correspondence points.}}{2}{}\protected@file@percent }
+\newlabel{fig:homography}{{2}{2}{}{}{}}
+\citation{mtmmc}
+\citation{mtmmc}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Cross-Camera Re-Identification}{3}{}\protected@file@percent }
+\newlabel{subsec:re-id}{{\mbox  {III-E}}{3}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces A 5\% edge margin on each camera frame triggers Re-ID for cross-camera association in non-overlapping zones.}}{3}{}\protected@file@percent }
 \newlabel{fig:handoff}{{3}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Cross-Camera Re-Identification}{3}{}\protected@file@percent }
-\newlabel{subsec:re-id}{{\mbox  {III-F}}{3}{}{}{}}
-\citation{mtmmc}
-\citation{mtmmc}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-G}}Evaluation Metrics}{4}{}\protected@file@percent }
-\newlabel{subsec:eval-metrics}{{\mbox  {III-G}}{4}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Results}{4}{}\protected@file@percent }
-\newlabel{sec:results}{{IV}{4}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Dataset and Experimental Setup}{4}{}\protected@file@percent }
-\newlabel{subsec:exp-setup}{{\mbox  {IV-A}}{4}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Overall Tracking Performance}{4}{}\protected@file@percent }
-\newlabel{subsec:tracking-results}{{\mbox  {IV-B}}{4}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Consolidated Tracking Performance (TensorRT Optimized, frame\_skip = 3)}}{4}{}\protected@file@percent }
-\newlabel{tab:tracking}{{I}{4}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Processing Latency}{4}{}\protected@file@percent }
-\newlabel{subsec:latency-results}{{\mbox  {IV-C}}{4}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Average Per-Frame Processing Latency (TensorRT GPU)}}{4}{}\protected@file@percent }
-\newlabel{tab:latency}{{II}{4}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Qualitative Results}{4}{}\protected@file@percent }
-\newlabel{subsec:qualitative}{{\mbox  {IV-D}}{4}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Discussion}{4}{}\protected@file@percent }
-\newlabel{subsec:discussion}{{\mbox  {IV-E}}{4}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Sample multi-camera tracking output showing consistent global identity assignment across camera views.}}{5}{}\protected@file@percent }
-\newlabel{fig:qualitative}{{4}{5}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Comparative IDF1 and MOTA scores across ablation configurations: (a) Detection + Tracking only, (b) with Re-ID only, (c) with Spatial Matching only, and (d) full pipeline.}}{5}{}\protected@file@percent }
-\newlabel{fig:comparison}{{5}{5}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces The SpotOn operator dashboard displaying real-time person locations on a unified 2D floor plan, with color-coded identity markers aggregated from multiple camera feeds.}}{5}{}\protected@file@percent }
-\newlabel{fig:dashboard}{{6}{5}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{5}{}\protected@file@percent }
-\newlabel{sec:conclusion}{{V}{5}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Experimental Results}{3}{}\protected@file@percent }
+\newlabel{sec:results}{{IV}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Dataset and Experimental Setup}{3}{}\protected@file@percent }
+\newlabel{subsec:exp-setup}{{\mbox  {IV-A}}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Overall Tracking Performance}{3}{}\protected@file@percent }
+\newlabel{subsec:tracking-results}{{\mbox  {IV-B}}{3}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Consolidated Tracking Performance (TensorRT Optimized, frame-skip = 3)}}{3}{}\protected@file@percent }
+\newlabel{tab:tracking}{{I}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Processing Latency}{3}{}\protected@file@percent }
+\newlabel{subsec:latency-results}{{\mbox  {IV-C}}{3}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Average Per-Frame Processing Latency (TensorRT GPU)}}{3}{}\protected@file@percent }
+\newlabel{tab:latency}{{II}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Qualitative Results}{3}{}\protected@file@percent }
+\newlabel{subsec:qualitative}{{\mbox  {IV-D}}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Discussion}{3}{}\protected@file@percent }
+\newlabel{subsec:discussion}{{\mbox  {IV-E}}{3}{}{}{}}
 \bibcite{bytetrack}{1}
-\bibcite{fastreid}{2}
-\bibcite{yoloreidnet}{3}
-\bibcite{mixed_syn_tracking}{4}
-\bibcite{geom_consist_tracking}{5}
-\bibcite{hospital_tracking}{6}
-\bibcite{mtmmc}{7}
-\bibcite{yolov26m}{8}
-\bibcite{torchreid}{9}
-\bibcite{faiss}{10}
-\@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
-\gdef \@abspage@last{6}
+\bibcite{deepsort}{2}
+\bibcite{strongsort}{3}
+\bibcite{yoloreidnet}{4}
+\bibcite{mixed_syn_tracking}{5}
+\bibcite{geom_consist_tracking}{6}
+\bibcite{hospital_tracking}{7}
+\bibcite{mtmmc}{8}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Sample multi-camera tracking output showing consistent global identity assignment across camera views.}}{4}{}\protected@file@percent }
+\newlabel{fig:qualitative}{{4}{4}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Comparative IDF1 and MOTA scores across ablation configurations: (a) Detection + Tracking only, (b) with Re-ID only, (c) with Spatial Matching only, and (d) full pipeline.}}{4}{}\protected@file@percent }
+\newlabel{fig:comparison}{{5}{4}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces The SpotOn operator dashboard displaying real-time person locations on a unified 2D floor plan, with color-coded identity markers aggregated from multiple camera feeds.}}{4}{}\protected@file@percent }
+\newlabel{fig:dashboard}{{6}{4}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{4}{}\protected@file@percent }
+\newlabel{sec:conclusion}{{V}{4}{}{}{}}
+\bibcite{yolov26m}{9}
+\bibcite{torchreid}{10}
+\bibcite{faiss}{11}
+\@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
+\gdef \@abspage@last{5}

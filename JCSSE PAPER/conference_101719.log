@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  15 MAR 2026 12:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  16 MAR 2026 14:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -113,9 +113,7 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <24> not available
 \IEEEPARstartletwidth=\dimen163
 \c@IEEEbiography=\count268
 \@IEEEtranrubishbin=\box52
-)
-** ATTENTION: Overriding command lockouts (line 2).
-(/usr/local/texlive/2024/texmf-dist/tex/latex/cite/cite.sty
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/cite/cite.sty
 LaTeX Info: Redefining \cite on input line 302.
 LaTeX Info: Redefining \nocite on input line 332.
 Package: cite 2015/02/27  v 5.5
@@ -266,20 +264,20 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 (./conference_101719.aux)
 \openout1 = `conference_101719.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
 
 -- Lines per column: 56 (exact).
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -304,77 +302,72 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Font Info:    Calculating math sizes for size <11> on input line 41.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 41.
+LaTeX Font Info:    Calculating math sizes for size <11> on input line 39.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 39.
 
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 41.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 39.
 
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Underfull \hbox (badness 10000) in paragraph at lines 47--49
+Underfull \hbox (badness 10000) in paragraph at lines 45--47
 []\OT1/ptm/b/it/9 Index Terms\OT1/ptm/b/n/9 ---Multi-Camera Track-ing, Per-son 
 Re-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 47--49
-\OT1/ptm/b/n/9 Identification, Com-puter Vi-sion, Space-Based Match-ing,
  []
 
 [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/l
 ocal/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 
-]
-Underfull \hbox (badness 2653) in paragraph at lines 80--81
-\OT1/ptm/m/n/10 by-detection al-go-rithm. Byte-Track as-so-ciates both high-
- []
-
-[2] [3]
-Overfull \hbox (33.8792pt too wide) in paragraph at lines 211--234
+] [2]
+Overfull \hbox (33.8792pt too wide) in paragraph at lines 171--194
  [][] 
  []
 
-<figure_4.png, id=23, 578.16pt x 433.62pt>
+<figure_4.png, id=18, 754.82pt x 831.105pt>
 File: figure_4.png Graphic file (type png)
 <use figure_4.png>
-Package pdftex.def Info: figure_4.png  used on input line 271.
-(pdftex.def)             Requested size: 252.0pt x 189.00032pt.
-<ablation_figure_5.png, id=25, 578.16pt x 433.62pt>
+Package pdftex.def Info: figure_4.png  used on input line 230.
+(pdftex.def)             Requested size: 252.0pt x 277.46126pt.
+<ablation_figure_5.png, id=19, 578.16pt x 433.62pt>
 File: ablation_figure_5.png Graphic file (type png)
 <use ablation_figure_5.png>
-Package pdftex.def Info: ablation_figure_5.png  used on input line 280.
+Package pdftex.def Info: ablation_figure_5.png  used on input line 239.
 (pdftex.def)             Requested size: 252.0pt x 189.00032pt.
-<figure_6.png, id=26, 578.16pt x 433.62pt>
+<figure_6.png, id=21, 1473.505pt x 768.8725pt>
 File: figure_6.png Graphic file (type png)
 <use figure_6.png>
-Package pdftex.def Info: figure_6.png  used on input line 289.
-(pdftex.def)             Requested size: 252.0pt x 189.00032pt.
-[4] [5 <./figure_4.png> <./ablation_figure_5.png> <./figure_6.png>]
-Underfull \hbox (badness 1354) in paragraph at lines 327--328
+Package pdftex.def Info: figure_6.png  used on input line 248.
+(pdftex.def)             Requested size: 252.0pt x 131.49263pt.
+[3]
+! Undefined control sequence.
+l.274 \columnbreak
+                  
+? 
+
+Underfull \hbox (badness 1354) in paragraph at lines 281--282
 []\OT1/ptm/m/n/8 V. Gau-tam, S. Prasad, and S. Sinha, ``YOLORE-IDNet: An Ef-
  []
 
 
-Underfull \hbox (badness 1377) in paragraph at lines 327--328
+Underfull \hbox (badness 1377) in paragraph at lines 281--282
 \OT1/ptm/m/n/8 fi-cient Multi-Camera Sys-tem for Person-Tracking,'' arXiv prepr
 int
  []
 
-
-Underfull \hbox (badness 2662) in paragraph at lines 332--333
+[4 <./figure_4.png> <./ablation_figure_5.png> <./figure_6.png>]
+Underfull \hbox (badness 2662) in paragraph at lines 286--287
 []\OT1/ptm/m/n/8 Ultralytics, ``YOLOv10 / YOLO11 NMS-free Ob-ject De-tec-tion,'
 '
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 332--333
+Underfull \hbox (badness 10000) in paragraph at lines 286--287
 \OT1/ptm/m/it/8 Ul-tr-a-lyt-ics GitHub Repos-i-tory\OT1/ptm/m/n/8 , 2024. [On-l
 ine]. Avail-able:
  []
@@ -390,37 +383,40 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[6
+[5
 
 ] (./conference_101719.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
- 4262 strings out of 474116
- 66848 string characters out of 5743683
- 1957187 words of memory out of 5000000
- 26581 multiletter control sequences out of 15000+600000
- 603277 words of font info for 128 fonts, out of 8000000 for 9000
+ 4257 strings out of 474116
+ 66729 string characters out of 5743683
+ 1955187 words of memory out of 5000000
+ 26577 multiletter control sequences out of 15000+600000
+ 602170 words of font info for 127 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,11n,65p,1001b,334s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,11n,65p,1106b,334s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></
 usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></us
 r/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/l
 ocal/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/lo
-cal/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/loca
-l/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/
-2024/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2024/texm
-f-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-dist/fon
-ts/type1/urw/times/utmri8a.pfb>
-Output written on conference_101719.pdf (6 pages, 454797 bytes).
+cal/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texliv
+e/2024/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2024/te
+xmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-dist/f
+onts/type1/urw/times/utmri8a.pfb>
+Output written on conference_101719.pdf (5 pages, 1512567 bytes).
 PDF statistics:
- 86 PDF objects out of 1000 (max. 8388607)
- 49 compressed objects within 1 object stream
+ 76 PDF objects out of 1000 (max. 8388607)
+ 44 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
