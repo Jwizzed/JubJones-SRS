@@ -9,7 +9,7 @@ The SpotOn project successfully delivered a fully functional, AI-powered multi-c
 The system was built upon three core technical pillars that collectively realize the project's central objective of identity continuity:
 
 \begin{enumerate}[leftmargin=80pt]
-    \item \textbf{Multi-Stage AI Pipeline:} The backend integrates YOLO26m for high-accuracy person detection, ByteTrack for intra-camera temporal identity preservation, and a FastReID-based Re-Identification module for cross-camera identity resolution. Together, these components form a coherent and ordered processing pipeline that transforms raw video frames into structured tracking metadata.
+    \item \textbf{Multi-Stage AI Pipeline:} The backend integrates YOLOv26m for high-accuracy person detection, ByteTrack for intra-camera temporal identity preservation, and a Torchreid-based Re-Identification module for cross-camera identity resolution. Together, these components form a coherent and ordered processing pipeline that transforms raw video frames into structured tracking metadata.
 
     \item \textbf{Real-Time Infrastructure:} A FastAPI-driven backend architecture leverages MJPEG streaming and WebSocket protocols to deliver sub-second visual feedback to the operator dashboard. The use of TimescaleDB ensures temporal integrity of tracking logs, while Redis provides the low-latency caching required for embedding-based matching in real-time.
 
