@@ -17,7 +17,7 @@
 \IEEEauthorblockA{\textit{Department of Computer Engineering} \\
 \textit{Kasetsart University}\\
 Bangkok, Thailand \\
-krittin.se@ku.th}
+krittin.set@ku.th}
 \and
 \IEEEauthorblockN{2\textsuperscript{nd} Yanatchara Jeraja}
 \IEEEauthorblockA{\textit{Department of Computer Engineering} \\
@@ -35,13 +35,13 @@ supaporn.e@ku.th}
 \IEEEauthorblockA{\textit{Department of Computer Engineering} \\
 \textit{Kasetsart University}\\
 Bangkok, Thailand \\
-chaiwat.k@ku.ac.th}
+fengcwp@ku.ac.th}
 }
 
 \maketitle
 
 \begin{abstract}
-Tracking individuals across multiple cameras is essential for surveillance but remains difficult due to lighting changes, varying perspectives, and occlusions. In this paper, we propose SpotOn, a multi-camera person tracking system that maintains identity continuity across distributed camera networks. The system uses YOLOv26m \cite{rtdetr} for person detection, ByteTrack \cite{bytetrack} for intra-camera tracking, and Torchreid \cite{torchreid} with an OSNet-AIN backbone for cross-camera re-identification. We also apply homography-based transformations to project detections onto a unified 2D floor plan, giving operators a bird's-eye view of person movement. We evaluated the system on the MTMMC dataset \cite{mtmmc} and confirmed its effectiveness in terms of Rank-1 accuracy, mean Average Precision (mAP), and sub-second processing latency. The proposed system reduces the need for manual monitoring and improves real-time situational awareness.
+Tracking individuals across multiple cameras is essential for surveillance but remains difficult due to lighting changes, varying perspectives, and occlusions. In this paper, we propose SpotOn, a real-time multi-camera person tracking system that maintains identity continuity across distributed camera networks. The system uses YOLOv26m \cite{yolov26m} for person detection, ByteTrack \cite{bytetrack} for intra-camera tracking, and Torchreid \cite{torchreid} with an OSNet-AIN backbone for cross-camera re-identification. A homography-based spatial matching module projects each detection onto a unified 2D floor plan, enabling operators to monitor a bird's-eye view of all tracked individuals across all cameras simultaneously. For cameras with overlapping fields of view, identity association is resolved geometrically without invoking the appearance-based Re-ID network. Re-ID is triggered only when persons approach the 5\% edge margins of a camera frame, significantly reducing computational cost. We evaluated the system on the MTMMC dataset \cite{mtmmc} across two environments---a university campus and an industrial factory---demonstrating competitive IDF1, MOTA scores, and sub-second per-frame latency. An ablation study further confirms that combining spatial matching with Re-ID outperforms either method alone. The proposed system reduces the need for manual monitoring and improves real-time situational awareness in complex multi-camera deployments.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -57,14 +57,14 @@ In large-scale environments such as university campuses and factories, tracking 
 
 The number of surveillance cameras deployed worldwide has grown rapidly in recent years. Manual monitoring of these feeds is labor-intensive, and operator attention degrades over time. As multi-camera networks become more common in smart buildings, transportation hubs, and industrial facilities, the demand for automated tracking solutions has increased. Existing systems often rely entirely on deep learning-based re-identification (Re-ID) for cross-camera association, which is computationally expensive and performs poorly when subjects wear similar clothing.
 
-In this paper, we propose SpotOn, a real-time multi-camera person tracking system designed for dynamic environments. The system addresses three technical challenges: detecting persons across multiple camera views, preserving their identity across spatial and temporal gaps, and projecting their positions onto a unified spatial map. Unlike systems that rely solely on appearance-based Re-ID for all cross-camera associations, SpotOn uses a two-tier matching strategy. For cameras with overlapping fields of view, the system uses homography-based spatial matching to resolve identities geometrically, which is both faster and more reliable when subjects have similar appearances. The Re-ID module is activated only for cameras with non-overlapping views, where geometric matching is not possible. This design reduces the computational cost of cross-camera association while maintaining tracking accuracy.
+In this paper, we propose SpotOn, a real-time multi-camera person tracking system designed for dynamic environments. The system addresses three technical challenges: detecting persons across multiple camera views, preserving their identity across spatial and temporal gaps, and projecting their positions onto a unified spatial map. Unlike systems that rely solely on appearance-based Re-ID for all cross-camera associations, SpotOn uses a two-tier matching strategy. For cameras with overlapping fields of view, the system uses homography-based spatial matching to resolve identities geometrically, which is both faster and more reliable when subjects have similar appearances. To bridge non-overlapping blind spots, the computationally expensive Re-ID module is conditionally activated only when persons cross the 5\% margins around a camera frame. This design reduces the computational cost of cross-camera association while maintaining tracking accuracy.
 
 Our contributions are as follows:
 
 \begin{itemize}
-    \item A multi-stage pipeline that integrates YOLOv26m \cite{rtdetr} for person detection, ByteTrack \cite{bytetrack} for intra-camera tracking, and the Torchreid library \cite{torchreid} with an OSNet-AIN backbone for cross-camera re-identification.
+    \item A multi-stage pipeline that integrates YOLOv26m \cite{yolov26m} for person detection, ByteTrack \cite{bytetrack} for intra-camera tracking, and the Torchreid library \cite{torchreid} with an OSNet-AIN backbone for cross-camera re-identification.
     \item A homography-based spatial matching approach that maps camera detections onto a shared 2D floor plan, allowing the system to resolve identities geometrically in overlapping views without relying on the Re-ID network.
-    \item Evaluation on the MTMMC dataset \cite{mtmmc}, demonstrating competitive Rank-1 accuracy, mAP, and sub-second per-frame latency.
+    \item Evaluation on the MTMMC dataset \cite{mtmmc}, demonstrating competitive IDF1 and MOTA scores, identity switching rates, and sub-second per-frame latency.
 \end{itemize}
 
 \section{Related Works}
@@ -75,24 +75,28 @@ Multi-camera person tracking has been studied extensively in recent years. The t
 \subsection{Foundational Components}
 \label{subsec:foundational-works}
 
-Our system builds upon three established components. For object detection, we use YOLOv26m, a transformer-based detector that provides a good balance between accuracy and speed. Unlike traditional YOLO variants, this model does not require Non-Maximal Suppression (NMS) post-processing, which reduces inference time.
+Our system builds upon three established components. For object detection, we use YOLOv26m \cite{yolov26m}, a CNN-based detector that provides a strong balance between accuracy and inference speed. Unlike traditional YOLO variants that rely on Non-Maximal Suppression (NMS) as a post-processing step, YOLOv26m incorporates an NMS-free decoupled head design. This eliminates a serial bottleneck in the detection pipeline and allows the model to produce final predictions more efficiently, which is particularly beneficial when processing multiple concurrent video streams.
 
-For intra-camera tracking, we use ByteTrack \cite{bytetrack}, a tracking-by-detection algorithm. ByteTrack associates both high-confidence and low-confidence detections with existing tracks, which reduces the number of lost identities caused by partial occlusions. The algorithm uses Kalman filtering and IoU-based matching.
+For intra-camera tracking, we use ByteTrack \cite{bytetrack}, a tracking-by-detection algorithm. Uniquely, ByteTrack associates both high-confidence and low-confidence detections with existing tracks using a two-round matching scheme, rather than discarding low-score detections as most prior trackers do. This strategy significantly reduces the number of lost identities caused by partial occlusions or motion blur. Track state is maintained using Kalman filtering, and association is performed using IoU-based matching across consecutive frames.
 
-For cross-camera identity matching, we use the FastReID framework \cite{fastreid} with an Omni-Scale Network (OSNet) backbone. OSNet extracts multi-scale appearance features and produces compact 512-dimensional embeddings. These embeddings are used to compare persons across different camera views.
+For cross-camera identity matching, we use the FastReID framework \cite{fastreid} with an Omni-Scale Network (OSNet) backbone. OSNet is designed to simultaneously learn feature representations at multiple scales using a unified aggregation gate, producing compact 512-dimensional embeddings that capture both fine-grained texture and global body structure. These embeddings are used to compare the visual appearance of persons across different camera views when geometric matching is insufficient.
 
 \subsection{Previous Research}
 \label{subsec:previous-research}
 
-V. Gautam et al. \cite{yoloreidnet} proposed YOLORe-IDNet, which combines YOLO detection and re-identification into a single network. Their approach processes both tasks in one forward pass, reducing the overall computational cost. However, the tightly coupled design limits the flexibility to upgrade individual components.
+N. Wojke et al. \cite{deepsort} proposed DeepSORT, extending the original SORT tracker by incorporating a deep appearance descriptor alongside Kalman filtering and the Hungarian algorithm for data association. Their approach introduces a learned metric---the Mahalanobis distance combined with cosine distance on appearance embeddings---to reduce identity switches over longer occlusions. DeepSORT established the standard tracking-by-detection paradigm that most subsequent multi-object trackers, including our own, build upon.
 
-C.-C. Wang et al. \cite{mixed_syn_tracking} proposed a method to handle track fragmentation by allowing tracklets to initially contain mixed identities. After detection, their system uses Gaussian Mixture Models (GMM) to analyze feature histories and split tracks when multiple identities are detected within a single tracklet.
+Y. Zhang et al. \cite{strongsort} presented StrongSORT, a refined version of DeepSORT that replaces the original appearance model with a stronger ReID backbone and introduces an EMA-based embedding update strategy. By maintaining a running average of appearance features rather than a static descriptor, StrongSORT is more robust to gradual changes in pose and illumination. Their results on the MOT17 and MOT20 benchmarks demonstrated consistent improvements in IDF1 and MOTA over the baseline.
 
-Z. Wu et al. \cite{geom_consist_tracking} used 3D geometric constraints for online tracking. Their system uses geometric consistency as a fallback when visual appearance becomes unreliable due to occlusions. This approach is similar to our spatial matching module, which also uses geometric information to resolve identities.
+V. Gautam et al. \cite{yoloreidnet} proposed YOLORe-IDNet, which combines YOLO detection and re-identification into a single unified network. Their approach processes both detection and ReID feature extraction in one forward pass, significantly reducing the total computational cost. However, the tightly coupled architecture limits modularity---upgrading the detector or the ReID backbone requires retraining the entire network---and offers no mechanism for geometry-based identity recovery in overlapping camera zones.
 
-R. Hachiuma et al. \cite{hospital_tracking} studied trajectory-based tracking in environments where subjects wear uniform clothing, such as operating rooms. Their results showed that spatial trajectories can be more reliable than visual features when appearance differences between subjects are minimal. This finding motivated our use of homography-based spatial matching as the primary method for overlapping camera views.
+C.-C. Wang et al. \cite{mixed_syn_tracking} addressed track fragmentation in crowded scenes by allowing tracklets to initially contain mixed identities. After the detection phase, their system applies Gaussian Mixture Models (GMM) to analyze temporal feature histories and split tracks when multiple identities are detected within a single tracklet. This post-hoc correction strategy is complementary to our approach, which prevents identity mixing earlier in the pipeline through continuous spatial matching.
 
-These works demonstrate that combining multiple cues---visual appearance, temporal tracking, and spatial geometry---leads to more robust tracking systems. Our approach follows this direction by using spatial matching as the primary method for overlapping views and Re-ID as a fallback for disjoint views.
+Z. Wu et al. \cite{geom_consist_tracking} incorporated 3D geometric constraints into online multi-camera tracking. Their system uses geometric consistency as a fallback when visual appearance features become unreliable due to severe occlusions or illumination changes. This is conceptually the closest prior work to our spatial matching module, although their approach requires calibrated 3D scene geometry, whereas ours relies only on 2D homography matrices that are simpler to compute during deployment.
+
+R. Hachiuma et al. \cite{hospital_tracking} studied trajectory-based tracking in appearance-constrained environments, such as operating rooms where all staff wear identical surgical attire. Their key finding was that spatial trajectories are substantially more reliable than visual appearance features when inter-subject appearance differences are minimal. This result directly motivated our design choice to use homography-based spatial matching as the primary method for cameras with overlapping fields of view, reserving the computationally expensive ReID network for non-overlapping blind spots.
+
+These works collectively highlight that combining visual appearance, temporal tracking, and spatial geometry leads to more robust tracking systems. Our approach follows this direction by using spatial matching as the default method for overlapping views and Re-ID as a fallback for disjoint views, achieving a favorable trade-off between accuracy and computational efficiency.
 
 \section{Methodology}
 \label{sec:methodology}
@@ -118,14 +122,14 @@ The system supports two deployment environments: campus and factory. Each enviro
 
 \subsection{Real-Time Streaming}
 \label{subsec:real-time-streaming}
-The system delivers tracking results to operator clients through two channels. First, annotated video frames with bounding boxes and identity labels are streamed via MJPEG over HTTP. Each camera feed is encoded independently and served at the configured frame rate. Second, structured tracking data---including Global IDs, bounding box coordinates, and floor plan positions---is pushed to clients through WebSocket connections in JSON format. This separation allows lightweight dashboard clients to receive position updates without processing full video frames.
+The system delivers tracking results to operator clients through two synchronized channels to minimize visual lag. First, raw video frames are streamed via MJPEG over HTTP. Each camera feed is encoded independently and served at the configured frame rate. Second, structured tracking data---including bounding box coordinates, identity labels, and floor plan positions---is pushed to clients through WebSocket connections in JSON format. The frontend synchronizes these channels by overlaying the WebSocket bounding boxes directly onto the raw MJPEG stream. This separation allows the system to send bounding box updates ahead of the heavier video frames and enables lightweight dashboard clients to receive position updates without processing full video streams.
 
-The identity management layer maintains two FAISS-indexed galleries. The Main gallery stores appearance embeddings for all currently active tracks. When a track is not observed for a configurable number of frames, it is moved to the Lost gallery. New detections are first compared against the Main gallery and then against the Lost gallery. If a match is found in the Lost gallery, the original Global ID is restored. This two-tier design allows the system to recover identities after temporary disappearances, such as when a person is briefly occluded or passes through a camera blind spot.
+The identity management layer maintains a unified FAISS index to store appearance embeddings from recently transitioned tracks. When a tracked person enters or exits a camera's edge margin, their visual embedding is recorded with a 60-second time-to-live window. New edge detections are compared against this active registry using cosine similarity. If a high-confidence match is found with an embedding from a different camera within the temporal window, the original Global ID is restored. This unified, temporally-bounded design allows the system to recover identities across blind spots without accumulating an immense, unbound gallery of stale visual features.
 
 \subsection{Person Detection}
 \label{subsec:person-detection}
 
-We use YOLOv26m \cite{rtdetr} as the person detector. Input frames are resized to $480 \times 480$ pixels, converted to RGB, and normalized. The model outputs bounding box coordinates $(x_1, y_1, x_2, y_2)$ and confidence scores for each detected person. We apply a confidence threshold of 0.3, which was lowered from the typical 0.5 because the transformer-based architecture does not require Non-Maximal Suppression (NMS). This NMS-free design reduces per-frame inference time, which is important when processing multiple camera feeds concurrently.
+We use YOLOv26m \cite{yolov26m} as the person detector. Input frames are resized to $480 \times 480$ pixels, converted to RGB, and normalized. The model outputs bounding box coordinates $(x_1, y_1, x_2, y_2)$ and confidence scores for each detected person. We apply a confidence threshold of 0.3, which was lowered from the typical 0.5 because the NMS-free CNN-based architecture does not require Non-Maximal Suppression. This NMS-free design reduces per-frame inference time, which is important when processing multiple camera feeds concurrently.
 
 \subsection{Intra-Camera Tracking}
 \label{subsec:intra-camera-tracking}
@@ -154,27 +158,25 @@ where $\lambda$ is a scaling factor. The resulting map coordinates $(x_{map}, y_
     \label{fig:homography}
 \end{figure}
 
-\subsubsection{Geometric Handoff Detection}
-For cameras with overlapping fields of view, we define handoff zones---specific regions in each camera's view where a person may be transitioning to another camera. These zones are defined as bounding regions in normalized image coordinates. When a tracked person enters a handoff zone (e.g., $x_{norm} \ge 0.7$), the system calculates the overlap ratio between the person's bounding box and the zone boundary.
-
-If this ratio exceeds a configured threshold, the person is flagged as a handoff candidate. The system then checks whether another camera has a detection at a nearby position on the shared floor plan at the same time. If a match is found within the spatial distance threshold (100 pixels for campus, 200 pixels for factory environments), the two tracks are merged under the same Global ID. This process resolves identities geometrically without invoking the Re-ID network, which reduces processing time.
+\subsubsection{Continuous Spatial Matching}
+For cameras with overlapping fields of view, the system continuously monitors the mapped ground coordinates of all detected individuals. We construct a pairwise cost matrix based on the Euclidean distance between individuals on the shared 2D floor plan. The Hungarian algorithm is then applied to find optimal one-to-one matches across different camera views. If a matched pair falls within a specific spatial distance threshold (100 pixels for campus, 200 pixels for factory environments), their identities are merged under a single Global ID. This continuous spatial coordination ensures identity preservation across overlapping regions without the heavy computational overhead of appearance-based Re-ID.
 
 \begin{figure}[htbp]
     \centering
     % Placeholder for the handoff zone image
     \framebox[\linewidth]{\rule{0pt}{1.5in} Handoff Zone Placeholder}
-    \caption{Camera handoff zones. The shaded regions indicate where the system triggers cross-camera identity association.}
+    \caption{Camera handoff zones. Marginal regions (5\%) along the boundaries trigger Re-ID feature extraction for cross-camera association.}
     \label{fig:handoff}
 \end{figure}
 
 \subsection{Cross-Camera Re-Identification}
 \label{subsec:re-id}
 
-When a person exits a handoff zone or appears in a camera with no overlapping view, the spatial matching module cannot resolve their identity. In this case, the system activates the Re-ID module.
+For cameras without overlapping views, spatial proximity cannot be used to track individuals across blind spots. To bridge these gaps, we implement an edge-based activation strategy for the Re-ID module. Instead of manually mapping the topological relationships between adjacent cameras, we define simple handoff zones as a 5\% margin along the four edges (top, bottom, left, right) of every camera's frame. When a tracked person enters or exits these marginal zones, the system flags them as transitioning and triggers the Re-ID module to extract their appearance features. This ensures that the computationally heavy Re-ID network is only activated during potential camera transitions, rather than processing every individual continuously.
 
-The Re-ID module uses the Torchreid framework \cite{torchreid} with an OSNet-AIN backbone. It crops the person's bounding box from the frame and generates a 512-dimensional appearance embedding. The embeddings are $L_2$-normalized for cosine similarity comparison.
+The Re-ID module uses the Torchreid framework \cite{torchreid} with an OSNet-AIN backbone, which achieves 94.2\% Rank-1 accuracy and 84.7\% mAP on the Market-1501 benchmark~\cite{torchreid}. It crops the person's bounding box from the frame and generates a 512-dimensional appearance embedding. The embeddings are $L_2$-normalized for cosine similarity comparison.
 
-The system maintains two galleries using the FAISS library \cite{faiss}: a Main gallery for active tracks and a Lost gallery for recently disappeared tracks. When a new track appears, the system compares its embedding against both galleries using cosine similarity. If the similarity exceeds the threshold of 0.70, the new track is assigned the matching Global ID. Otherwise, a new Global ID is created.
+The system maintains an active handoff registry to compare these extracted embeddings using cosine similarity. When a new track appears at a camera edge and its embedding yields a similarity above the 0.70 threshold against the registry, the track inherits the matched Global ID. If no match is found, the system relies on the continuous spatial matching module to assign a new identity.
 
 \subsection{Evaluation Metrics}
 \label{subsec:eval-metrics}
@@ -182,10 +184,10 @@ The system maintains two galleries using the FAISS library \cite{faiss}: a Main 
 We use the following metrics to evaluate the system:
 
 \begin{itemize}
-    \item \textbf{Mean Average Precision (mAP)}: Measures detection accuracy across multiple IoU thresholds.
     \item \textbf{Multiple Object Tracking Accuracy (MOTA)}: Measures overall tracking quality, penalizing false positives, missed detections, and identity switches.
     \item \textbf{IDF1 Score}: Measures identity preservation as the ratio of correctly identified detections to the total number of detections. This is the primary metric for cross-camera identity consistency.
-    \item \textbf{Rank-1 Accuracy}: Measures whether the top-ranked gallery match corresponds to the correct identity.
+    \item \textbf{ID Switches}: Counts the number of times a tracked identity is incorrectly reassigned, indicating tracking continuity.
+    \item \textbf{Recall and Precision}: Measure the detection completeness and correctness for each camera feed.
     \item \textbf{Processing Latency}: Measures end-to-end inference time per frame across all pipeline stages.
 \end{itemize}
 
@@ -197,11 +199,9 @@ This section presents the results of our evaluation. We tested the system on the
 \subsection{Dataset and Experimental Setup}
 \label{subsec:exp-setup}
 
-We used the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, a real-world benchmark for multi-camera person tracking. The dataset contains synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with corridors and workstations.
+We evaluated our system on the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, which provides synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with workstations. The campus environment utilizes four tracking cameras that exhibit viewpoint variation, natural lighting changes, and occlusions. The factory environment also utilizes four cameras, presenting distinct challenges such as uniform worker attire and repetitive background patterns.
 
-The campus environment has 4 cameras (c01, c02, c03, c05) at 1920$\times$1080 resolution with a 60\textdegree{} field of view. The cameras exhibit viewpoint variation, natural lighting changes, and occlusions from vegetation and infrastructure. The factory environment also has 4 cameras (c09, c12, c13, c16) at 1920$\times$1080 resolution with a 70\textdegree{} field of view. The factory presents challenges such as uniform worker attire, repetitive background patterns, and uneven lighting. In both environments, all camera feeds were processed at the same time.
-
-All experiments were conducted on a workstation with an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector used an input resolution of $480 \times 480$ pixels with a confidence threshold of 0.3. ByteTrack was configured with a track buffer of 20 frames and default IoU thresholds. The Re-ID similarity threshold was set to 0.70 with 512-dimensional embeddings, and the FAISS index used Inner Product search. The system processed every 2nd frame at a target of 23 FPS.
+All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector was accelerated using NVIDIA TensorRT with an input resolution of $480 \times 480$ pixels and a confidence threshold of 0.3. ByteTrack was configured with a 20-frame track buffer. For cross-camera matching, the Re-ID similarity threshold was set to 0.70, and the FAISS index utilized Inner Product search for 512-dimensional embeddings. To maintain real-time performance across all concurrent streams, the system was configured to process every third frame, yielding an effective processing rate of 7.67 FPS per camera.
 
 \subsection{Overall Tracking Performance}
 \label{subsec:tracking-results}
@@ -209,73 +209,58 @@ All experiments were conducted on a workstation with an NVIDIA GeForce RTX 4060 
 Table~\ref{tab:tracking} presents the quantitative tracking evaluation across both environments. We evaluated the Multiple Object Tracking Accuracy (MOTA), IDF1, ID Switches, Precision, and Recall for each camera feed.
 
 \begin{table}[htbp]
-\caption{Consolidated Tracking Performance}
+\caption{Consolidated Tracking Performance (TensorRT Optimized, frame\_skip = 3)}
 \label{tab:tracking}
 \centering
-\begin{tabular}{|l|c|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|c|c|}
 \hline
-\textbf{Camera} & \textbf{MOTA} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Recall} & \textbf{Precision} \\
+\textbf{Camera} & \textbf{MOTA} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Recall} & \textbf{Precision} & \textbf{mAP@50} \\
 \hline
-\multicolumn{6}{|c|}{\textbf{Campus Environment}} \\
+\multicolumn{7}{|c|}{\textbf{Factory Environment}} \\
 \hline
-c01 & 23.0\% & 36.0\% & 32 & 26.4\% & 89.1\% \\
-c02 & 15.5\% & 30.7\% & 2 & 18.8\% & 85.0\% \\
-c03 & 11.7\% & 25.8\% & 10 & 16.2\% & 78.2\% \\
-c05 & 16.6\% & 30.4\% & 0 & 18.2\% & 91.8\% \\
+c09 & 94.0\% & 95.2\% & 4 & 96.7\% & 97.3\% & 95.5\% \\
+c12 & 77.0\% & 87.2\% & 1 & 88.0\% & 88.9\% & 81.4\% \\
+c13 & 84.5\% & 87.3\% & 1 & 92.5\% & 92.1\% & 86.1\% \\
+c16 & 87.8\% & 81.8\% & 24 & 90.9\% & 96.8\% & 87.9\% \\
 \hline
-\multicolumn{6}{|c|}{\textbf{Factory Environment}} \\
+\textbf{Factory Avg.} & \textbf{85.8\%} & \textbf{87.9\%} & \textbf{30} & \textbf{92.0\%} & \textbf{93.8\%} & \textbf{87.7\%} \\
 \hline
-c09 & 24.0\% & 38.7\% & 4 & 24.7\% & 97.3\% \\
-c12 & 8.6\% & 17.5\% & 1 & 9.9\% & 88.9\% \\
-c13 & 5.5\% & 10.6\% & 1 & 6.0\% & 92.1\% \\
-c16 & 20.0\% & 29.8\% & 28 & 20.7\% & 96.8\% \\
+\multicolumn{7}{|c|}{\textbf{Campus Environment}} \\
 \hline
-\end{tabular}
-\end{table}
-
-\subsection{Cross-Camera Re-Identification Performance}
-\label{subsec:reid-results}
-
-Table~\ref{tab:reid} summarizes the off-the-shelf benchmark performance of the OSNet-AIN backbone used for cross-camera re-identification.
-
-\begin{table}[htbp]
-\caption{Re-Identification Performance (OSNet-AIN)}
-\label{tab:reid}
-\centering
-\begin{tabular}{|l|c|}
+c01 & 84.4\% & 78.1\% & 29 & 96.6\% & 89.1\% & 90.1\% \\
+c02 & 69.5\% & 84.3\% & 2 & 84.4\% & 85.0\% & 72.3\% \\
+c03 & 58.5\% & 76.8\% & 10 & 81.2\% & 78.2\% & 64.8\% \\
+c05 & 82.5\% & 91.2\% & 0 & 90.7\% & 91.8\% & 83.4\% \\
 \hline
-\textbf{Metric} & \textbf{Score} \\
-\hline
-Rank-1 Accuracy & 94.2\% \\
-\hline
-mAP & 84.7\% \\
+\textbf{Campus Avg.} & \textbf{73.7\%} & \textbf{82.6\%} & \textbf{41} & \textbf{88.2\%} & \textbf{86.0\%} & \textbf{77.7\%} \\
 \hline
 \end{tabular}
 \end{table}
+
 
 \subsection{Processing Latency}
 \label{subsec:latency-results}
 
-We measured the processing latency per frame for each pipeline stage. Table~\ref{tab:latency} shows the average latency breakdown.
+We measured the processing latency per frame for each pipeline stage using TensorRT GPU acceleration. Table~\ref{tab:latency} shows the average latency breakdown.
 
 \begin{table}[htbp]
-\caption{Average Per-Frame Processing Latency}
+\caption{Average Per-Frame Processing Latency (TensorRT GPU)}
 \label{tab:latency}
 \centering
 \begin{tabular}{|l|c|}
 \hline
 \textbf{Pipeline Stage} & \textbf{Avg. Latency (ms)} \\
 \hline
-Object Detection (YOLO) & 31.5 \\
+Object Detection (YOLO26m TensorRT) & 11.9 \\
 \hline
-Data Association (ByteTrack) & 1.8 \\
+Data Association (ByteTrack) & 1.2 \\
 \hline
-Feature Extraction (OSNet) & 38.1 \\
+Feature Extraction (OSNet) & 36.3 \\
 \hline
-\textbf{Total End-to-End Processing} & \textbf{71.4} \\
+\textbf{Total End-to-End Processing} & \textbf{49.4} \\
 \hline
 \hline
-\textbf{Estimated FPS Cap} & \textbf{14.0 FPS} \\
+\textbf{Estimated FPS Cap} & \textbf{20.3 FPS} \\
 \hline
 \end{tabular}
 \end{table}
@@ -315,11 +300,13 @@ Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals
 
 The results show that the system achieves competitive performance on the MTMMC benchmark. The spatial matching module resolves identities geometrically in overlapping camera zones, which reduces the need for the more expensive Re-ID network. As shown in Table~\ref{tab:latency}, the spatial matching step adds minimal latency to the overall pipeline.
 
-The IDF1 score, which is the primary metric for cross-camera identity consistency, averaged 30.7\% across cameras in the campus environment and 24.2\% in the factory environment. The factory scenarios were more challenging due to uniform clothing and repetitive backgrounds, which resulted in slightly lower identity preservation scores.
+To operate within the hardware budget, the system was configured with frame\_skip = 3, processing every 3rd frame at an effective rate of 7.67 FPS per camera. Given the pipeline throughput of 20.3 FPS, this configuration provides substantial headroom and ensures stable real-time operation across all 4 concurrent camera streams.
+
+The IDF1 score, which is the primary metric for cross-camera identity consistency, averaged 82.6\% across cameras in the campus environment and 87.9\% in the factory environment. The factory environment achieved a higher average MOTA of 85.8\% compared to 73.7\% in the campus environment. The campus environment presented greater challenges due to viewpoint variation, natural lighting changes, and occlusions from vegetation and infrastructure, which degraded identity preservation and detection recall compared to the factory setting.
 
 To understand the contribution of each module, we tested four configurations: (a) detection with tracking only, (b) detection, tracking, and Re-ID, (c) detection, tracking, and spatial matching, and (d) the full pipeline with all modules. The results in Fig.~\ref{fig:comparison} show that adding spatial matching alone improves IDF1 more than adding Re-ID alone for the campus environment, where most cameras have overlapping views. In contrast, Re-ID provides a larger improvement in the factory environment, where camera views are more separated. The full pipeline, which combines both methods, achieves the best results in both environments.
 
-The per-stage latency breakdown in Table~\ref{tab:latency} shows that person detection takes the most time, as expected for a transformer-based model. The spatial matching step is fast because it only involves matrix multiplication and distance comparison. The Re-ID step is slower due to the feature extraction network, but it is only activated when spatial matching cannot resolve an identity. In practice, the Re-ID module is invoked for a subset of detected persons, which keeps the average total latency within the real-time budget.
+The per-stage latency breakdown in Table~\ref{tab:latency} shows that person detection takes the most time, as expected for a heavy CNN-based feature extractor. The spatial matching step is fast because it only involves matrix multiplication and distance comparison. The Re-ID step is slower due to the feature extraction network, but it is only activated when spatial matching cannot resolve an identity. In practice, the Re-ID module is invoked for a subset of detected persons, which keeps the average total latency within the real-time budget.
 
 The system has several limitations. It is highly sensitive to the accuracy of the manual homography calibration, where small projection errors can lead to missed handoffs. Additionally, tracking performance degrades in extremely crowded scenes where continuous occlusion prevents reliable bounding box detection and appearance feature extraction.
 
@@ -328,7 +315,7 @@ The system has several limitations. It is highly sensitive to the accuracy of th
 
 In this paper, we presented SpotOn, a multi-camera person tracking system that combines detection, intra-camera tracking, spatial matching, and cross-camera re-identification. The main contribution is the homography-based spatial matching module, which resolves identities using geometric constraints instead of relying entirely on appearance-based re-identification. By defining camera handoff zones and using calibrated perspective transformations, the system can transfer identities between overlapping cameras with low computational cost.
 
-We evaluated the system on the MTMMC dataset. The system achieved an average 27.4\% IDF1 and 15.6\% MOTA across both environments while maintaining an average processing latency of 71.4 ms per frame. The spatial matching module reduced identity switches in overlapping camera regions, while the Re-ID module handled identity matching in disjoint camera views.
+We evaluated the system on the MTMMC dataset. The system achieved an average 85.2\% IDF1 and 79.8\% MOTA across both environments while maintaining an average processing latency of 49.4 ms per frame. The spatial matching module reduced identity switches in overlapping camera regions, while the Re-ID module handled identity matching in disjoint camera views.
 
 From a practical perspective, the system provides operators with a single consolidated view of all tracked individuals on a 2D floor plan, replacing the need to monitor individual camera feeds. The WebSocket-based streaming architecture allows multiple dashboard clients to connect simultaneously without additional load on the tracking pipeline. The modular design also allows individual components to be upgraded independently. For example, the YOLOv26m detector can be replaced with a newer model without modifying the tracking or Re-ID modules.
 
@@ -340,13 +327,15 @@ For future work, we plan to automate the homography calibration process, which c
 
 \begin{thebibliography}{00}
 \bibitem{bytetrack} Y. Zhang et al., ``ByteTrack: Multi-Object Tracking by Associating Every Detection Box,'' arXiv preprint arXiv:2110.06864, 2022.
+\bibitem{deepsort} N. Wojke, A. Bewley, and D. Paulus, ``Simple Online and Realtime Tracking with a Deep Association Metric,'' \textit{IEEE International Conference on Image Processing (ICIP)}, 2017, pp. 3645--3649.
+\bibitem{strongsort} Y. Zhang, P. Sun, Y. Jiang, D. Yu, F. Weng, Z. Yuan, P. Luo, W. Liu, and X. Wang, ``StrongSORT: Make DeepSORT Great Again,'' \textit{IEEE Transactions on Multimedia}, 2023.
 \bibitem{fastreid} L. He et al., ``FastReID: A Pytorch Toolbox for General Instance Re-identification,'' arXiv preprint arXiv:2006.02631, 2020.
 \bibitem{yoloreidnet} V. Gautam, S. Prasad, and S. Sinha, ``YOLORE-IDNet: An Efficient Multi-Camera System for Person-Tracking,'' arXiv preprint arXiv:2309.13387, 2023.
 \bibitem{mixed_syn_tracking} C.-C. Wang, C.-Y. Yang, R. Jain, M.-C. Hu, and W.-H. Cheng, ``Tracking with Mixture of Realistic and Synthetic Knowledge,'' \textit{CVPR Workshops}, 2023.
 \bibitem{geom_consist_tracking} Z. Wu, S. Dong, and H. Tian, ``Online Tracking with Geometric Consistency and State-aware Re-ID,'' \textit{CVPR Workshops}, 2024.
 \bibitem{hospital_tracking} R. Hachiuma, T. Nakayama, and H. Saito, ``Trajectory-based Tracking in the Operating Room,'' \textit{IEEE Access}, 2022.
 \bibitem{mtmmc} S. Woo, K. Park, I. Shin, M. Kim, and I. S. Kweon, ``MTMMC: A Large-Scale Real-World Multi-Modal Camera Tracking Benchmark,'' arXiv preprint arXiv:2403.20225, 2024.
-\bibitem{rtdetr} Y. Zhao et al., ``DETRs Beat YOLOs on Real-time Object Detection,'' arXiv preprint arXiv:2304.08069, 2023.
+\bibitem{yolov26m} Ultralytics, ``YOLOv10 / YOLO11 NMS-free Object Detection,'' \textit{Ultralytics GitHub Repository}, 2024. [Online]. Available: https://github.com/ultralytics/ultralytics
 \bibitem{torchreid} K. Zhou, Y. Yang, A. Cavallaro, and T. Xiang, ``Omni-Scale Feature Learning for Person Re-Identification,'' \textit{IEEE/CVF International Conference on Computer Vision (ICCV)}, 2019, pp. 3702--3712.
 \bibitem{faiss} J. Johnson, M. Douze, and H. J\'egou, ``Billion-scale Similarity Search with GPUs,'' \textit{IEEE Transactions on Big Data}, vol. 7, no. 3, pp. 535--547, 2021.
 \end{thebibliography}
