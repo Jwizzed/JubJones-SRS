@@ -146,7 +146,7 @@ The backend test report covers API availability, environment management, real-ti
 3 & HLT-003 & Deep Health & GET \texttt{/health/deep} & Returns 200/503/500 with component status & Passed \\ \hline
 4 & HLT-004 & Liveness Probe & GET \texttt{/health/live} & Returns 200 ``alive'' & Passed \\ \hline
 5 & HLT-005 & WS Module & GET \texttt{/ws/health} & Returns 200 status & Passed \\ \hline
-6 & ENV-001 & List environments & GET \texttt{/api/v1/environments/} & Returns 200 list & Passed \\ \hline
+6 & ENV-001 & List environments & GET \url{/api/v1/environments/} & Returns 200 list & Passed \\ \hline
 7 & ENV-002 & Env metadata & GET valid ID & Returns 200 details & Passed \\ \hline
 8 & ENV-003 & Unknown Env & GET invalid ID & Returns 404 & Passed \\ \hline
 9 & ENV-004 & List cameras & GET cameras & Returns 200 camera list & Passed \\ \hline
