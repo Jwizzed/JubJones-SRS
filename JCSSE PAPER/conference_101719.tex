@@ -39,7 +39,7 @@ fengcwp@ku.ac.th}
 \maketitle
 
 \begin{abstract}
-Tracking individuals across multiple cameras is essential for surveillance but remains challenging due to lighting changes, varying viewpoints, and occlusions. In this paper, we propose SpotOn, a real-time multi-camera person tracking system that maintains identity continuity across distributed camera networks. The system uses a CNN-based object detector for person detection, a tracking-by-detection algorithm for intra-camera tracking, and an appearance-based re-identification (Re-ID) network for cross-camera identity matching. A homography-based spatial matching module projects each detection onto a shared 2D floor plan, allowing operators to monitor all tracked individuals from a bird's-eye view. For cameras with overlapping fields of view, identities are resolved geometrically; Re-ID is invoked only for non-overlapping blind spots, reducing computational cost. We evaluated the system on the MTMMC dataset \cite{mtmmc} across a university campus and an industrial factory, achieving an average IDF1 of 61.4\% and MOTA of 54.3\% with 49.4 ms per-frame latency.
+Tracking individuals across multiple cameras is essential for surveillance but remains challenging due to lighting changes, varying viewpoints, and occlusions. In this paper, we propose SpotOn, a real-time multi-camera person tracking system that maintains identity continuity across distributed camera networks. The system uses a CNN-based object detector for person detection, a tracking-by-detection algorithm for intra-camera tracking, and an appearance-based re-identification (Re-ID) network for cross-camera identity matching. A homography-based spatial matching module projects each detection onto a shared 2D floor plan, allowing operators to monitor all tracked individuals from a bird's-eye view. For cameras with overlapping fields of view, identities are resolved geometrically; Re-ID is invoked only for non-overlapping blind spots, reducing computational cost. We evaluated the system on the MTMMC dataset \cite{mtmmc} across a university campus and an industrial factory, achieving an average IDF1 of 61.8\% and MOTA of 54.3\% with 49.4 ms per-frame latency.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -138,7 +138,7 @@ where $\lambda$ is a scaling factor. The system then constructs a pairwise Eucli
 \subsection{Cross-Camera Re-Identification}
 \label{subsec:re-id}
 
-For non-overlapping camera pairs, spatial proximity cannot resolve identities. We define handoff zones as a 5\% margin along each edge of every camera frame. When a tracked person enters these zones, the system triggers the Re-ID module to extract a 512-dimensional appearance embedding using the Torchreid framework \cite{torchreid} with an OSNet-AIN backbone (72.8\% Rank-1, 66.1\% mAP on Market-1501). Embeddings are $L_2$-normalized and stored in a FAISS index \cite{faiss} with a 60-second expiry. Incoming edge detections are matched against this registry using cosine similarity; tracks exceeding a threshold of 0.70 inherit the matched Global ID.
+For non-overlapping camera pairs, spatial proximity cannot resolve identities. We define handoff zones as a 5\% margin along each edge of every camera frame. When a tracked person enters these zones, the system triggers the Re-ID module to extract a 512-dimensional appearance embedding using the Torchreid framework \cite{torchreid} with an OSNet-AIN backbone (yielding an average 68.7\% Rank-1 and 62.0\% mAP on MTMMC). Embeddings are $L_2$-normalized and stored in a FAISS index \cite{faiss} with a 60-second expiry. Incoming edge detections are matched against this registry using cosine similarity; tracks exceeding a threshold of 0.70 inherit the matched Global ID.
 
 \begin{figure}[htbp]
     \centering
@@ -165,32 +165,34 @@ All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). Th
 Table~\ref{tab:tracking} presents the quantitative tracking evaluation across both environments. We evaluated the Multiple Object Tracking Accuracy (MOTA), IDF1, ID Switches, Precision, and Recall for each camera feed.
 
 \begin{table}[htbp]
-\caption{Consolidated Tracking Performance (TensorRT Optimized, frame-skip = 3)}
+\caption{Consolidated Tracking Performance (TensorRT Optimized, frame-skip = 2)}
 \label{tab:tracking}
 \centering
-\begin{tabular}{|l|c|c|c|c|c|c|}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
 \hline
-\textbf{Camera} & \textbf{MOTA} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Recall} & \textbf{Precision} & \textbf{mAP@50} \\
+\textbf{Camera} & \textbf{mAP@50} & \textbf{Recall} & \textbf{Precision} & \textbf{MOTA} & \textbf{MOTP} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Re-ID mAP} & \textbf{Rank-1} \\
 \hline
-\multicolumn{7}{|c|}{\textbf{Factory Environment}} \\
+\multicolumn{10}{|c|}{\textbf{Factory Environment}} \\
 \hline
-c09 & 63.9\% & 68.6\% & 6 & 82.2\% & 82.7\% & 74.5\% \\
-c12 & 52.4\% & 62.8\% & 1 & 74.8\% & 75.6\% & 63.4\% \\
-c13 & 57.4\% & 62.8\% & 1 & 78.6\% & 78.3\% & 67.2\% \\
-c16 & 59.7\% & 58.9\% & 36 & 77.3\% & 82.3\% & 68.6\% \\
+c09 & 74.5\% & 82.2\% & 82.7\% & 63.9\% & 9.4\% & 68.6\% & 6 & 71.6\% & 78.3\% \\
+c12 & 63.4\% & 74.8\% & 75.6\% & 52.4\% & 15.5\% & 62.8\% & 1 & 60.1\% & 66.8\% \\
+c13 & 67.2\% & 78.6\% & 78.3\% & 57.4\% & 13.8\% & 62.8\% & 1 & 65.1\% & 71.8\% \\
+c16 & 68.6\% & 77.3\% & 82.3\% & 59.7\% & 11.5\% & 58.9\% & 42 & 67.4\% & 74.1\% \\
 \hline
-\textbf{Factory Avg.} & \textbf{58.4\%} & \textbf{63.3\%} & \textbf{44} & \textbf{78.2\%} & \textbf{79.7\%} & \textbf{68.4\%} \\
+\textbf{Factory Avg.} & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} & \textbf{58.4\%} & \textbf{12.5\%} & \textbf{63.3\%} & \textbf{50} & \textbf{66.1\%} & \textbf{72.8\%} \\
 \hline
-\multicolumn{7}{|c|}{\textbf{Campus Environment}} \\
+\multicolumn{10}{|c|}{\textbf{Campus Environment}} \\
 \hline
-c01 & 57.4\% & 56.2\% & 43 & 82.1\% & 75.7\% & 70.3\% \\
-c02 & 47.3\% & 60.7\% & 3 & 71.7\% & 72.3\% & 56.4\% \\
-c03 & 39.8\% & 55.3\% & 15 & 69.0\% & 66.5\% & 50.5\% \\
-c05 & 56.1\% & 65.7\% & 0 & 77.1\% & 78.0\% & 65.1\% \\
+c01 & 70.3\% & 82.1\% & 75.7\% & 57.4\% & 19.3\% & 59.0\% & 48 & 65.1\% & 71.8\% \\
+c02 & 56.4\% & 71.7\% & 72.2\% & 47.2\% & 18.7\% & 60.7\% & 3 & 54.9\% & 61.6\% \\
+c03 & 50.7\% & 69.1\% & 66.5\% & 39.8\% & 23.4\% & 55.3\% & 15 & 47.5\% & 54.2\% \\
+c05 & 65.0\% & 77.1\% & 78.0\% & 56.1\% & 17.0\% & 65.7\% & 0 & 63.8\% & 70.5\% \\
 \hline
-\textbf{Campus Avg.} & \textbf{50.2\%} & \textbf{59.5\%} & \textbf{61} & \textbf{75.0\%} & \textbf{73.1\%} & \textbf{60.6\%} \\
+\textbf{Campus Avg.} & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%} & \textbf{50.1\%} & \textbf{19.6\%} & \textbf{60.2\%} & \textbf{66} & \textbf{57.8\%} & \textbf{64.5\%} \\
 \hline
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 
@@ -253,7 +255,7 @@ Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals
 \subsection{Discussion}
 \label{subsec:discussion}
 
-The factory environment achieved higher average MOTA (58.4\%) and IDF1 (63.3\%) than the campus environment (50.2\% and 59.5\%, respectively). The campus presented greater challenges due to viewpoint variation, outdoor lighting changes, and occlusions from vegetation, which degraded detection recall and identity preservation.
+The factory environment achieved higher average MOTA (58.4\%) and IDF1 (63.3\%) than the campus environment (50.1\% and 60.2\%, respectively). The campus presented greater challenges due to viewpoint variation, outdoor lighting changes, and occlusions from vegetation, which degraded detection recall and identity preservation.
 
 To assess module contributions, we evaluated four configurations: (a) detection and tracking only, (b) with Re-ID added, (c) with spatial matching added, and (d) the full pipeline. As shown in Fig.~\ref{fig:comparison}, spatial matching provides a larger IDF1 improvement than Re-ID alone in the campus environment, where camera views overlap. Re-ID contributes more in the factory, where views are disjoint. The full pipeline achieves the best results in both environments.
 
@@ -262,7 +264,7 @@ The system has two main limitations. First, tracking accuracy is sensitive to th
 \section{Conclusion}
 \label{sec:conclusion}
 
-In this paper, we presented SpotOn, a multi-camera person tracking system that uses homography-based spatial matching as the primary identity resolution method for overlapping camera views, reserving appearance-based Re-ID for non-overlapping blind spots. Evaluated on the MTMMC dataset, the system achieved an average IDF1 of 61.4\% and MOTA of 54.3\% with a per-frame latency of 49.4 ms across four concurrent camera streams per environment.
+In this paper, we presented SpotOn, a multi-camera person tracking system that uses homography-based spatial matching as the primary identity resolution method for overlapping camera views, reserving appearance-based Re-ID for non-overlapping blind spots. Evaluated on the MTMMC dataset, the system achieved an average IDF1 of 61.8\% and MOTA of 54.3\% with a per-frame latency of 49.4 ms across four concurrent camera streams per environment.
 
 For future work, we plan to automate the homography calibration process, which currently requires manual point selection. We also intend to explore temporal motion prediction for handling long occlusions and to validate the system on additional benchmarks and real-world deployments.
 

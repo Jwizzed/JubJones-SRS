@@ -201,19 +201,37 @@ To validate the theoretical capabilities outlined in the system architecture and
 \subsection{AI Accuracy Metrics}
 The primary objective of the AI pipeline is to maintain high accuracy in dynamic, crowded scenarios. The detection model (YOLOv26m) and Re-Identification model (Torchreid/OSNet-AIN) were evaluated against the MTMMC validation dataset. The key metrics reflect the system's ability to minimize identity fragmentation and accurately localize subjects.
 
+
+
 \begin{table}[H]
     \centering
-    \caption{AI Model Accuracy Evaluation}
-    \label{tab:ai_accuracy_metrics}
-    \begin{tabular}{|l|c|}
+    \caption{Detailed Tracking Performance per Camera (TensorRT Optimized, frame-skip = 2)}
+    \label{tab:detailed_tracking}
+    \resizebox{\columnwidth}{!}{%
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
     \hline
-    \textbf{Metric} & \textbf{Achieved Result} \\ \hline
-    Detection mAP@0.5 & 64.5\% \\ \hline
-    Re-ID Rank-1 & 72.8\% \\ \hline
-    Re-ID mAP & 66.1\% \\ \hline
-    Tracking MOTA & 54.3\% \\ \hline
-    Tracking IDF1 & 61.4\% \\ \hline
-    \end{tabular}
+    \textbf{Camera} & \textbf{mAP@50} & \textbf{Recall} & \textbf{Precision} & \textbf{MOTA} & \textbf{MOTP} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Re-ID mAP} & \textbf{Rank-1} \\
+    \hline
+    \multicolumn{10}{|c|}{\textbf{Factory Environment}} \\
+    \hline
+    c09 & 74.5\% & 82.2\% & 82.7\% & 63.9\% & 9.4\% & 68.6\% & 6 & 71.6\% & 78.3\% \\
+    c12 & 63.4\% & 74.8\% & 75.6\% & 52.4\% & 15.5\% & 62.8\% & 1 & 60.1\% & 66.8\% \\
+    c13 & 67.2\% & 78.6\% & 78.3\% & 57.4\% & 13.8\% & 62.8\% & 1 & 65.1\% & 71.8\% \\
+    c16 & 68.6\% & 77.3\% & 82.3\% & 59.7\% & 11.5\% & 58.9\% & 42 & 67.4\% & 74.1\% \\
+    \hline
+    \textbf{Factory Avg.} & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} & \textbf{58.4\%} & \textbf{12.5\%} & \textbf{63.3\%} & \textbf{50} & \textbf{66.1\%} & \textbf{72.8\%} \\
+    \hline
+    \multicolumn{10}{|c|}{\textbf{Campus Environment}} \\
+    \hline
+    c01 & 70.3\% & 82.1\% & 75.7\% & 57.4\% & 19.3\% & 59.0\% & 48 & 65.1\% & 71.8\% \\
+    c02 & 56.4\% & 71.7\% & 72.2\% & 47.2\% & 18.7\% & 60.7\% & 3 & 54.9\% & 61.6\% \\
+    c03 & 50.7\% & 69.1\% & 66.5\% & 39.8\% & 23.4\% & 55.3\% & 15 & 47.5\% & 54.2\% \\
+    c05 & 65.0\% & 77.1\% & 78.0\% & 56.1\% & 17.0\% & 65.7\% & 0 & 63.8\% & 70.5\% \\
+    \hline
+    \textbf{Campus Avg.} & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%} & \textbf{50.1\%} & \textbf{19.6\%} & \textbf{60.2\%} & \textbf{66} & \textbf{57.8\%} & \textbf{64.5\%} \\
+    \hline
+    \end{tabular}%
+    }
 \end{table}
 
 \subsection{Operations and Real-Time Pipeline Metrics}
@@ -221,15 +239,15 @@ To guarantee situational awareness without disruptive lag, the system's streamin
 
 \begin{table}[H]
     \centering
-    \caption{System Latency and Throughput Benchmarks}
+    \caption{Average Per-Frame Processing Latency (TensorRT GPU)}
     \label{tab:ops_performance_metrics}
     \begin{tabular}{|l|c|}
     \hline
-    \textbf{Performance Attribute} & \textbf{Measured Result} \\ \hline
-    Pipeline Processing Latency (End-to-End) & 49.4 ms \\ \hline
-    Inference Speed (FPS / Stream) & 20.3 FPS \\ \hline
-    WebSocket Delivery Latency & < 30 ms \\ \hline
-    MJPEG Stream Initialization (TTFB) & < 500 ms \\ \hline
-    Backend API Throughput & 38.2 RPS \\ \hline
+    \textbf{Pipeline Stage} & \textbf{Avg. Latency (ms)} \\ \hline
+    Object Detection (YOLOv26m TensorRT) & 11.9 \\ \hline
+    Data Association (ByteTrack) & 1.2 \\ \hline
+    Feature Extraction (OSNet) & 36.3 \\ \hline
+    \textbf{Total End-to-End Processing} & \textbf{49.4} \\ \hline
+    \textbf{Estimated FPS Cap} & \textbf{20.3 FPS} \\ \hline
     \end{tabular}
 \end{table}
