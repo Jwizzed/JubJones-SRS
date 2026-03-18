@@ -58,12 +58,51 @@ A FastAPI-driven service architecture operates as the central controller, design
     \item \textbf{State Persistence:} Integrating PostgreSQL and TimescaleDB to securely log tracking metadata and system events, ensuring the analytics pipeline retains temporally accurate data.
 \end{itemize}
 
+\vspace{\fill}
+\newpage
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/backend_api.png}
+    \caption{Interactive FastAPI Swagger documentation detailing system endpoints.}
+    \label{fig:deliv-backend-api}
+\end{figure}
+
 \subsection{AI Models \& Inference Pipeline}
 The intelligence driving the physical tracking relies on a multi-stage computer vision workflow integrated directly into the backend.
 \begin{itemize}
     \item \textbf{Object Detection \& Spatial Tracking:} Utilizing YOLO-based models for high-speed pedestrian detection, tightly coupled with SORT-driven algorithms to maintain short-term, single-camera spatial continuity.
     \item \textbf{Cross-Camera Re-Identification (Re-ID):} An implementation of a Torchreid-based neural network architecture capable of extracting deep appearance embeddings using an OSNet-AIN backbone. This enables the system to re-identify subjects across disjointed camera views by comparing feature vectors, mitigating the limitations of blind spots.
+    \item \textbf{Experiment Tracking \& Model Management:} Throughout the development lifecycle, MLflow was utilized to systematically log all model training experiments, track hyperparameters, and compare evaluation metrics across different iterations of the AI models. This ensured rigorous engineering practices and reproducibility before finalizing the weights for deployment.
 \end{itemize}
+
+\vspace{\fill}
+\newpage
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/mlflow_experiment.png}
+    \caption{MLflow dashboard displaying experiment tracking and model evaluation metrics.}
+    \label{fig:deliv-mlflow}
+\end{figure}
+
+\subsection{Continuous Integration and Deployment (CI/CD)}
+To ensure code quality, prevent regressions, and streamline the development lifecycle, SpotOn employs automated Continuous Integration (CI) pipelines using GitHub Actions for both the frontend and backend repositories. These pipelines are triggered automatically upon every pull request and push to the main branches.
+
+\begin{itemize}
+    \item \textbf{Backend CI Pipeline:} The backend workflow is optimized for speed and isolation. It utilizes \texttt{uv}, an extremely fast Python package and project manager, to provision Python 3.12 environments and install dependencies. To keep the cloud runners efficient, the pipeline specifically requests CPU-only wheels for heavy machine learning libraries (like PyTorch) and avoids installing GPU-specific CUDA toolkits. Finally, it executes an extensive suite of over 160 isolated unit and integration tests using \texttt{pytest}, ensuring API contracts, Re-ID logic, and database operations remain fully functional.
+    \item \textbf{Frontend CI Pipeline:} The frontend workflow utilizes Node.js and \texttt{npm} to ensure UI stability. The pipeline executes a strict progression of quality checks: running static code linting via ESLint to maintain styling conventions, enforcing rigorous TypeScript type-checking to catch compilation errors, and ultimately executing the suite of unit and component tests to validate UI rendering and state management logic.
+\end{itemize}
+
+\vspace{\fill}
+\newpage
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{jubjones/backend_ci.png}
+    \caption{GitHub Actions dashboard illustrating successful automated CI/CD pipeline executions.}
+    \label{fig:deliv-github-actions}
+\end{figure}
 
 The reliability and performance of the SpotOn system were validated through a series of rigorous tests covering both frontend interface interactions and backend service logic. The following tables summarize the test cases and their respective execution statuses.
 
