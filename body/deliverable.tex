@@ -239,7 +239,7 @@ To validate the theoretical capabilities outlined in the system architecture and
 
 
 \subsection{Baseline (Non-Optimized) Performance}
-To establish a performance benchmark, the system was evaluated using a standard non-optimized configuration. This baseline utilizes a standard PyTorch YOLOv8m detector and an exhaustive Re-ID pipeline, where appearance features are extracted for every detected individual in every frame without spatial filtering or on-demand handoff logic. These results represent the mathematical "brutal reality" that the SpotOn optimizations aim to improve.
+To establish a performance benchmark, the system was evaluated using a standard non-optimized configuration. This baseline utilizes the same YOLOv26m detector running in plain PyTorch (without TensorRT acceleration) and an exhaustive Re-ID pipeline, where appearance features are extracted for every detected individual in every frame without spatial filtering or on-demand handoff logic. These results represent the mathematical "brutal reality" that the SpotOn optimizations aim to improve.
 
 \begin{table}[H]
     \centering
@@ -278,7 +278,7 @@ To establish a performance benchmark, the system was evaluated using a standard 
     \begin{tabular}{|l|c|}
     \hline
     \textbf{Pipeline Stage} & \textbf{Avg. Latency (ms)} \\ \hline
-    Object Detection (YOLOv8m PyTorch) & 35.0 \\ \hline
+    Object Detection (YOLOv26m PyTorch) & 35.0 \\ \hline
     Data Association (ByteTrack) & 1.5 \\ \hline
     Feature Extraction (OSNet - Exhaustive)* & 181.5 \\ \hline
     Matching \& Association (Global Gallery) & 15.0 \\ \hline
@@ -335,6 +335,7 @@ To guarantee situational awareness without disruptive lag, the system's streamin
     Object Detection (YOLOv26m TensorRT) & 11.9 \\ \hline
     Data Association (ByteTrack) & 1.2 \\ \hline
     Feature Extraction (OSNet) & 36.3 \\ \hline
+    Matching \& Association & 0.8 \\ \hline
     \textbf{Total End-to-End Processing} & \textbf{49.4} \\ \hline
     \textbf{Estimated FPS Cap} & \textbf{20.3 FPS} \\ \hline
     \end{tabular}
