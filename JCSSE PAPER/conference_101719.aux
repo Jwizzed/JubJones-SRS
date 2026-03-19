@@ -46,26 +46,34 @@
 \newlabel{sec:results}{{IV}{3}{}{}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Dataset and Experimental Setup}{3}{}\protected@file@percent }
 \newlabel{subsec:exp-setup}{{\mbox  {IV-A}}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Overall Tracking Performance}{3}{}\protected@file@percent }
-\newlabel{subsec:tracking-results}{{\mbox  {IV-B}}{3}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Consolidated Tracking Performance (TensorRT Optimized, frame-skip = 2)}}{3}{}\protected@file@percent }
-\newlabel{tab:tracking}{{I}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Processing Latency}{3}{}\protected@file@percent }
-\newlabel{subsec:latency-results}{{\mbox  {IV-C}}{3}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Average Per-Frame Processing Latency (TensorRT GPU)}}{3}{}\protected@file@percent }
-\newlabel{tab:latency}{{II}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Qualitative Results}{3}{}\protected@file@percent }
-\newlabel{subsec:qualitative}{{\mbox  {IV-D}}{3}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Discussion}{3}{}\protected@file@percent }
-\newlabel{subsec:discussion}{{\mbox  {IV-E}}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Baseline System Benchmarking}{3}{}\protected@file@percent }
+\newlabel{subsec:baseline-results}{{\mbox  {IV-B}}{3}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Baseline System Performance (Non-Optimized)}}{3}{}\protected@file@percent }
+\newlabel{tab:baseline_tracking}{{I}{3}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Average Per-Frame Processing Latency (Baseline)}}{3}{}\protected@file@percent }
+\newlabel{tab:baseline_latency}{{II}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Optimized Tracking Performance}{3}{}\protected@file@percent }
+\newlabel{subsec:tracking-results}{{\mbox  {IV-C}}{3}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Consolidated Tracking Performance (TensorRT Optimized, frame-skip = 2)}}{3}{}\protected@file@percent }
+\newlabel{tab:tracking}{{III}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Processing Latency}{3}{}\protected@file@percent }
+\newlabel{subsec:latency-results}{{\mbox  {IV-D}}{3}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Average Per-Frame Processing Latency (TensorRT GPU)}}{3}{}\protected@file@percent }
+\newlabel{tab:latency}{{IV}{3}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Performance Gain Summary}{4}{}\protected@file@percent }
+\newlabel{subsec:delta-results}{{\mbox  {IV-E}}{4}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Tracking Performance Delta ($\Delta $ = Optimized $-$ Baseline)}}{4}{}\protected@file@percent }
+\newlabel{tab:tracking_delta}{{V}{4}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Pipeline Latency Delta ($\Delta $ = Optimized $-$ Baseline)}}{4}{}\protected@file@percent }
+\newlabel{tab:latency_delta}{{VI}{4}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Qualitative Results}{4}{}\protected@file@percent }
+\newlabel{subsec:qualitative}{{\mbox  {IV-F}}{4}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-G}}Discussion}{4}{}\protected@file@percent }
+\newlabel{subsec:discussion}{{\mbox  {IV-G}}{4}{}{}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Sample multi-camera tracking output showing consistent global identity assignment across camera views.}}{4}{}\protected@file@percent }
 \newlabel{fig:qualitative}{{4}{4}{}{}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Comparative IDF1 and MOTA scores across ablation configurations: (a) Detection + Tracking only, (b) with Re-ID only, (c) with Spatial Matching only, and (d) full pipeline.}}{4}{}\protected@file@percent }
 \newlabel{fig:comparison}{{5}{4}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces The SpotOn operator dashboard displaying real-time person locations on a unified 2D floor plan, with color-coded identity markers aggregated from multiple camera feeds.}}{4}{}\protected@file@percent }
-\newlabel{fig:dashboard}{{6}{4}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{4}{}\protected@file@percent }
-\newlabel{sec:conclusion}{{V}{4}{}{}{}}
 \bibcite{bytetrack}{1}
 \bibcite{deepsort}{2}
 \bibcite{strongsort}{3}
@@ -77,5 +85,9 @@
 \bibcite{yolov26m}{9}
 \bibcite{torchreid}{10}
 \bibcite{faiss}{11}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces The SpotOn operator dashboard displaying real-time person locations on a unified 2D floor plan, with color-coded identity markers aggregated from multiple camera feeds.}}{5}{}\protected@file@percent }
+\newlabel{fig:dashboard}{{6}{5}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Conclusion}{5}{}\protected@file@percent }
+\newlabel{sec:conclusion}{{V}{5}{}{}{}}
 \@writefile{toc}{\contentsline {section}{References}{5}{}\protected@file@percent }
 \gdef \@abspage@last{5}
