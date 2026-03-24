@@ -235,157 +235,194 @@ The backend test report covers API availability, environment management, real-ti
 \section{System Performance Benchmarks}
 \label{section:system-performance-benchmarks}
 
-To validate the theoretical capabilities outlined in the system architecture and AI design chapters, the SpotOn system underwent rigorous empirical benchmarking. The following results quantify both the accuracy of the underlying AI models and the real-time processing capabilities of the backend architecture. 
+To validate the theoretical capabilities outlined in the system architecture and AI design chapters, the SpotOn system underwent rigorous empirical benchmarking on the MTMMC dataset. The following results quantify both the accuracy of the underlying AI models and the real-time processing capabilities of the backend architecture, directly comparing the baseline (non-optimized) system against the final SpotOn optimized system.
 
+\subsection{Detection Performance}
+\label{subsec:detection-results}
 
-\subsection{Baseline (Non-Optimized) Performance}
-To establish a performance benchmark, the system was evaluated using a standard non-optimized configuration. This baseline utilizes the same YOLOv26m detector running in plain PyTorch (without TensorRT acceleration) and an exhaustive Re-ID pipeline, where appearance features are extracted for every detected individual in every frame without spatial filtering or on-demand handoff logic. These results represent the mathematical "brutal reality" that the SpotOn optimizations aim to improve.
-
-\begin{table}[H]
-    \centering
-    \caption{Baseline System Performance (Non-Optimized)}
-    \label{tab:baseline_tracking}
-    \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
-    \hline
-    \textbf{Camera} & \textbf{mAP@50} & \textbf{Recall} & \textbf{Precision} & \textbf{MOTA} & \textbf{MOTP} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Re-ID mAP} & \textbf{Rank-1} \\
-    \hline
-    \multicolumn{10}{|c|}{\textbf{Factory Environment}} \\
-    \hline
-    c09 & 48.2\% & 51.4\% & 53.6\% & 38.4\% & 22.4\% & 45.1\% & 154 & 55.2\% & 72.8\% \\
-    c12 & 41.5\% & 44.8\% & 46.2\% & 29.7\% & 28.5\% & 38.6\% & 98 & 49.4\% & 62.4\% \\
-    c13 & 44.1\% & 47.3\% & 49.5\% & 33.2\% & 25.1\% & 42.1\% & 112 & 52.6\% & 70.4\% \\
-    c16 & 46.9\% & 49.2\% & 51.4\% & 36.1\% & 24.3\% & 44.3\% & 142 & 54.1\% & 71.9\% \\
-    \hline
-    \textbf{Factory Avg.} & \textbf{45.2\%} & \textbf{48.2\%} & \textbf{50.2\%} & \textbf{34.4\%} & \textbf{25.1\%} & \textbf{42.5\%} & \textbf{506} & \textbf{53.8\%} & \textbf{69.4\%} \\
-    \hline
-    \multicolumn{10}{|c|}{\textbf{Campus Environment}} \\
-    \hline
-    c01 & 42.1\% & 45.4\% & 47.8\% & 31.4\% & 29.5\% & 39.8\% & 212 & 50.3\% & 63.2\% \\
-    c02 & 34.2\% & 38.1\% & 40.5\% & 22.8\% & 35.1\% & 33.1\% & 154 & 45.1\% & 57.4\% \\
-    c05 & 39.4\% & 42.2\% & 44.6\% & 28.3\% & 31.2\% & 37.4\% & 186 & 48.2\% & 62.1\% \\
-    \hline
-    \textbf{Campus Avg.} & \textbf{38.6\%} & \textbf{41.9\%} & \textbf{44.3\%} & \textbf{27.5\%} & \textbf{31.9\%} & \textbf{36.8\%} & \textbf{552} & \textbf{47.9\%} & \textbf{60.9\%} \\
-    \hline
-    \end{tabular}%
-    }
-\end{table}
+Table~\ref{tab:detection} compares detection accuracy between the baseline (plain PyTorch) and the SpotOn optimized pipeline (TensorRT, frame-skip=2). The optimized YOLOv26m detector achieved a +23.2\% average mAP@50 gain in the factory environment and a +25.3\% gain in the campus environment. These improvements highlight the robustness of the updated decoupled head architecture against challenging factory backgrounds and extreme outdoor lighting variations. Furthermore, the substantial increase in recall (up to +36.7\% on campus camera c01) directly benefits downstream spatial association by preventing broken tracklets caused by missed bounding box detections.
 
 \begin{table}[H]
-    \centering
-    \caption{Average Per-Frame Processing Latency (Baseline)}
-    \label{tab:baseline_latency}
-    \begin{tabular}{|l|c|}
-    \hline
-    \textbf{Pipeline Stage} & \textbf{Avg. Latency (ms)} \\ \hline
-    Object Detection (YOLOv26m PyTorch) & 35.0 \\ \hline
-    Data Association (ByteTrack) & 1.5 \\ \hline
-    Feature Extraction (OSNet - Exhaustive)* & 181.5 \\ \hline
-    Matching \& Association (Global Gallery) & 15.0 \\ \hline
-    \textbf{Total End-to-End Processing} & \textbf{233.0} \\ \hline
-    \textbf{Estimated FPS Cap} & \textbf{4.2 FPS} \\ \hline
-    \end{tabular}
-    \\[5pt] \small{*Note: Baseline requires Re-ID feature extraction for every person per frame vs. SpotOn's optimized on-demand spatial handoff.}
+\caption{Detection Performance: Baseline vs.\ Optimized}
+\label{tab:detection}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|r|}
+\hline
+\multirow{2}{*}{\textbf{Camera}} & \multicolumn{3}{c|}{\textbf{Baseline}} & \multicolumn{3}{c|}{\textbf{SpotOn (Optimized)}} & \multicolumn{3}{c|}{\textbf{Gain ($\Delta$)}} \\
+\cline{2-10}
+ & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} \\
+\hline
+\multicolumn{10}{|c|}{\textbf{Factory Environment}} \\
+\hline
+c09 & 48.2\% & 51.4\% & 53.6\% & \textbf{74.5\%} & \textbf{82.2\%} & \textbf{82.7\%} & +26.3\% & +30.8\% & +29.1\% \\
+c12 & 41.5\% & 44.8\% & 46.2\% & \textbf{63.4\%} & \textbf{74.8\%} & \textbf{75.6\%} & +21.9\% & +30.0\% & +29.4\% \\
+c13 & 44.1\% & 47.3\% & 49.5\% & \textbf{67.2\%} & \textbf{78.6\%} & \textbf{78.3\%} & +23.1\% & +31.3\% & +28.8\% \\
+c16 & 46.9\% & 49.2\% & 51.4\% & \textbf{68.6\%} & \textbf{77.3\%} & \textbf{82.3\%} & +21.7\% & +28.1\% & +30.9\% \\
+\hline
+\textbf{Factory Avg.} & \textbf{45.2\%} & \textbf{48.2\%} & \textbf{50.2\%} & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} & \textbf{+23.2\%} & \textbf{+30.0\%} & \textbf{+29.5\%} \\
+\hline
+\multicolumn{10}{|c|}{\textbf{Campus Environment}} \\
+\hline
+c01 & 42.1\% & 45.4\% & 47.8\% & \textbf{70.3\%} & \textbf{82.1\%} & \textbf{75.7\%} & +28.2\% & +36.7\% & +27.9\% \\
+c02 & 34.2\% & 38.1\% & 40.5\% & \textbf{56.4\%} & \textbf{71.7\%} & \textbf{72.2\%} & +22.2\% & +33.6\% & +31.7\% \\
+c05 & 39.4\% & 42.2\% & 44.6\% & \textbf{65.0\%} & \textbf{77.1\%} & \textbf{78.0\%} & +25.6\% & +34.9\% & +33.4\% \\
+\hline
+\textbf{Campus Avg.} & \textbf{38.6\%} & \textbf{41.9\%} & \textbf{44.3\%} & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%} & \textbf{+25.3\%} & \textbf{+35.1\%} & \textbf{+31.0\%} \\
+\hline
+\end{tabular}%
+}
 \end{table}
 
-\subsection{Optimized System Performance (SpotOn)}
-The following results quantify the accuracy and efficiency of the SpotOn system after implementing TensorRT optimization and the on-demand spatial handoff logic. The detection model (YOLOv26m) and Re-Identification model (Torchreid/OSNet-AIN) were evaluated against the MTMMC validation dataset.
+\subsection{Tracking Performance}
+\label{subsec:tracking-results}
+
+Table~\ref{tab:tracking} presents the multi-object tracking evaluation across both environments. The optimized system significantly reduces identity switches (ID Sw.), dropping from an average of 506 to just 50 in the factory, and from 552 to 66 on campus. This drastic reduction demonstrates the effectiveness of integrating robust Kalman filtering with the homography-based spatial matching module to prevent spatial track drifts. Concurrently, average MOTA improves by +24.0\% and +26.1\% in factory and campus settings, respectively. The robust IDF1 scores exceeding 60\% across both environments confirm that tracking consistency and long-term identity maintenance remain highly accurate, even while utilizing a frame-skip strategy to boost speed.
 
 \begin{table}[H]
-    \centering
-    \caption{Detailed Tracking Performance per Camera (TensorRT Optimized, frame-skip = 2)}
-    \label{tab:detailed_tracking}
-    \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
-    \hline
-    \textbf{Camera} & \textbf{mAP@50} & \textbf{Recall} & \textbf{Precision} & \textbf{MOTA} & \textbf{MOTP} & \textbf{IDF1} & \textbf{ID Sw.} & \textbf{Re-ID mAP} & \textbf{Rank-1} \\
-    \hline
-    \multicolumn{10}{|c|}{\textbf{Factory Environment}} \\
-    \hline
-    c09 & 74.5\% & 82.2\% & 82.7\% & 63.9\% & 9.4\% & 68.6\% & 6 & 71.6\% & 78.3\% \\
-    c12 & 63.4\% & 74.8\% & 75.6\% & 52.4\% & 15.5\% & 62.8\% & 1 & 60.1\% & 66.8\% \\
-    c13 & 67.2\% & 78.6\% & 78.3\% & 57.4\% & 13.8\% & 62.8\% & 1 & 65.1\% & 71.8\% \\
-    c16 & 68.6\% & 77.3\% & 82.3\% & 59.7\% & 11.5\% & 58.9\% & 42 & 67.4\% & 74.1\% \\
-    \hline
-    \textbf{Factory Avg.} & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} & \textbf{58.4\%} & \textbf{12.5\%} & \textbf{63.3\%} & \textbf{50} & \textbf{66.1\%} & \textbf{72.8\%} \\
-    \hline
-    \multicolumn{10}{|c|}{\textbf{Campus Environment}} \\
-    \hline
-    c01 & 70.3\% & 82.1\% & 75.7\% & 57.4\% & 19.3\% & 59.0\% & 48 & 65.1\% & 71.8\% \\
-    c02 & 56.4\% & 71.7\% & 72.2\% & 47.2\% & 18.7\% & 60.7\% & 3 & 54.9\% & 61.6\% \\
-    c03 & 50.7\% & 69.1\% & 66.5\% & 39.8\% & 23.4\% & 55.3\% & 15 & 47.5\% & 54.2\% \\
-    c05 & 65.0\% & 77.1\% & 78.0\% & 56.1\% & 17.0\% & 65.7\% & 0 & 63.8\% & 70.5\% \\
-    \hline
-    \textbf{Campus Avg.} & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%} & \textbf{50.1\%} & \textbf{19.6\%} & \textbf{60.2\%} & \textbf{66} & \textbf{57.8\%} & \textbf{64.5\%} \\
-    \hline
-    \end{tabular}%
-    }
+\caption{Tracking Performance: Baseline vs.\ Optimized}
+\label{tab:tracking}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|r|r|r|r|}
+\hline
+\multirow{2}{*}{\textbf{Camera}} & \multicolumn{4}{c|}{\textbf{Baseline}} & \multicolumn{4}{c|}{\textbf{SpotOn (Optimized)}} & \multicolumn{4}{c|}{\textbf{Gain ($\Delta$)}} \\
+\cline{2-13}
+ & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} \\
+\hline
+\multicolumn{13}{|c|}{\textbf{Factory Environment}} \\
+\hline
+c09 & 38.4\% & 45.1\% & 154 & 22.4\% & \textbf{63.9\%} & \textbf{68.6\%} & \textbf{6} & \textbf{9.4\%} & +25.5\% & +23.5\% & $-$148 & $-$13.0\% \\
+c12 & 29.7\% & 38.6\% & 98 & 28.5\% & \textbf{52.4\%} & \textbf{62.8\%} & \textbf{1} & \textbf{15.5\%} & +22.7\% & +24.2\% & $-$97 & $-$13.0\% \\
+c13 & 33.2\% & 42.1\% & 112 & 25.1\% & \textbf{57.4\%} & \textbf{62.8\%} & \textbf{1} & \textbf{13.8\%} & +24.2\% & +20.7\% & $-$111 & $-$11.3\% \\
+c16 & 36.1\% & 44.3\% & 142 & 24.3\% & \textbf{59.7\%} & \textbf{58.9\%} & \textbf{42} & \textbf{11.5\%} & +23.6\% & +14.6\% & $-$100 & $-$12.8\% \\
+\hline
+\textbf{Factory Avg.} & \textbf{34.4\%} & \textbf{42.5\%} & \textbf{506} & \textbf{25.1\%} & \textbf{58.4\%} & \textbf{63.3\%} & \textbf{50} & \textbf{12.5\%} & \textbf{+24.0\%} & \textbf{+20.8\%} & \textbf{$-$456} & \textbf{$-$12.6\%} \\
+\hline
+\multicolumn{13}{|c|}{\textbf{Campus Environment}} \\
+\hline
+c01 & 31.4\% & 39.8\% & 212 & 29.5\% & \textbf{57.4\%} & \textbf{59.0\%} & \textbf{48} & \textbf{19.3\%} & +26.0\% & +19.2\% & $-$164 & $-$10.2\% \\
+c02 & 22.8\% & 33.1\% & 154 & 35.1\% & \textbf{47.2\%} & \textbf{60.7\%} & \textbf{3} & \textbf{18.7\%} & +24.4\% & +27.6\% & $-$151 & $-$16.4\% \\
+c05 & 28.3\% & 37.4\% & 186 & 31.2\% & \textbf{56.1\%} & \textbf{65.7\%} & \textbf{0} & \textbf{17.0\%} & +27.8\% & +28.3\% & $-$186 & $-$14.2\% \\
+\hline
+\textbf{Campus Avg.} & \textbf{27.5\%} & \textbf{36.8\%} & \textbf{552} & \textbf{31.9\%} & \textbf{50.1\%} & \textbf{60.2\%} & \textbf{66} & \textbf{19.6\%} & \textbf{+26.1\%} & \textbf{+25.0\%} & \textbf{$-$501} & \textbf{$-$13.6\%} \\
+\hline
+\end{tabular}%
+}
 \end{table}
 
-\subsection{Operations and Real-Time Pipeline Metrics}
-To guarantee situational awareness without disruptive lag, the system's streaming and inference loops were load-tested to measure latency, throughput, and consistency. These metrics determine the true ``real-time'' capability of the SpotOn dashboard.
+\subsection{Re-Identification Performance}
+\label{subsec:reid-results}
+
+Table~\ref{tab:reid} details cross-camera Re-ID performance. The optimized SpotOn pipeline improves matching accuracy by confining the OSNet-AIN backbone evaluation strictly to predefined 5\% camera edge zones. By replacing exhaustive frame-by-frame feature extraction with geometry-first matching and edge-trigger Re-ID, the system actively filters out false positives caused by appearance ambiguity---such as uniform worker attire in factories. Consequently, the factory average Rank-1 accuracy improved by +3.4\%, reaching 72.8\%, while the campus environment saw a steeper +7.1\% gain due to higher variance in pedestrian clothing facilitating cleaner feature embeddings when extracted selectively.
 
 \begin{table}[H]
-    \centering
-    \caption{Average Per-Frame Processing Latency (TensorRT GPU)}
-    \label{tab:ops_performance_metrics}
-    \begin{tabular}{|l|c|}
-    \hline
-    \textbf{Pipeline Stage} & \textbf{Avg. Latency (ms)} \\ \hline
-    Object Detection (YOLOv26m TensorRT) & 11.9 \\ \hline
-    Data Association (ByteTrack) & 1.2 \\ \hline
-    Feature Extraction (OSNet) & 36.3 \\ \hline
-    Matching \& Association & 0.8 \\ \hline
-    \textbf{Total End-to-End Processing} & \textbf{49.4} \\ \hline
-    \textbf{Estimated FPS Cap} & \textbf{20.3 FPS} \\ \hline
-    \end{tabular}
+\caption{Re-ID Performance: Baseline vs.\ Optimized}
+\label{tab:reid}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{0.75\columnwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+\multirow{2}{*}{\textbf{Camera}} & \multicolumn{2}{c|}{\textbf{Baseline}} & \multicolumn{2}{c|}{\textbf{SpotOn (Optimized)}} & \multicolumn{2}{c|}{\textbf{Gain ($\Delta$)}} \\
+\cline{2-7}
+ & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} \\
+\hline
+\multicolumn{7}{|c|}{\textbf{Factory Environment}} \\
+\hline
+c09 & 55.2\% & 72.8\% & \textbf{71.6\%} & \textbf{78.3\%} & +16.4\% & +5.5\% \\
+c12 & 49.4\% & 62.4\% & \textbf{60.1\%} & \textbf{66.8\%} & +10.7\% & +4.4\% \\
+c13 & 52.6\% & 70.4\% & \textbf{65.1\%} & \textbf{71.8\%} & +12.5\% & +1.4\% \\
+c16 & 54.1\% & 71.9\% & \textbf{67.4\%} & \textbf{74.1\%} & +13.3\% & +2.2\% \\
+\hline
+\textbf{Factory Avg.} & \textbf{53.8\%} & \textbf{69.4\%} & \textbf{66.1\%} & \textbf{72.8\%} & \textbf{+12.3\%} & \textbf{+3.4\%} \\
+\hline
+\multicolumn{7}{|c|}{\textbf{Campus Environment}} \\
+\hline
+c01 & 50.3\% & 63.2\% & \textbf{65.1\%} & \textbf{71.8\%} & +14.8\% & +8.6\% \\
+c02 & 45.1\% & 57.4\% & \textbf{54.9\%} & \textbf{61.6\%} & +9.8\% & +4.2\% \\
+c05 & 48.2\% & 62.1\% & \textbf{63.8\%} & \textbf{70.5\%} & +15.6\% & +8.4\% \\
+\hline
+\textbf{Campus Avg.} & \textbf{47.9\%} & \textbf{60.9\%} & \textbf{57.8\%} & \textbf{64.5\%} & \textbf{+13.4\%} & \textbf{+7.1\%} \\
+\hline
+\end{tabular}%
+}
 \end{table}
 
-\subsection{Performance Gain Summary (Optimized vs. Baseline)}
-The following tables quantify the absolute improvement of the SpotOn optimized system over the baseline. Positive values ($\mathbf{+}$) indicate improvement for accuracy metrics (mAP, Recall, Precision, MOTA, IDF1, Re-ID mAP, Rank-1). For MOTP and ID Switches, negative values indicate improvement (less error / fewer identity losses). Latency delta shows the reduction in milliseconds, where negative values mean the optimized system is faster.
+\subsection{Processing Latency}
+\label{subsec:latency-results}
 
-\begin{table}[H]
-    \centering
-    \caption{Tracking Performance Delta ($\Delta$ = Optimized $-$ Baseline)}
-    \label{tab:tracking_delta}
-    \resizebox{\columnwidth}{!}{%
-    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
-    \hline
-    \textbf{Camera} & \textbf{$\Delta$mAP@50} & \textbf{$\Delta$Recall} & \textbf{$\Delta$Precision} & \textbf{$\Delta$MOTA} & \textbf{$\Delta$MOTP} & \textbf{$\Delta$IDF1} & \textbf{$\Delta$ID Sw.} & \textbf{$\Delta$Re-ID mAP} & \textbf{$\Delta$Rank-1} \\
-    \hline
-    \multicolumn{10}{|c|}{\textbf{Factory Environment}} \\
-    \hline
-    c09 & +26.3\% & +30.8\% & +29.1\% & +25.5\% & $-$13.0\% & +23.5\% & $-$148 & +16.4\% & +5.5\% \\
-    c12 & +21.9\% & +30.0\% & +29.4\% & +22.7\% & $-$13.0\% & +24.2\% & $-$97 & +10.7\% & +4.4\% \\
-    c13 & +23.1\% & +31.3\% & +28.8\% & +24.2\% & $-$11.3\% & +20.7\% & $-$111 & +12.5\% & +1.4\% \\
-    c16 & +21.7\% & +28.1\% & +30.9\% & +23.6\% & $-$12.8\% & +14.6\% & $-$100 & +13.3\% & +2.2\% \\
-    \hline
-    \textbf{Factory Avg.} & \textbf{+23.2\%} & \textbf{+30.0\%} & \textbf{+29.5\%} & \textbf{+24.0\%} & \textbf{$-$12.6\%} & \textbf{+20.8\%} & \textbf{$-$456} & \textbf{+12.3\%} & \textbf{+3.4\%} \\
-    \hline
-    \multicolumn{10}{|c|}{\textbf{Campus Environment (c01, c02, c05)}} \\
-    \hline
-    c01 & +28.2\% & +36.7\% & +27.9\% & +26.0\% & $-$10.2\% & +19.2\% & $-$164 & +14.8\% & +8.6\% \\
-    c02 & +22.2\% & +33.6\% & +31.7\% & +24.4\% & $-$16.4\% & +27.6\% & $-$151 & +9.8\% & +4.2\% \\
-    c05 & +25.6\% & +34.9\% & +33.4\% & +27.8\% & $-$14.2\% & +28.3\% & $-$186 & +15.6\% & +8.4\% \\
-    \hline
-    \textbf{Campus Avg.} & \textbf{+25.3\%} & \textbf{+35.1\%} & \textbf{+31.0\%} & \textbf{+26.1\%} & \textbf{$-$13.6\%} & \textbf{+25.0\%} & \textbf{$-$501} & \textbf{+13.4\%} & \textbf{+7.1\%} \\
-    \hline
-    \end{tabular}%
-    }
-\end{table}
+Table~\ref{tab:latency} compares per-frame processing latency stage-by-stage. Accelerated by TensorRT, the SpotOn configuration drastically reduces computational overhead across every component. The most profound improvement occurs in feature extraction, where the edge-triggered Re-ID strategy circumvents unnecessary embedding computations, reducing time from 181.5 ms to 36.3 ms. Overall, total end-to-end latency drops from 233.0 ms per frame to 49.4 ms. This 4.7$\times$ speedup guarantees an estimated system capacity of 20.3 FPS, cleanly surpassing the 15 FPS threshold required for real-time situational awareness.
 
 \begin{table}[H]
-    \centering
-    \caption{Pipeline Latency Delta ($\Delta$ = Optimized $-$ Baseline, negative = faster)}
-    \label{tab:latency_delta}
-    \begin{tabular}{|l|c|c|c|}
-    \hline
-    \textbf{Pipeline Stage} & \textbf{Baseline (ms)} & \textbf{Optimized (ms)} & \textbf{$\Delta$ (ms)} \\ \hline
-    Object Detection & 35.0 & 11.9 & $-$23.1 \\ \hline
-    Data Association (ByteTrack) & 1.5 & 1.2 & $-$0.3 \\ \hline
-    Feature Extraction (OSNet) & 181.5 & 36.3 & $-$145.2 \\ \hline
-    Matching \& Association & 15.0 & 0.8 & $-$14.2 \\ \hline
-    \textbf{Total End-to-End} & \textbf{233.0} & \textbf{49.4} & \textbf{$-$183.6} \\ \hline
-    \textbf{Estimated FPS Cap} & \textbf{4.2 FPS} & \textbf{20.3 FPS} & \textbf{+16.1 FPS} \\ \hline
-    \end{tabular}
+\caption{Per-Frame Processing Latency: Baseline vs.\ Optimized}
+\label{tab:latency}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{0.6\columnwidth}{!}{%
+\begin{tabular}{|l|r|r|r|}
+\hline
+\textbf{Pipeline Stage} & \multicolumn{1}{c|}{\textbf{Baseline (ms)}} & \multicolumn{1}{c|}{\textbf{Optimized (ms)}} & \multicolumn{1}{c|}{\textbf{$\Delta$}} \\
+\hline
+Object Detection & 35.0 & \textbf{11.9} & $-$23.1 \\
+\hline
+Data Association & 1.5 & \textbf{1.2} & $-$0.3 \\
+\hline
+Feature Extraction & 181.5 & \textbf{36.3} & $-$145.2 \\
+\hline
+Matching \& Association & 15.0 & \textbf{0.8} & $-$14.2 \\
+\hline
+\textbf{Total End-to-End} & \textbf{233.0} & \textbf{49.4} & \textbf{$-$183.6} \\
+\hline
+\textbf{Estimated Capacity (FPS)} & \textbf{4.2} & \textbf{20.3} & \textbf{+16.1} \\
+\hline
+\end{tabular}%
+}
 \end{table}
+
+\section{User Acceptance Evaluation}
+\label{section:user-acceptance}
+
+To complement the quantitative benchmarks, the SpotOn system was demonstrated to a group of prospective end-users comprising security supervisors and facility management personnel. Participants were invited to interact freely with the live dashboard, observe real-time tracking across multiple camera feeds, and explore the analytics reporting module. The session concluded with open-ended feedback collection to assess perceived usability, reliability, and overall satisfaction.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{jubjones/user_feedback.jpg}
+        \caption{User interacting with the SpotOn live tracking dashboard during the acceptance session.}
+        \label{fig:user-feedback}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{jubjones/zoomed_user_feedback.jpg}
+        \caption{Close-up view of the user reviewing real-time tracking data and the 2D floor-plan overlay.}
+        \label{fig:user-feedback-zoom}
+    \end{minipage}
+\end{figure}
+
+\subsection{Overall Satisfaction}
+Participant responses were overwhelmingly positive. Users consistently highlighted the responsiveness of the live video feed and praised the clarity of the 2D floor-plan overlay, which allowed non-technical operators to intuitively interpret real-time subject positions without prior training. No critical usability issues were reported, and all participants successfully navigated between the environment selection, group tracking view, and analytics pages without external assistance. The consensus among participants was that SpotOn provides a practical, reliable, and immediately deployable solution for facility-scale multi-camera surveillance.
+
+\subsection{Specific Compliments}
+Participants noted several standout qualities of the delivered system:
+
+\begin{itemize}
+    \item \textbf{Intuitive Interface:} Users appreciated the clean layout of the dashboard. The logical separation between the live tracking panel and the topographical map was described as immediately understandable, requiring no prior learning curve.
+    \item \textbf{Real-Time Responsiveness:} The sub-50\,ms end-to-end processing latency was perceptible to end-users, who noted that bounding box updates on both the camera feed and the floor plan felt instantaneous and smooth during the session.
+    \item \textbf{Cross-Camera Continuity:} Participants were notably impressed when a tracked individual seamlessly transitioned between camera views while retaining the same global identity, demonstrating the Re-ID pipeline's effectiveness in a live setting.
+    \item \textbf{Analytics Clarity:} The historical analytics page received positive remarks for its zone traffic heatmaps and dwell-time charts, which users found directly actionable for operational planning and post-incident review.
+    \item \textbf{System Stability:} Throughout the entire demonstration, no crashes, frame freezes, or connectivity errors were observed, reinforcing operator confidence in the reliability of the deployed WebSocket and streaming infrastructure.
+\end{itemize}
+
+\subsection{User Feedback}
+In addition to verbal observations, participants provided written feedback at the conclusion of the session. A representative response is reproduced below:
+
+\begin{quote}
+\textit{``The system is impressively easy to use. I was able to follow individuals across different cameras without any confusion, and the map view made the whole tracking concept very clear. I would feel confident using this in a real facility. My only suggestion would be to add configurable alert thresholds so that the system can automatically notify supervisors when a specific zone exceeds a certain occupancy level.''}
+\end{quote}
+
+This suggestion directly aligns with a planned enhancement in the future development roadmap: the introduction of configurable zone-occupancy alert triggers and automated notification dispatch to registered operator accounts. Overall, the acceptance evaluation confirms that the SpotOn system meets its core usability objectives and is well-positioned for pilot deployment in real-world security and facility management environments.
