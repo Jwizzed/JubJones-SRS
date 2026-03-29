@@ -19,7 +19,7 @@ This document summarizes the feedback from the professor regarding the JCSSE pap
 
 *   [x] **New System Overview Diagram (New Fig. 1)**: Create a new diagram for Section III.A (System Overview) with 4 main boxes. *(Implemented via custom left-to-right TikZ flowchart in `spoton_architecture.tex`)*
 *   [ ] **Fix Figure 5 Y-Axis (New)**: Adjust the maximum y-axis value of Figure 5 (`ablation_figure_5.png`) to exactly 40. You will need to regenerate this plot from your script.
-*   [x] **Modified Deployment Diagram (Old Fig. 1)**: Redesign the original deployment figure to represent workflow steps using boxes. Place the tool names/logos *outside/next to* the boxes. *(Integrated into Section 3.1)*
+*   [ ] **Modified Deployment Diagram (Old Fig. 1)**: Redesign the original deployment figure to represent workflow steps using boxes. Place the tool names/logos *outside/next to* the boxes. *(Waiting for genuine exported diagram)*
 
 ## Part C: Need to wait for the professor / action required
 *Tasks the professor is handling, thinking about, or requiring external action.*

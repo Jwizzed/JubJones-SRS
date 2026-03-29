@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  29 MAR 2026 14:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  29 MAR 2026 15:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -457,11 +457,9 @@ File: input_frame.jpeg Graphic file (type jpg)
 Package pdftex.def Info: input_frame.jpeg  used on input line 25.
 (pdftex.def)             Requested size: 85.35826pt x 47.5322pt.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9> on input line 26.
+(Font)              <14.4> on input line 26.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 26.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 26.
+(Font)              <7> on input line 26.
 <bbox1.png, id=5, 58.2175pt x 106.3975pt>
 File: bbox1.png Graphic file (type png)
 <use bbox1.png>
@@ -535,23 +533,21 @@ L3 programming layer <2024-02-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 13709 strings out of 474116
- 291141 string characters out of 5743683
+ 13702 strings out of 474116
+ 291106 string characters out of 5743683
  1962187 words of memory out of 5000000
- 35846 multiletter control sequences out of 15000+600000
- 561097 words of font info for 46 fonts, out of 8000000 for 9000
+ 35843 multiletter control sequences out of 15000+600000
+ 560488 words of font info for 44 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,8n,107p,421b,903s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb>
-</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></u
-sr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr
-/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/l
-ocal/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/
-local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb>
-Output written on spoton_architecture.pdf (1 page, 2519539 bytes).
+</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb
+></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><
+/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb>
+</usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+Output written on spoton_architecture.pdf (1 page, 2497949 bytes).
 PDF statistics:
- 64 PDF objects out of 1000 (max. 8388607)
- 26 compressed objects within 1 object stream
+ 54 PDF objects out of 1000 (max. 8388607)
+ 20 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  78 words of extra memory for PDF output out of 10000 (max. 10000000)
 

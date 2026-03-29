@@ -94,13 +94,13 @@ Multi-Camera Tracking, Person Re-Identification, Computer Vision, Spatial Matchi
 \section{Introduction}
 \label{sec:introduction}
 
-Multi-camera person tracking is a cornerstone technology for modern smart cities, intelligent transportation hubs, retail analytics, and vast public spaces. In these diverse real-world applications, maintaining a continuous trajectory of an individual as they move across disjointed camera networks is essential for ensuring public safety, optimizing crowd flow, and extracting operational intelligence. However, as the scale of surveillance networks expands, traditional manual monitoring becomes computationally intractable and highly prone to human error, necessitating the development of robust, automated tracking frameworks.
+Multi-camera person tracking has become a critical enabling technology across a wide spectrum of real-world applications. In smart cities, surveillance networks monitor pedestrian flow to detect anomalies and prevent crime. In airports and transit hubs, tracking individuals across non-overlapping cameras is essential for access control and crowd management. In hospitals, continuous identity tracking across wards helps staff monitor patient movement without constant supervision. In retail environments, understanding individual trajectories provides behavioral analytics that drive operational decisions. Across all these domains, the scale of the monitoring task far exceeds human capacity, demanding automated, robust, and efficient solutions.
 
-The fundamental challenge in multi-camera tracking lies in the visual instability of subjects across varying physical environments. When an individual transitions from one camera view to another, lighting fluctuations, perspective distortions, and severe partial occlusions can drastically alter their physical appearance. Existing tracking systems typically resolve this by brute-forcing cross-camera association using computationally expensive appearance-based re-identification (Re-ID) on every frame. This brute-force approach severely limits real-time scalability. Furthermore, appearance-based models degrade significantly in environments where subjects wear highly similar clothing---such as uniform security personnel or industrial factory workers---rendering purely visual matching unreliable.
+Despite this widespread need, maintaining consistent person identities across a distributed camera network remains an open challenge. When an individual moves from one camera view to another, changes in viewing angle, illumination, and partial occlusion can dramatically alter their appearance. Existing systems commonly address this by applying appearance-based re-identification (Re-ID) exhaustively across all camera pairs---a brute-force strategy that is computationally prohibitive at scale. Appearance-based models also degrade in constrained environments where subjects wear similar uniforms, such as factory workers or hospital staff. These limitations motivate a more principled approach that invokes appearance matching only when geometrically necessary.
 
 In this paper, we propose SpotOn, a real-time multi-camera person tracking system that uses a two-tier matching strategy. For cameras with overlapping fields of view, identities are resolved geometrically using homography-based spatial matching, which is faster and more robust than appearance-based Re-ID in such zones. For non-overlapping blind spots, the Re-ID module is activated only when a person approaches the edge margin of a camera frame. This design reduces overall computational cost while maintaining tracking accuracy.
 
-The SpotOn pipeline consists of four tightly integrated stages. First, a YOLOv26m object detector processes each camera frame to localize all persons within the scene. Second, ByteTrack maintains per-camera track identities across frames using Kalman filtering and IoU-based association, preserving continuity through short occlusions. Third, for cameras with overlapping fields of view, a homography-based spatial matching module projects the foot position of each detection onto a shared 2D floor plan; identities are then resolved by computing pairwise Euclidean distances and applying the Hungarian algorithm across camera views. Fourth, for non-overlapping camera pairs, an appearance-based Re-ID module using OSNet-AIN is triggered only when a track enters a 5\% edge-margin zone, extracting a 512-dimensional embedding for cross-camera matching via cosine similarity. Each stage is described in detail in Section~\ref{sec:methodology}.
+The SpotOn pipeline consists of four tightly integrated stages. First, a YOLOv26m detector processes each camera frame to localize all persons. Second, ByteTrack maintains per-camera track identities using Kalman filtering and IoU-based association. Third, for overlapping camera pairs, a homography-based spatial matching module projects foot positions onto a shared 2D floor plan, resolving identities via pairwise Euclidean distance minimization and the Hungarian algorithm. Fourth, for non-overlapping pairs, an OSNet-AIN Re-ID module is triggered only when a track enters a 5\% edge-margin zone, extracting a 512-dimensional embedding for cosine similarity matching. Each stage is described in Section~\ref{sec:methodology}.
 
 The main contributions of this work are: (1) a two-tier identity matching strategy that prioritizes geometry-based matching for overlapping views and invokes Re-ID only at camera edge boundaries; (2) a homography-based spatial matching module that projects detections onto a shared 2D floor plan and resolves identities without appearance features; and (3) an evaluation on the MTMMC dataset~\cite{mtmmc} demonstrating competitive IDF1, MOTA, and sub-second per-frame latency.
 
@@ -127,28 +127,22 @@ This section describes the SpotOn pipeline and each of its constituent modules. 
 \subsection{System Overview}
 \label{subsec:system-overview}
 
-As shown in Fig.~\ref{fig:pipeline}, the pipeline consists of four stages: (1) Person Detection, (2) Intra-Camera Tracking, (3) Spatial Matching via Homography, and (4) Cross-Camera Re-Identification. To facilitate seamless deployment, we developed a centralized application built with FastAPI that runs as an asynchronous service, connecting all independent processes to measure systemic performance in real time. Each camera feed is processed by an independent worker, and a central coordinator aggregates the results and maintains the global identity registry, as detailed in the deployment workflow (Fig.~\ref{fig:workflow}). Models are shared across workers to minimize GPU memory usage.
+As shown in Fig.~\ref{fig:pipeline}, the pipeline consists of four stages: (1) Person Detection, (2) Intra-Camera Tracking, (3) Spatial Matching via Homography, and (4) Cross-Camera Re-Identification. To facilitate seamless deployment, we developed a centralized application built with FastAPI that runs as an asynchronous service, connecting all independent processes to measure systemic performance in real time. Each camera feed is processed by an independent worker, and a central coordinator aggregates the results and maintains the global identity registry. Models are shared across workers to minimize GPU memory usage.
 
 Tracking results are delivered to operator clients through two synchronized channels. Raw video frames are streamed via MJPEG, while structured tracking data---bounding boxes, identity labels, and floor plan positions---is pushed through WebSocket connections. The frontend overlays WebSocket data onto the MJPEG stream in real time.
 
-\begin{figure}[htbp]
+\begin{figure*}[t]
     \centering
-    \includegraphics[width=\linewidth]{workflow.png}
-    \caption{Deployment workflow and service component interactions of the SpotOn application.}
-    \label{fig:workflow}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\linewidth]{spoton_architecture.pdf}
+    \includegraphics[width=0.7\linewidth]{spoton_architecture.pdf}
     \caption{Overview of the proposed SpotOn multi-camera tracking pipeline.}
     \label{fig:pipeline}
-\end{figure}
+    \vspace{-3em}
+\end{figure*}
 
 \subsection{Datasets}
 \label{subsec:datasets}
 
-We evaluated our system on the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, which provides synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with workstations. The campus environment utilizes four tracking cameras that exhibit viewpoint variation, natural lighting changes, and occlusions. The factory environment also utilizes four cameras, presenting distinct challenges such as uniform worker attire and repetitive background patterns.
+We evaluated our system on the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, which provides synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with workstations. The campus environment utilizes tracking cameras (specifically evaluated on c01, c02, and c05) that exhibit viewpoint variation, natural lighting changes, and occlusions. The factory environment utilizes tracking cameras (evaluated on c09, c12, c13, and c16), presenting distinct challenges such as uniform worker attire and repetitive background patterns.
 
 \subsection{Person Detection}
 \label{subsec:person-detection}
@@ -163,26 +157,28 @@ Bounding boxes from the detector are passed to ByteTrack~\cite{bytetrack} for mu
 \subsection{Geometry-First Spatial Matching}
 \label{subsec:spatial-matching}
 
-The spatial matching module resolves identities geometrically for cameras with overlapping fields of view. We compute a $3 \times 3$ homography matrix $\mathbf{H}$ for each camera using RANdom SAmple Consensus (RANSAC) over manually defined ground-plane calibration points, as illustrated in Fig.~\ref{fig:ground_labeling}. During tracking, the bottom-center point of each bounding box, approximating the person's foot position $(x_c, y_{max})$, is projected onto the shared floor plan:
+The spatial matching module resolves identities geometrically for cameras with overlapping fields of view. We compute a $3 \times 3$ homography matrix $\mathbf{H}$ for each camera using RANdom SAmple Consensus (RANSAC) over manually defined ground-plane calibration points, as illustrated in Fig.~\ref{fig:ground_labeling}. During tracking, the bottom-center of the person's bounding box---defined by its horizontal center $x_c$ and lowest vertical extent $y_{max}$---determines the image-plane coordinate $\mathbf{p}_{img} = [x_c, y_{max}, 1]^T$. This point represents the target's physical foot location in the pixel space. By applying the projective transformation:
 
 \begin{equation}
 \lambda \mathbf{p}_{map} = \mathbf{H} \mathbf{p}_{img}
 \end{equation}
 
-where $\lambda$ is a scaling factor. As depicted in Fig.~\ref{fig:spatial_matching}, the system then constructs a pairwise Euclidean distance matrix over all projected positions across camera views and applies the Hungarian algorithm to find optimal identity assignments. Pairs within 100 pixels (campus) or 200 pixels (factory) are merged under a single Global ID.
+the coordinate is scaled by $\lambda$ and mapped to $\mathbf{p}_{map} = [X_{map}, Y_{map}, 1]^T$, which represents the absolute top-down position on the environment's virtual 2D floor plan. For example, if a tracked person walks horizontally across the field of view in Camera A, their continuously updating $\mathbf{p}_{img}$ geometrically translates into a moving $\mathbf{p}_{map}$ trajectory. Simultaneously, if Camera B observes that same physical region from a different angle, it projects its own detections to the exact same global vicinity on the floor plan. As depicted in Fig.~\ref{fig:spatial_matching}, the system constructs a pairwise Euclidean distance matrix between these projected $\mathbf{p}_{map}$ sets across all overlapping views. The Hungarian algorithm then minimizes the global assignment cost to match identities. Pairs whose spatial distance falls below an environmental tolerance (100 pixels for campus, 200 pixels for factory) are confirmed as the same physical individual and merged under a single Global ID.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{ground_homography.png}
+    \includegraphics[width=0.9\linewidth]{ground_homography.png}
     \caption{Manual annotation of ground-plane calibration points used to compute the camera-to-floor homography matrix.}
     \label{fig:ground_labeling}
+    \vspace{-1em}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{spatial_matching.jpeg}
+    \includegraphics[width=0.9\linewidth]{spatial_matching.jpeg}
     \caption{The spatial mapping process projecting pedestrian 3D positions onto a unified 2D floor plan for cross-camera association.}
     \label{fig:spatial_matching}
+    \vspace{-1em}
 \end{figure}
 
 \subsection{Cross-Camera Re-Identification}
@@ -193,7 +189,7 @@ For non-overlapping camera pairs, spatial proximity cannot resolve identities. W
 \subsection{Experimental Setup}
 \label{subsec:exp-setup}
 
-All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector was accelerated using NVIDIA TensorRT with an input resolution of $480 \times 480$ pixels and a confidence threshold of 0.3. ByteTrack was configured with a 20-frame track buffer. For cross-camera matching, the Re-ID similarity threshold was set to 0.70, and the FAISS index utilized Inner Product search for 512-dimensional embeddings. To maintain real-time performance across all concurrent streams, the system was configured to process every third frame, yielding an effective processing rate of 7.67 FPS per camera.
+All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector was accelerated using NVIDIA TensorRT with an input resolution of $480 \times 480$ pixels and a confidence threshold of 0.3. ByteTrack was configured with a 20-frame track buffer. For cross-camera matching, the Re-ID similarity threshold was set to 0.70, and the FAISS index utilized Inner Product search for 512-dimensional embeddings. To maintain real-time performance across all concurrent streams, the system was configured to process every third frame, yielding an effective processing rate of 7.67 FPS per camera. For evaluations, we benchmark the \textit{SpotOn (Optimized)} pipeline against a \textit{Baseline} configuration. For the machine learning metrics (Detection, Tracking, and Re-ID), the baseline refers to pre-trained models without dataset-specific fine-tuning. Additionally, for Tracking and Per-Frame Processing Latency, the baseline represents the system operating without the geometry-first spatial matching module. The optimized pipeline integrates both domain-specific fine-tuning and the spatial matching logic.
 
 \subsection{Evaluation Metrics}
 \label{subsec:metrics}
@@ -204,7 +200,7 @@ To quantify the performance of the proposed pipeline, we employ standard metrics
 \caption{Detection Performance}
 \label{tab:detection}
 \centering
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|r|r|r|r|r|r|}
 \hline
@@ -237,7 +233,7 @@ c05 & 39.4\% & 42.2\% & 44.6\% & \textbf{65.0\%} & \textbf{77.1\%} & \textbf{78.
 \caption{Tracking Performance}
 \label{tab:tracking}
 \centering
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|r|r|r|r|r|r|r|r|}
 \hline
@@ -270,7 +266,7 @@ c05 & 28.3\% & 37.4\% & 186 & 31.2\% & \textbf{56.1\%} & \textbf{65.7\%} & \text
 \caption{Re-ID Performance}
 \label{tab:reid}
 \centering
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|r|r|r|r|}
 \hline
@@ -303,7 +299,7 @@ c05 & 48.2\% & 62.1\% & \textbf{63.8\%} & \textbf{70.5\%} \\ % & +15.6\% & +8.4\
 \caption{Per-Frame Processing Latency}
 \label{tab:latency}
 \centering
-\renewcommand{\arraystretch}{1.15}
+\renewcommand{\arraystretch}{1.1}
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|r|r|}
 \hline
@@ -382,15 +378,14 @@ Fig.~\ref{fig:comparison} compares the IDF1 and MOTA scores across different pip
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{ablation_figure_5.png}
-    \caption{Comparative IDF1 and MOTA scores across ablation configurations.} %: (a) Detection + Tracking only, (b) with Re-ID only, (c) with Spatial Matching only, and (d) full pipeline.
+    \includegraphics[width=0.9\linewidth]{ablation_figure_5.png}
+    \caption{Ablation study analyzing the impact of geometry-first spatial matching on total track identity switches compared to standard appearance-only Re-ID matching.}
     \label{fig:comparison}
+    \vspace{-1.5em}
 \end{figure}
 
 Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals from all cameras are displayed on the shared 2D floor plan.
 
-%\begin{figure}[htbp]
-%    \centering
 %    \includegraphics[width=\linewidth]{VIDEO_FEED.jpeg}
 %    \caption{The SpotOn operator dashboard presenting a consolidated real-time multi-camera interface for improved situational awareness.}
 %    \label{fig:dashboard}
@@ -415,24 +410,24 @@ The authors would like to thank the Department of Computer Engineering, Kasetsar
 \vfill\null
 \newpage
 \begin{thebibliography}{00}
-\bibitem{sort} A. Bewley, Z. Ge, L. Ott, F. Ramos, and B. Upcroft, ``Simple Online and Realtime Tracking,'' \textit{IEEE International Conference on Image Processing (ICIP)}, 2016, pp. 3464--3468.
+\bibitem{mtmmc} S. Woo, K. Park, I. Shin, M. Kim, and I. S. Kweon, ``MTMMC: A Large-Scale Real-World Multi-Modal Camera Tracking Benchmark,'' arXiv preprint arXiv:2403.20225, 2024.
 \bibitem{deepsort} N. Wojke, A. Bewley, and D. Paulus, ``Simple Online and Realtime Tracking with a Deep Association Metric,'' \textit{IEEE International Conference on Image Processing (ICIP)}, 2017, pp. 3645--3649.
-\bibitem{bytetrack} Y. Zhang, P. Sun, Y. Jiang, D. Yu, F. Weng, Z. Yuan, P. Luo, W. Liu, and X. Wang, ``ByteTrack: Multi-Object Tracking by Associating Every Detection Box,'' \textit{European Conference on Computer Vision (ECCV)}, 2022, pp. 1--21.
+\bibitem{sort} A. Bewley, Z. Ge, L. Ott, F. Ramos, and B. Upcroft, ``Simple Online and Realtime Tracking,'' \textit{IEEE International Conference on Image Processing (ICIP)}, 2016, pp. 3464--3468.
 \bibitem{strongsort} Y. Zhang, P. Sun, Y. Jiang, D. Yu, F. Weng, Z. Yuan, P. Luo, W. Liu, and X. Wang, ``StrongSORT: Make DeepSORT Great Again,'' \textit{IEEE Transactions on Multimedia}, 2023.
-\bibitem{botsort} N. Aharon, R. Orfaig, and B.-Z. Bobrovsky, ``BoT-SORT: Robust Associations Multi-Pedestrian Tracking,'' arXiv preprint arXiv:2206.14651, 2022.
-\bibitem{yolov8} G. Jocher et al., ``Ultralytics YOLOv8,'' \textit{Ultralytics GitHub Repository}, 2023. [Online]. Available: https://github.com/ultralytics/ultralytics
-\bibitem{yolov26m} Ultralytics, ``YOLO11: Real-Time Object Detection with NMS-Free Decoupled Head,'' \textit{Ultralytics GitHub Repository}, 2024. [Online]. Available: https://github.com/ultralytics/ultralytics
-\bibitem{osnet} K. Zhou, Y. Yang, A. Cavallaro, and T. Xiang, ``Omni-Scale Feature Learning for Person Re-Identification,'' \textit{IEEE/CVF International Conference on Computer Vision (ICCV)}, 2019, pp. 3702--3712.
-\bibitem{torchreid} K. Zhou and T. Xiang, ``Torchreid: A Library for Deep Learning Person Re-Identification in PyTorch,'' arXiv preprint arXiv:1910.10093, 2019.
-\bibitem{agw} M. Ye, J. Shen, G. Lin, T. Xiang, L. Shao, and S. C. H. Hoi, ``Deep Learning for Person Re-Identification: A Survey and Outlook,'' \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}, vol. 44, no. 6, pp. 2872--2893, 2022.
-\bibitem{transreid} S. He, H. Luo, P. Wang, F. Wang, H. Li, and W. Jiang, ``TransReID: Transformer-Based Object Re-Identification,'' \textit{IEEE/CVF International Conference on Computer Vision (ICCV)}, 2021, pp. 14993--15002.
-\bibitem{faiss} J. Johnson, M. Douze, and H. J\'egou, ``Billion-scale Similarity Search with GPUs,'' \textit{IEEE Transactions on Big Data}, vol. 7, no. 3, pp. 535--547, 2021.
+\bibitem{mot17} A. Milan, L. Leal-Taix\'{e}, I. Reid, S. Roth, and K. Schindler, ``MOT16: A Benchmark for Multi-Object Tracking,'' arXiv preprint arXiv:1603.00831, 2016.
 \bibitem{yoloreidnet} V. Gautam, S. Prasad, and S. Sinha, ``YOLORE-IDNet: An Efficient Multi-Camera System for Person-Tracking,'' arXiv preprint arXiv:2309.13387, 2023.
 \bibitem{mixed_syn_tracking} C.-C. Wang, C.-Y. Yang, R. Jain, M.-C. Hu, and W.-H. Cheng, ``Tracking with Mixture of Realistic and Synthetic Knowledge,'' \textit{CVPR Workshops}, 2023.
 \bibitem{geom_consist_tracking} Z. Wu, S. Dong, and H. Tian, ``Online Tracking with Geometric Consistency and State-aware Re-ID,'' \textit{CVPR Workshops}, 2024.
 \bibitem{hospital_tracking} R. Hachiuma, T. Nakayama, and H. Saito, ``Trajectory-based Tracking in the Operating Room,'' \textit{IEEE Access}, 2022.
-\bibitem{mtmmc} S. Woo, K. Park, I. Shin, M. Kim, and I. S. Kweon, ``MTMMC: A Large-Scale Real-World Multi-Modal Camera Tracking Benchmark,'' arXiv preprint arXiv:2403.20225, 2024.
-\bibitem{mot17} A. Milan, L. Leal-Taix\'{e}, I. Reid, S. Roth, and K. Schindler, ``MOT16: A Benchmark for Multi-Object Tracking,'' arXiv preprint arXiv:1603.00831, 2016.
+\bibitem{yolov26m} Ultralytics, ``YOLO11: Real-Time Object Detection with NMS-Free Decoupled Head,'' \textit{Ultralytics GitHub Repository}, 2024. [Online]. Available: https://github.com/ultralytics/ultralytics
+\bibitem{yolov8} G. Jocher et al., ``Ultralytics YOLOv8,'' \textit{Ultralytics GitHub Repository}, 2023. [Online]. Available: https://github.com/ultralytics/ultralytics
+\bibitem{bytetrack} Y. Zhang, P. Sun, Y. Jiang, D. Yu, F. Weng, Z. Yuan, P. Luo, W. Liu, and X. Wang, ``ByteTrack: Multi-Object Tracking by Associating Every Detection Box,'' \textit{European Conference on Computer Vision (ECCV)}, 2022, pp. 1--21.
+\bibitem{torchreid} K. Zhou and T. Xiang, ``Torchreid: A Library for Deep Learning Person Re-Identification in PyTorch,'' arXiv preprint arXiv:1910.10093, 2019.
+\bibitem{osnet} K. Zhou, Y. Yang, A. Cavallaro, and T. Xiang, ``Omni-Scale Feature Learning for Person Re-Identification,'' \textit{IEEE/CVF International Conference on Computer Vision (ICCV)}, 2019, pp. 3702--3712.
+\bibitem{faiss} J. Johnson, M. Douze, and H. J\'egou, ``Billion-scale Similarity Search with GPUs,'' \textit{IEEE Transactions on Big Data}, vol. 7, no. 3, pp. 535--547, 2021.
+\bibitem{botsort} N. Aharon, R. Orfaig, and B.-Z. Bobrovsky, ``BoT-SORT: Robust Associations Multi-Pedestrian Tracking,'' arXiv preprint arXiv:2206.14651, 2022.
+\bibitem{agw} M. Ye, J. Shen, G. Lin, T. Xiang, L. Shao, and S. C. H. Hoi, ``Deep Learning for Person Re-Identification: A Survey and Outlook,'' \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}, vol. 44, no. 6, pp. 2872--2893, 2022.
+\bibitem{transreid} S. He, H. Luo, P. Wang, F. Wang, H. Li, and W. Jiang, ``TransReID: Transformer-Based Object Re-Identification,'' \textit{IEEE/CVF International Conference on Computer Vision (ICCV)}, 2021, pp. 14993--15002.
 \bibitem{homography_calib} R. Hartley and A. Zisserman, \textit{Multiple View Geometry in Computer Vision}, 2nd ed. Cambridge, UK: Cambridge University Press, 2004.
 \bibitem{hungarian} H. W. Kuhn, ``The Hungarian Method for the Assignment Problem,'' \textit{Naval Research Logistics Quarterly}, vol. 2, no. 1--2, pp. 83--97, 1955.
 \bibitem{kalman} R. E. Kalman, ``A New Approach to Linear Filtering and Prediction Problems,'' \textit{Journal of Basic Engineering}, vol. 82, pp. 35--45, 1960.
