@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1774775617.49087 "conference_101719.tex" "conference_101719.pdf" "conference_101719" 1774775618.61654 0
+["pdflatex"] 1774778098.01202 "conference_101719.tex" "conference_101719.pdf" "conference_101719" 1774778099.11973 0
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
@@ -24,14 +24,10 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx6.tfm" 1136768653 1344 8a0be4fe4d376203000810ad4dc81558 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx7.tfm" 1136768653 1336 3125ccb448c1a09074e3aa4a9832f130 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx8.tfm" 1136768653 1332 1fde11373e221473104d6cc5993f046e ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmex10.tfm" 1136768653 992 662f679a0b3d2d53c1b94050fdaa3f50 ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi10.tfm" 1136768653 1528 abec98dbc43e172678c11b3b9031252a ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi6.tfm" 1136768653 1512 f21f83efb36853c0b70002322c1ab3ad ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmmi8.tfm" 1136768653 1520 eccf95517727cb11801f4f1aee3a21b4 ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmr10.tfm" 1136768653 1296 45809c5a464d5f32c8f98ba97c1bb47f ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmr6.tfm" 1136768653 1300 b62933e007d01cfd073f79b963c01526 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmr8.tfm" 1136768653 1292 21c1c5bfeaebccffdb478fd231a0997d ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmsy10.tfm" 1136768653 1124 6c73e740cf17375f03eec0ee63599741 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm" 1136768653 1116 933a60c408fc0a863a92debe84b2d294 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm" 1136768653 1120 8b7d695260f3cff42e636090a8002094 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb" 1248133631 34811 78b52f49e893bcba91bd7581cdc144c0 ""
@@ -91,8 +87,8 @@
   "IEEEtran.cls" 1772333402 281957 5b2e4fa15b0f7eabb840ebf67df4c0f7 ""
   "VIDEO_FEED.jpeg" 1774079278.94197 805548 834cc73af5522751dac9d56f311dec5e ""
   "ablation_figure_5.png" 1774774456.40806 130058 c9f5e379f44b9d82787fbf497950a9f9 ""
-  "conference_101719.aux" 1774775618.54403 6332 0a9b5176ee29b4c366d47792e6123bdd "pdflatex"
-  "conference_101719.tex" 1774775547.26437 39814 dd150b7c1a10ccf3738479f4b2543445 ""
+  "conference_101719.aux" 1774778099.01063 6332 4a1242082281177260b2c26f971ebd64 "pdflatex"
+  "conference_101719.tex" 1774777750.83141 39054 3ca4c4a9972e7b5017724a1ee47c3a39 ""
   "ground_homography.png" 1774078941.70964 357347 d5dbaa94f9df44f1bc3fe54629644679 ""
   "spatial_matching.jpeg" 1774078941.70609 195940 6bc93d74381b22282e71a95b05c32f55 ""
   "spoton_architecture.pdf" 1774771296.25849 2497949 f9d3d1300935836f30770af6be842df5 ""
