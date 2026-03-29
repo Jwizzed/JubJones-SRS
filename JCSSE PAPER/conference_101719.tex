@@ -6,6 +6,7 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{multirow}
+\usepackage{subcaption}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
@@ -93,9 +94,9 @@ Multi-Camera Tracking, Person Re-Identification, Computer Vision, Spatial Matchi
 \section{Introduction}
 \label{sec:introduction}
 
-In large-scale environments such as university campuses and factories, tracking individuals across multiple cameras is essential for security and operational efficiency. When a person moves from one camera view to another, the system must re-establish their identity despite changes in lighting, perspective, and possible occlusion. Without an automated solution, security operators must manually match individuals across fragmented video feeds, which is time-consuming and error-prone.
+Multi-camera person tracking is a cornerstone technology for modern smart cities, intelligent transportation hubs, retail analytics, and vast public spaces. In these diverse real-world applications, maintaining a continuous trajectory of an individual as they move across disjointed camera networks is essential for ensuring public safety, optimizing crowd flow, and extracting operational intelligence. However, as the scale of surveillance networks expands, traditional manual monitoring becomes computationally intractable and highly prone to human error, necessitating the development of robust, automated tracking frameworks.
 
-Existing multi-camera tracking systems typically brute-force cross-camera association using computationally expensive appearance-based re-identification (Re-ID) on every frame. This brute-force approach severely limits real-time scalability and performs poorly in scenarios where subjects wear similar clothing, as is common in industrial factory environments.
+The fundamental challenge in multi-camera tracking lies in the visual instability of subjects across varying physical environments. When an individual transitions from one camera view to another, lighting fluctuations, perspective distortions, and severe partial occlusions can drastically alter their physical appearance. Existing tracking systems typically resolve this by brute-forcing cross-camera association using computationally expensive appearance-based re-identification (Re-ID) on every frame. This brute-force approach severely limits real-time scalability. Furthermore, appearance-based models degrade significantly in environments where subjects wear highly similar clothing---such as uniform security personnel or industrial factory workers---rendering purely visual matching unreliable.
 
 In this paper, we propose SpotOn, a real-time multi-camera person tracking system that uses a two-tier matching strategy. For cameras with overlapping fields of view, identities are resolved geometrically using homography-based spatial matching, which is faster and more robust than appearance-based Re-ID in such zones. For non-overlapping blind spots, the Re-ID module is activated only when a person approaches the edge margin of a camera frame. This design reduces overall computational cost while maintaining tracking accuracy.
 
@@ -126,16 +127,28 @@ This section describes the SpotOn pipeline and each of its constituent modules. 
 \subsection{System Overview}
 \label{subsec:system-overview}
 
-As shown in Fig.~\ref{fig:pipeline}, the pipeline consists of four stages: (1) Person Detection, (2) Intra-Camera Tracking, (3) Spatial Matching via Homography, and (4) Cross-Camera Re-Identification. The backend is built with FastAPI and runs as an asynchronous service. Each camera feed is processed by an independent worker, and a central coordinator aggregates the results and maintains the global identity registry. Models are shared across workers to minimize GPU memory usage.
+As shown in Fig.~\ref{fig:pipeline}, the pipeline consists of four stages: (1) Person Detection, (2) Intra-Camera Tracking, (3) Spatial Matching via Homography, and (4) Cross-Camera Re-Identification. To facilitate seamless deployment, we developed a centralized application built with FastAPI that runs as an asynchronous service, connecting all independent processes to measure systemic performance in real time. Each camera feed is processed by an independent worker, and a central coordinator aggregates the results and maintains the global identity registry, as detailed in the deployment workflow (Fig.~\ref{fig:workflow}). Models are shared across workers to minimize GPU memory usage.
 
 Tracking results are delivered to operator clients through two synchronized channels. Raw video frames are streamed via MJPEG, while structured tracking data---bounding boxes, identity labels, and floor plan positions---is pushed through WebSocket connections. The frontend overlays WebSocket data onto the MJPEG stream in real time.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\linewidth]{architecture.jpg}
-    \caption{Overview of the proposed multi-camera tracking pipeline.}
+    \includegraphics[width=\linewidth]{workflow.png}
+    \caption{Deployment workflow and service component interactions of the SpotOn application.}
+    \label{fig:workflow}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{spoton_architecture.pdf}
+    \caption{Overview of the proposed SpotOn multi-camera tracking pipeline.}
     \label{fig:pipeline}
 \end{figure}
+
+\subsection{Datasets}
+\label{subsec:datasets}
+
+We evaluated our system on the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, which provides synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with workstations. The campus environment utilizes four tracking cameras that exhibit viewpoint variation, natural lighting changes, and occlusions. The factory environment also utilizes four cameras, presenting distinct challenges such as uniform worker attire and repetitive background patterns.
 
 \subsection{Person Detection}
 \label{subsec:person-detection}
@@ -177,198 +190,211 @@ where $\lambda$ is a scaling factor. As depicted in Fig.~\ref{fig:spatial_matchi
 
 For non-overlapping camera pairs, spatial proximity cannot resolve identities. We define handoff zones as a 5\% margin along each edge of every camera frame. When a tracked person enters these zones, the system triggers the Re-ID module to extract a 512-dimensional appearance embedding using the Torchreid framework~\cite{torchreid} with an OSNet-AIN backbone~\cite{osnet}, which learns omni-scale features at multiple receptive field sizes simultaneously. The OSNet-AIN backbone yields an average 68.7\% Rank-1 and 62.0\% mAP on the MTMMC dataset~\cite{mtmmc}. Embeddings are $L_2$-normalized and stored in a Facebook AI Similarity Search (FAISS) index~\cite{faiss} with a 60-second expiry. Incoming edge detections are matched against this registry using cosine similarity; tracks exceeding a threshold of 0.70 inherit the matched Global ID.
 
+\subsection{Experimental Setup}
+\label{subsec:exp-setup}
+
+All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector was accelerated using NVIDIA TensorRT with an input resolution of $480 \times 480$ pixels and a confidence threshold of 0.3. ByteTrack was configured with a 20-frame track buffer. For cross-camera matching, the Re-ID similarity threshold was set to 0.70, and the FAISS index utilized Inner Product search for 512-dimensional embeddings. To maintain real-time performance across all concurrent streams, the system was configured to process every third frame, yielding an effective processing rate of 7.67 FPS per camera.
+
 \subsection{Evaluation Metrics}
 \label{subsec:metrics}
 
 To quantify the performance of the proposed pipeline, we employ standard metrics across three domains. For object detection, we report Mean Average Precision at IoU 50\% (mAP@50), Recall, and Precision. Multi-object tracking is evaluated using Multiple Object Tracking Accuracy (MOTA), which aggregates false positives, false negatives, and identity switches; the ID F1 Score (IDF1), which emphasizes identity consistency through track longevity; and Multiple Object Tracking Precision (MOTP) for bounding box localization error. Cross-camera Re-ID is assessed using Rank-1 cumulative matching accuracy and Re-ID mAP. Finally, system efficiency is evaluated through algorithmic end-to-end processing latency (ms).
 
+\begin{table}[htbp]
+\caption{Detection Performance}
+\label{tab:detection}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|r|}
+\hline
+\multirow{2}{*}{\textbf{Camera}} & \multicolumn{3}{c|}{\textbf{Baseline}} & \multicolumn{3}{c|}{\textbf{SpotOn (Optimized)}}\\ % & \multicolumn{3}{c|} {\textbf{Gain ($\Delta$)}} \\
+\cline{2-7}
+ & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} \\ % & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} \\
+\hline
+\multicolumn{7}{|l|}{\textbf{Factory Environment}} \\
+\hline
+c09 & 48.2\% & 51.4\% & 53.6\% & \textbf{74.5\%} & \textbf{82.2\%} & \textbf{82.7\%} \\ % & +26.3\% & +30.8\% & +29.1\% \\
+c12 & 41.5\% & 44.8\% & 46.2\% & \textbf{63.4\%} & \textbf{74.8\%} & \textbf{75.6\%} \\ % & +21.9\% & +30.0\% & +29.4\% \\
+c13 & 44.1\% & 47.3\% & 49.5\% & \textbf{67.2\%} & \textbf{78.6\%} & \textbf{78.3\%} \\ % & +23.1\% & +31.3\% & +28.8\% \\
+c16 & 46.9\% & 49.2\% & 51.4\% & \textbf{68.6\%} & \textbf{77.3\%} & \textbf{82.3\%} \\ % & +21.7\% & +28.1\% & +30.9\% \\
+\hline
+\textbf{Factory Avg.} & \textbf{45.2\%} & \textbf{48.2\%} & \textbf{50.2\%} & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} \\ % & \textbf{+23.2\%} & \textbf{+30.0\%} & \textbf{+29.5\%} \\
+\hline
+\multicolumn{7}{|l|}{\textbf{Campus Environment}} \\
+\hline
+c01 & 42.1\% & 45.4\% & 47.8\% & \textbf{70.3\%} & \textbf{82.1\%} & \textbf{75.7\%} \\ % & +28.2\% & +36.7\% & +27.9\% \\
+c02 & 34.2\% & 38.1\% & 40.5\% & \textbf{56.4\%} & \textbf{71.7\%} & \textbf{72.2\%} \\ % & +22.2\% & +33.6\% & +31.7\% \\
+c05 & 39.4\% & 42.2\% & 44.6\% & \textbf{65.0\%} & \textbf{77.1\%} & \textbf{78.0\%} \\ % & +25.6\% & +34.9\% & +33.4\% \\
+\hline
+\textbf{Campus Avg.} & \textbf{38.6\%} & \textbf{41.9\%} & \textbf{44.3\%} & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%}\\ % & \textbf{+25.3\%} & \textbf{+35.1\%} & \textbf{+31.0\%} \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Tracking Performance}
+\label{tab:tracking}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|r|r|r|r|}
+\hline
+\multirow{2}{*}{\textbf{Camera}} & \multicolumn{4}{c|}{\textbf{Baseline}} & \multicolumn{4}{c|}{\textbf{SpotOn (Optimized)}} \\ % & \multicolumn{4}{c|}{\textbf{Gain ($\Delta$)}} \\
+\cline{2-9}
+ & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} \\ % & \multicolumn{1}{c|}{\textbf{MOTA}}  & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} \\
+\hline
+\multicolumn{9}{|l|}{\textbf{Factory Environment}} \\
+\hline
+c09 & 38.4\% & 45.1\% & 154 & 22.4\% & \textbf{63.9\%} & \textbf{68.6\%} & \textbf{6} & \textbf{9.4\%} \\ % & +25.5\% & +23.5\% & $-$148 & $-$13.0\% \\
+c12 & 29.7\% & 38.6\% & 98 & 28.5\% & \textbf{52.4\%} & \textbf{62.8\%} & \textbf{1} & \textbf{15.5\%} \\ % & +22.7\% & +24.2\% & $-$97 & $-$13.0\% \\
+c13 & 33.2\% & 42.1\% & 112 & 25.1\% & \textbf{57.4\%} & \textbf{62.8\%} & \textbf{1} & \textbf{13.8\%} \\ % & +24.2\% & +20.7\% & $-$111 & $-$11.3\% \\
+c16 & 36.1\% & 44.3\% & 142 & 24.3\% & \textbf{59.7\%} & \textbf{58.9\%} & \textbf{42} & \textbf{11.5\%} \\ % & +23.6\% & +14.6\% & $-$100 & $-$12.8\% \\
+\hline
+\textbf{Factory Avg.} & \textbf{34.4\%} & \textbf{42.5\%} & \textbf{506} & \textbf{25.1\%} & \textbf{58.4\%} & \textbf{63.3\%} & \textbf{50} & \textbf{12.5\%} \\ % & \textbf{+24.0\%} & \textbf{+20.8\%} & \textbf{$-$456} & \textbf{$-$12.6\%} \\
+\hline
+\multicolumn{9}{|l|}{\textbf{Campus Environment}} \\
+\hline
+c01 & 31.4\% & 39.8\% & 212 & 29.5\% & \textbf{57.4\%} & \textbf{59.0\%} & \textbf{48} & \textbf{19.3\%} \\ % & +26.0\% & +19.2\% & $-$164 & $-$10.2\% \\
+c02 & 22.8\% & 33.1\% & 154 & 35.1\% & \textbf{47.2\%} & \textbf{60.7\%} & \textbf{3} & \textbf{18.7\%} \\ % & +24.4\% & +27.6\% & $-$151 & $-$16.4\% \\
+c05 & 28.3\% & 37.4\% & 186 & 31.2\% & \textbf{56.1\%} & \textbf{65.7\%} & \textbf{0} & \textbf{17.0\%} \\ % & +27.8\% & +28.3\% & $-$186 & $-$14.2\% \\
+\hline
+\textbf{Campus Avg.} & \textbf{27.5\%} & \textbf{36.8\%} & \textbf{552} & \textbf{31.9\%} & \textbf{50.1\%} & \textbf{60.2\%} & \textbf{66} & \textbf{19.6\%} \\ % & \textbf{+26.1\%} & \textbf{+25.0\%} & \textbf{$-$501} & \textbf{$-$13.6\%} \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[t]
+\caption{Re-ID Performance}
+\label{tab:reid}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+\multirow{2}{*}{\textbf{Camera}} & \multicolumn{2}{c|}{\textbf{Baseline}} & \multicolumn{2}{c|}{\textbf{SpotOn (Optimized)}} \\ % & \multicolumn{2}{c|}{\textbf{Gain ($\Delta$)}} \\
+\cline{2-5}
+ & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} \\ % & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} \\
+\hline
+\multicolumn{5}{|l|}{\textbf{Factory Environment}} \\
+\hline
+c09 & 55.2\% & 72.8\% & \textbf{71.6\%} & \textbf{78.3\%} \\ % & +16.4\% & +5.5\% \\
+c12 & 49.4\% & 62.4\% & \textbf{60.1\%} & \textbf{66.8\%} \\ % & +10.7\% & +4.4\% \\
+c13 & 52.6\% & 70.4\% & \textbf{65.1\%} & \textbf{71.8\%} \\ % & +12.5\% & +1.4\% \\
+c16 & 54.1\% & 71.9\% & \textbf{67.4\%} & \textbf{74.1\%} \\ % & +13.3\% & +2.2\% \\
+\hline
+\textbf{Factory Avg.} & \textbf{53.8\%} & \textbf{69.4\%} & \textbf{66.1\%} & \textbf{72.8\%} \\ % & \textbf{+12.3\%} & \textbf{+3.4\%} \\
+\hline
+\multicolumn{5}{|l|}{\textbf{Campus Environment}} \\
+\hline
+c01 & 50.3\% & 63.2\% & \textbf{65.1\%} & \textbf{71.8\%} \\ % & +14.8\% & +8.6\% \\
+c02 & 45.1\% & 57.4\% & \textbf{54.9\%} & \textbf{61.6\%} \\ % & +9.8\% & +4.2\% \\
+c05 & 48.2\% & 62.1\% & \textbf{63.8\%} & \textbf{70.5\%} \\ % & +15.6\% & +8.4\% \\
+\hline
+\textbf{Campus Avg.} & \textbf{47.9\%} & \textbf{60.9\%} & \textbf{57.8\%} & \textbf{64.5\%} \\ % & \textbf{+13.4\%} & \textbf{+7.1\%} \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Per-Frame Processing Latency}
+\label{tab:latency}
+\centering
+\renewcommand{\arraystretch}{1.15}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|r|r|}
+\hline
+\textbf{Pipeline Stage} & \multicolumn{1}{c|}{\textbf{Baseline (ms)}} & \multicolumn{1}{c|}{\textbf{Optimized (ms)}} \\ % & \multicolumn{1}{c|} {\textbf{$\Delta$}} \\
+\hline
+Object Detection & 35.0 & \textbf{11.9} \\ % & $-$23.1 \\
+\hline
+Data Association & 1.5 & \textbf{1.2} \\ % & $-$0.3 \\
+\hline
+Feature Extraction & 181.5 & \textbf{36.3} \\ % & $-$145.2 \\
+\hline
+Matching \& Association & 15.0 & \textbf{0.8} \\ % & $-$14.2 \\
+\hline
+\textbf{Total End-to-End} & \textbf{233.0} & \textbf{49.4} \\ % & \textbf{$-$183.6} \\
+\hline
+\textbf{Estimated Capacity (FPS)} & \textbf{4.2} & \textbf{20.3} \\ % & \textbf{+16.1} \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
 \section{Experimental Results}
 \label{sec:results}
 
-This section presents the results of our evaluation. We tested the system on the MTMMC dataset \cite{mtmmc}.
+This section presents the results of our evaluation. We tested the system on the MTMMC dataset \cite{mtmmc}. 
 
-\subsection{Dataset and Experimental Setup}
-\label{subsec:exp-setup}
-
-We evaluated our system on the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, which provides synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with workstations. The campus environment utilizes four tracking cameras that exhibit viewpoint variation, natural lighting changes, and occlusions. The factory environment also utilizes four cameras, presenting distinct challenges such as uniform worker attire and repetitive background patterns.
-
-All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector was accelerated using NVIDIA TensorRT with an input resolution of $480 \times 480$ pixels and a confidence threshold of 0.3. ByteTrack was configured with a 20-frame track buffer. For cross-camera matching, the Re-ID similarity threshold was set to 0.70, and the FAISS index utilized Inner Product search for 512-dimensional embeddings. To maintain real-time performance across all concurrent streams, the system was configured to process every third frame, yielding an effective processing rate of 7.67 FPS per camera.
-
+To rigorously validate our system's efficacy across diverse scenarios, we report all evaluation metrics disaggregated by individual camera feeds (e.g., c09, c12, ..., c05) rather than relying exclusively on global averages. This granular, per-camera reporting exposes how the pipeline handles explicit environmental challenges unique to distinct viewpoints---for instance, overcoming the uniform visual appearance of subjects in factory sectors (c09, c16) versus coping with extreme outdoor illumination variances on campus pathways (c01, c05). Presenting the data per-camera thus proves the robustness of both the geometric spatial matching and specific Re-ID trigger logic across highly heterogeneous fields of view.
 
 \subsection{Detection Performance}
 \label{subsec:detection-results}
 
 Table~\ref{tab:detection} compares detection accuracy between the baseline (plain PyTorch) and the SpotOn optimized pipeline (TensorRT, frame-skip=2). The optimized YOLOv26m detector achieved a +23.2\% average mAP@50 gain in the factory environment and a +25.3\% gain in the campus environment. These improvements highlight the robustness of the updated decoupled head architecture against challenging factory backgrounds and extreme outdoor lighting variations. Furthermore, the substantial increase in recall (up to +36.7\% on campus camera c01) directly benefits downstream spatial association by preventing broken tracklets caused by missed bounding box detections.
 
-\begin{table*}[htbp]
-\caption{Detection Performance: Baseline vs.\ Optimized}
-\label{tab:detection}
-\centering
-\renewcommand{\arraystretch}{1.15}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|r|r|r|r|r|r|r|r|r|}
-\hline
-\multirow{2}{*}{\textbf{Camera}} & \multicolumn{3}{c|}{\textbf{Baseline}} & \multicolumn{3}{c|}{\textbf{SpotOn (Optimized)}} & \multicolumn{3}{c|}{\textbf{Gain ($\Delta$)}} \\
-\cline{2-10}
- & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} & \multicolumn{1}{c|}{\textbf{mAP@50}} & \multicolumn{1}{c|}{\textbf{Recall}} & \multicolumn{1}{c|}{\textbf{Precision}} \\
-\hline
-\multicolumn{10}{|c|}{\textbf{Factory Environment}} \\
-\hline
-c09 & 48.2\% & 51.4\% & 53.6\% & \textbf{74.5\%} & \textbf{82.2\%} & \textbf{82.7\%} & +26.3\% & +30.8\% & +29.1\% \\
-c12 & 41.5\% & 44.8\% & 46.2\% & \textbf{63.4\%} & \textbf{74.8\%} & \textbf{75.6\%} & +21.9\% & +30.0\% & +29.4\% \\
-c13 & 44.1\% & 47.3\% & 49.5\% & \textbf{67.2\%} & \textbf{78.6\%} & \textbf{78.3\%} & +23.1\% & +31.3\% & +28.8\% \\
-c16 & 46.9\% & 49.2\% & 51.4\% & \textbf{68.6\%} & \textbf{77.3\%} & \textbf{82.3\%} & +21.7\% & +28.1\% & +30.9\% \\
-\hline
-\textbf{Factory Avg.} & \textbf{45.2\%} & \textbf{48.2\%} & \textbf{50.2\%} & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} & \textbf{+23.2\%} & \textbf{+30.0\%} & \textbf{+29.5\%} \\
-\hline
-\multicolumn{10}{|c|}{\textbf{Campus Environment}} \\
-\hline
-c01 & 42.1\% & 45.4\% & 47.8\% & \textbf{70.3\%} & \textbf{82.1\%} & \textbf{75.7\%} & +28.2\% & +36.7\% & +27.9\% \\
-c02 & 34.2\% & 38.1\% & 40.5\% & \textbf{56.4\%} & \textbf{71.7\%} & \textbf{72.2\%} & +22.2\% & +33.6\% & +31.7\% \\
-c05 & 39.4\% & 42.2\% & 44.6\% & \textbf{65.0\%} & \textbf{77.1\%} & \textbf{78.0\%} & +25.6\% & +34.9\% & +33.4\% \\
-\hline
-\textbf{Campus Avg.} & \textbf{38.6\%} & \textbf{41.9\%} & \textbf{44.3\%} & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%} & \textbf{+25.3\%} & \textbf{+35.1\%} & \textbf{+31.0\%} \\
-\hline
-\end{tabular}%
-}
-\end{table*}
-
 \subsection{Tracking Performance}
 \label{subsec:tracking-results}
 
 Table~\ref{tab:tracking} presents the multi-object tracking evaluation across both environments. The optimized system significantly reduces identity switches (ID Sw.), dropping from an average of 506 to just 50 in the factory, and from 552 to 66 on campus. This drastic reduction demonstrates the effectiveness of integrating robust Kalman filtering with the homography-based spatial matching module to prevent spatial track drifts. Concurrently, average MOTA improves by +24.0\% and +26.1\% in factory and campus settings, respectively. The robust IDF1 scores exceeding 60\% across both environments confirm that tracking consistency and long-term identity maintenance remain highly accurate, even while utilizing a frame-skip strategy to boost speed.
-
-\begin{table*}[htbp]
-\caption{Tracking Performance: Baseline vs.\ Optimized}
-\label{tab:tracking}
-\centering
-\renewcommand{\arraystretch}{1.15}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|l|r|r|r|r|r|r|r|r|r|r|r|r|}
-\hline
-\multirow{2}{*}{\textbf{Camera}} & \multicolumn{4}{c|}{\textbf{Baseline}} & \multicolumn{4}{c|}{\textbf{SpotOn (Optimized)}} & \multicolumn{4}{c|}{\textbf{Gain ($\Delta$)}} \\
-\cline{2-13}
- & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} & \multicolumn{1}{c|}{\textbf{MOTA}} & \multicolumn{1}{c|}{\textbf{IDF1}} & \multicolumn{1}{c|}{\textbf{ID Sw.}} & \multicolumn{1}{c|}{\textbf{MOTP}} \\
-\hline
-\multicolumn{13}{|c|}{\textbf{Factory Environment}} \\
-\hline
-c09 & 38.4\% & 45.1\% & 154 & 22.4\% & \textbf{63.9\%} & \textbf{68.6\%} & \textbf{6} & \textbf{9.4\%} & +25.5\% & +23.5\% & $-$148 & $-$13.0\% \\
-c12 & 29.7\% & 38.6\% & 98 & 28.5\% & \textbf{52.4\%} & \textbf{62.8\%} & \textbf{1} & \textbf{15.5\%} & +22.7\% & +24.2\% & $-$97 & $-$13.0\% \\
-c13 & 33.2\% & 42.1\% & 112 & 25.1\% & \textbf{57.4\%} & \textbf{62.8\%} & \textbf{1} & \textbf{13.8\%} & +24.2\% & +20.7\% & $-$111 & $-$11.3\% \\
-c16 & 36.1\% & 44.3\% & 142 & 24.3\% & \textbf{59.7\%} & \textbf{58.9\%} & \textbf{42} & \textbf{11.5\%} & +23.6\% & +14.6\% & $-$100 & $-$12.8\% \\
-\hline
-\textbf{Factory Avg.} & \textbf{34.4\%} & \textbf{42.5\%} & \textbf{506} & \textbf{25.1\%} & \textbf{58.4\%} & \textbf{63.3\%} & \textbf{50} & \textbf{12.5\%} & \textbf{+24.0\%} & \textbf{+20.8\%} & \textbf{$-$456} & \textbf{$-$12.6\%} \\
-\hline
-\multicolumn{13}{|c|}{\textbf{Campus Environment}} \\
-\hline
-c01 & 31.4\% & 39.8\% & 212 & 29.5\% & \textbf{57.4\%} & \textbf{59.0\%} & \textbf{48} & \textbf{19.3\%} & +26.0\% & +19.2\% & $-$164 & $-$10.2\% \\
-c02 & 22.8\% & 33.1\% & 154 & 35.1\% & \textbf{47.2\%} & \textbf{60.7\%} & \textbf{3} & \textbf{18.7\%} & +24.4\% & +27.6\% & $-$151 & $-$16.4\% \\
-c05 & 28.3\% & 37.4\% & 186 & 31.2\% & \textbf{56.1\%} & \textbf{65.7\%} & \textbf{0} & \textbf{17.0\%} & +27.8\% & +28.3\% & $-$186 & $-$14.2\% \\
-\hline
-\textbf{Campus Avg.} & \textbf{27.5\%} & \textbf{36.8\%} & \textbf{552} & \textbf{31.9\%} & \textbf{50.1\%} & \textbf{60.2\%} & \textbf{66} & \textbf{19.6\%} & \textbf{+26.1\%} & \textbf{+25.0\%} & \textbf{$-$501} & \textbf{$-$13.6\%} \\
-\hline
-\end{tabular}%
-}
-\end{table*}
 
 \subsection{Re-Identification Performance}
 \label{subsec:reid-results}
 
 Table~\ref{tab:reid} details cross-camera Re-ID performance. The optimized SpotOn pipeline improves matching accuracy by confining the OSNet-AIN backbone evaluation strictly to predefined 5\% camera edge zones. By replacing exhaustive frame-by-frame feature extraction with geometry-first matching and edge-trigger Re-ID, the system actively filters out false positives caused by appearance ambiguity---such as uniform worker attire in factories. Consequently, the factory average Rank-1 accuracy improved by +3.4\%, reaching 72.8\%, while the campus environment saw a steeper +7.1\% gain due to higher variance in pedestrian clothing facilitating cleaner feature embeddings when extracted selectively.
 
-\begin{table}[htbp]
-\caption{Re-ID Performance: Baseline vs.\ Optimized}
-\label{tab:reid}
-\centering
-\renewcommand{\arraystretch}{1.15}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{|l|r|r|r|r|r|r|}
-\hline
-\multirow{2}{*}{\textbf{Camera}} & \multicolumn{2}{c|}{\textbf{Baseline}} & \multicolumn{2}{c|}{\textbf{SpotOn (Optimized)}} & \multicolumn{2}{c|}{\textbf{Gain ($\Delta$)}} \\
-\cline{2-7}
- & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} & \multicolumn{1}{c|}{\textbf{Re-ID mAP}} & \multicolumn{1}{c|}{\textbf{Rank-1}} \\
-\hline
-\multicolumn{7}{|c|}{\textbf{Factory Environment}} \\
-\hline
-c09 & 55.2\% & 72.8\% & \textbf{71.6\%} & \textbf{78.3\%} & +16.4\% & +5.5\% \\
-c12 & 49.4\% & 62.4\% & \textbf{60.1\%} & \textbf{66.8\%} & +10.7\% & +4.4\% \\
-c13 & 52.6\% & 70.4\% & \textbf{65.1\%} & \textbf{71.8\%} & +12.5\% & +1.4\% \\
-c16 & 54.1\% & 71.9\% & \textbf{67.4\%} & \textbf{74.1\%} & +13.3\% & +2.2\% \\
-\hline
-\textbf{Factory Avg.} & \textbf{53.8\%} & \textbf{69.4\%} & \textbf{66.1\%} & \textbf{72.8\%} & \textbf{+12.3\%} & \textbf{+3.4\%} \\
-\hline
-\multicolumn{7}{|c|}{\textbf{Campus Environment}} \\
-\hline
-c01 & 50.3\% & 63.2\% & \textbf{65.1\%} & \textbf{71.8\%} & +14.8\% & +8.6\% \\
-c02 & 45.1\% & 57.4\% & \textbf{54.9\%} & \textbf{61.6\%} & +9.8\% & +4.2\% \\
-c05 & 48.2\% & 62.1\% & \textbf{63.8\%} & \textbf{70.5\%} & +15.6\% & +8.4\% \\
-\hline
-\textbf{Campus Avg.} & \textbf{47.9\%} & \textbf{60.9\%} & \textbf{57.8\%} & \textbf{64.5\%} & \textbf{+13.4\%} & \textbf{+7.1\%} \\
-\hline
-\end{tabular}%
-}
-\end{table}
 
 \subsection{Processing Latency}
 \label{subsec:latency-results}
 
 Table~\ref{tab:latency} compares per-frame processing latency stage-by-stage. Accelerated by TensorRT, the SpotOn configuration drastically reduces computational overhead across every component. The most profound improvement occurs in feature extraction, where the edge-triggered Re-ID strategy circumvents unnecessary embedding computations, reducing time from 181.5 ms to 36.3 ms. Overall, total end-to-end latency drops from 233.0 ms per frame to 49.4 ms. This 4.7$\times$ speedup guarantees an estimated system capacity of 20.3 FPS, cleanly surpassing the 15 FPS threshold required for real-time situational awareness.
 
-\begin{table}[htbp]
-\caption{Per-Frame Processing Latency: Baseline vs.\ Optimized}
-\label{tab:latency}
-\centering
-\renewcommand{\arraystretch}{1.15}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{|l|r|r|r|}
-\hline
-\textbf{Pipeline Stage} & \multicolumn{1}{c|}{\textbf{Baseline (ms)}} & \multicolumn{1}{c|}{\textbf{Optimized (ms)}} & \multicolumn{1}{c|}{\textbf{$\Delta$}} \\
-\hline
-Object Detection & 35.0 & \textbf{11.9} & $-$23.1 \\
-\hline
-Data Association & 1.5 & \textbf{1.2} & $-$0.3 \\
-\hline
-Feature Extraction & 181.5 & \textbf{36.3} & $-$145.2 \\
-\hline
-Matching \& Association & 15.0 & \textbf{0.8} & $-$14.2 \\
-\hline
-\textbf{Total End-to-End} & \textbf{233.0} & \textbf{49.4} & \textbf{$-$183.6} \\
-\hline
-\textbf{Estimated Capacity (FPS)} & \textbf{4.2} & \textbf{20.3} & \textbf{+16.1} \\
-\hline
-\end{tabular}%
-}
-\end{table}
-
 \subsection{Qualitative Results}
 \label{subsec:qualitative}
 
-Figures~\ref{fig:qualitative}, \ref{fig:comparison}, and \ref{fig:dashboard} present a qualitative overview of the SpotOn system in deployment. Fig.~\ref{fig:qualitative} illustrates the system's ability to maintain and visualize unified global IDs for subjects directly on the raw camera feeds. Fig.~\ref{fig:comparison} provides an ablation visualization, confirming that full pipeline integration maximizes both MOTA and IDF1 compared to standalone module configurations. Finally, Fig.~\ref{fig:dashboard} shows the practical operator dashboard interface, which consolidates asynchronous video feeds and localized tracking vectors into a single robust perspective, drastically reducing the cognitive load required to monitor multi-camera networks manually.
+Figures~\ref{fig:dashboard} and \ref{fig:qualitative} present a qualitative overview of the SpotOn system in deployment.  Fig.~\ref{fig:dashboard} shows the practical operator dashboard interface, which consolidates asynchronous video feeds and localized tracking vectors into a single robust perspective, drastically reducing the cognitive load required to monitor multi-camera networks manually, while Fig.~\ref{fig:qualitative} illustrates the system's ability to maintain and visualize unified global IDs for subjects directly on the raw camera feeds. Fig.~\ref{fig:comparison} provides an ablation visualization, confirming that full pipeline integration maximizes both MOTA and IDF1 compared to standalone module configurations.  
 
-\begin{figure}[htbp]
+\begin{figure*}[htbp]
+    %\centering
+    %\includegraphics[width=\linewidth]{DETECTED_PEOPLE.jpeg}
+    %\caption{Sample application output displaying detected individuals with globally synchronized identity markers across disjoint camera views.}
+    %\label{fig:qualitative}
     \centering
-    \includegraphics[width=\linewidth]{DETECTED_PEOPLE.jpeg}
-    \caption{Sample application output displaying detected individuals with globally synchronized identity markers across disjoint camera views.}
-    \label{fig:qualitative}
-\end{figure}
+    \begin{subfigure}{.45\textwidth}
+        \includegraphics[width=\columnwidth]{VIDEO_FEED.jpeg}
+        \caption{SpotOn operator dashboard presenting a consolidated real-time multi-camera interface.} % for improved situational awareness.
+        \label{fig:dashboard}
+    \end{subfigure}
+    %\hfill
+    \begin{subfigure}{.45\textwidth}
+        \includegraphics[width=\columnwidth]{DETECTED_PEOPLE.jpeg}
+        \caption{Sample application output displaying globally synchronized identity individuals across disjoint camera views.} % detected individuals with 
+        \label{fig:qualitative}
+    \end{subfigure}
+    \caption{SpotOn Deployment}
+\end{figure*}
 
 Fig.~\ref{fig:comparison} compares the IDF1 and MOTA scores across different pipeline configurations to show the contribution of each module.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\linewidth]{ablation_figure_5.png}
-    \caption{Comparative IDF1 and MOTA scores across ablation configurations: (a) Detection + Tracking only, (b) with Re-ID only, (c) with Spatial Matching only, and (d) full pipeline.}
+    \caption{Comparative IDF1 and MOTA scores across ablation configurations.} %: (a) Detection + Tracking only, (b) with Re-ID only, (c) with Spatial Matching only, and (d) full pipeline.
     \label{fig:comparison}
 \end{figure}
 
 Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals from all cameras are displayed on the shared 2D floor plan.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\linewidth]{VIDEO_FEED.jpeg}
-    \caption{The SpotOn operator dashboard presenting a consolidated real-time multi-camera interface for improved situational awareness.}
-    \label{fig:dashboard}
-\end{figure}
+%\begin{figure}[htbp]
+%    \centering
+%    \includegraphics[width=\linewidth]{VIDEO_FEED.jpeg}
+%    \caption{The SpotOn operator dashboard presenting a consolidated real-time multi-camera interface for improved situational awareness.}
+%    \label{fig:dashboard}
+%\end{figure}
 
 \subsection{Discussion}
 \label{subsec:discussion}

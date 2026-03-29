@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  21 MAR 2026 15:06
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  29 MAR 2026 14:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -263,42 +263,83 @@ Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
 \multirow@dima=\skip57
 \bigstrutjot=\dimen175
 )
-(/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
-File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count286
-\l__pdf_internal_box=\box55
+(/usr/local/texlive/2024/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
+
+(/usr/local/texlive/2024/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2023/08/05 v3.6o Customizing captions (AR)
+
+(/usr/local/texlive/2024/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
+\caption@tempdima=\dimen176
+\captionmargin=\dimen177
+\caption@leftmargin=\dimen178
+\caption@rightmargin=\dimen179
+\caption@width=\dimen180
+\caption@indent=\dimen181
+\caption@parindent=\dimen182
+\caption@hangindent=\dimen183
+Package caption Info: Unknown document class (or package),
+(caption)             standard defaults will be used.
+Package caption Info: \@makecaption = \long macro:#1#2->\ifx \@captype \@IEEEta
+blestring \footnotesize \bgroup \par \centering \@IEEEtabletopskipstrut {\norma
+lfont \footnotesize #1}\\{\normalfont \footnotesize \scshape #2}\par \addvspace
+ {0.5\baselineskip }\egroup \@IEEEtablecaptionsepspace \else \@IEEEfigurecaptio
+nsepspace \setbox \@tempboxa \hbox {\normalfont \footnotesize {#1.}\nobreakspac
+e \nobreakspace #2}\ifdim \wd \@tempboxa >\hsize \setbox \@tempboxa \hbox {\nor
+malfont \footnotesize {#1.}\nobreakspace \nobreakspace }\parbox [t]{\hsize }{\n
+ormalfont \footnotesize \noindent \unhbox \@tempboxa #2}\else \ifCLASSOPTIONcon
+ference \hbox to\hsize {\normalfont \footnotesize \hfil \box \@tempboxa \hfil }
+\else \hbox to\hsize {\normalfont \footnotesize \box \@tempboxa \hfil }\fi \fi 
+\fi  on input line 1175.
 )
-(./conference_101719.aux)
+
+Package caption Warning: Unknown document class (or package),
+(caption)                standard defaults will be used.
+See the caption package documentation for explanation.
+
+\c@caption@flags=\count286
+\c@continuedfloat=\count287
+)
+Package caption Info: New subtype `subfigure' on input line 238.
+\c@subfigure=\count288
+Package caption Info: New subtype `subtable' on input line 238.
+\c@subtable=\count289
+) (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count290
+\l__pdf_internal_box=\box55
+) (./conference_101719.aux)
 \openout1 = `conference_101719.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 21.
+LaTeX Font Info:    ... okay on input line 21.
 
 -- Lines per column: 56 (exact).
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count287
-\scratchdimen=\dimen176
+\scratchcounter=\count291
+\scratchdimen=\dimen184
 \scratchbox=\box56
-\nofMPsegments=\count288
-\nofMParguments=\count289
+\nofMPsegments=\count292
+\nofMParguments=\count293
 \everyMPshowfont=\toks24
-\MPscratchCnt=\count290
-\MPscratchDim=\dimen177
-\MPnumerator=\count291
-\makeMPintoPDFobject=\count292
+\MPscratchCnt=\count294
+\MPscratchDim=\dimen185
+\MPnumerator=\count295
+\makeMPintoPDFobject=\count296
 \everyMPtoPDFconversion=\toks25
 ) (/usr/local/texlive/2024/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -309,20 +350,22 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-LaTeX Font Info:    Calculating math sizes for size <11> on input line 81.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 81.
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
+LaTeX Font Info:    Calculating math sizes for size <11> on input line 82.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 82.
 
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 81.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 82.
 
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Underfull \hbox (badness 10000) in paragraph at lines 87--89
+Underfull \hbox (badness 10000) in paragraph at lines 88--90
 []\OT1/ptm/b/it/9 Index Terms\OT1/ptm/b/n/9 ---Multi-Camera Track-ing, Per-son 
 Re-
  []
@@ -332,65 +375,68 @@ ocal/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}
 
 
 ]
-<architecture.jpg, id=10, 1507.6325pt x 1059.96pt>
-File: architecture.jpg Graphic file (type jpg)
-<use architecture.jpg>
-Package pdftex.def Info: architecture.jpg  used on input line 135.
-(pdftex.def)             Requested size: 252.0pt x 177.16634pt.
+<workflow.png, id=10, 814.04124pt x 433.62pt>
+File: workflow.png Graphic file (type png)
+<use workflow.png>
+Package pdftex.def Info: workflow.png  used on input line 136.
+(pdftex.def)             Requested size: 252.0pt x 134.23555pt.
+<spoton_architecture.pdf, id=12, 1170.21898pt x 625.77386pt>
+File: spoton_architecture.pdf Graphic file (type pdf)
+<use spoton_architecture.pdf>
+Package pdftex.def Info: spoton_architecture.pdf  used on input line 143.
+(pdftex.def)             Requested size: 252.0pt x 134.74883pt.
 
-Underfull \hbox (badness 1430) in paragraph at lines 143--144
+Underfull \hbox (badness 1430) in paragraph at lines 156--157
 \OT1/ptm/m/n/10 ants [6], en-abling ef-fi-cient multi-stream in-fer-ence. In-pu
 t
  []
 
-[2 <./architecture.jpg (PNG copy)>]
-<ground_homography.png, id=16, 379.4175pt x 211.79124pt>
+[2 <./workflow.png>]
+<ground_homography.png, id=17, 379.4175pt x 211.79124pt>
 File: ground_homography.png Graphic file (type png)
 <use ground_homography.png>
-Package pdftex.def Info: ground_homography.png  used on input line 163.
+Package pdftex.def Info: ground_homography.png  used on input line 176.
 (pdftex.def)             Requested size: 252.0pt x 140.66812pt.
 <spatial_matching.jpeg, id=18, 1660.2025pt x 437.635pt>
 File: spatial_matching.jpeg Graphic file (type jpg)
 <use spatial_matching.jpeg>
-Package pdftex.def Info: spatial_matching.jpeg  used on input line 170.
+Package pdftex.def Info: spatial_matching.jpeg  used on input line 183.
 (pdftex.def)             Requested size: 252.0pt x 66.4237pt.
- [3 <./ground_homography.png> <./spatial_matching.jpeg>]
-<DETECTED_PEOPLE.jpeg, id=27, 2661.945pt x 1545.775pt>
-File: DETECTED_PEOPLE.jpeg Graphic file (type jpg)
-<use DETECTED_PEOPLE.jpeg>
-Package pdftex.def Info: DETECTED_PEOPLE.jpeg  used on input line 350.
-(pdftex.def)             Requested size: 252.0pt x 146.33124pt.
-<ablation_figure_5.png, id=28, 578.16pt x 433.62pt>
-File: ablation_figure_5.png Graphic file (type png)
-<use ablation_figure_5.png>
-Package pdftex.def Info: ablation_figure_5.png  used on input line 359.
-(pdftex.def)             Requested size: 252.0pt x 189.00032pt.
-<VIDEO_FEED.jpeg, id=29, 2663.9525pt x 1555.8125pt>
+ [3 <./spoton_architecture.pdf> <./ground_homography.png> <./spatial_matching.j
+peg>] [4]
+<VIDEO_FEED.jpeg, id=92, 2663.9525pt x 1555.8125pt>
 File: VIDEO_FEED.jpeg Graphic file (type jpg)
 <use VIDEO_FEED.jpeg>
 Package pdftex.def Info: VIDEO_FEED.jpeg  used on input line 368.
-(pdftex.def)             Requested size: 252.0pt x 147.16275pt.
- [4 <./DETECTED_PEOPLE.jpeg> <./ablation_figure_5.png>]
-Underfull \hbox (badness 2035) in paragraph at lines 383--384
+(pdftex.def)             Requested size: 232.19843pt x 135.60149pt.
+<DETECTED_PEOPLE.jpeg, id=93, 2661.945pt x 1545.775pt>
+File: DETECTED_PEOPLE.jpeg Graphic file (type jpg)
+<use DETECTED_PEOPLE.jpeg>
+Package pdftex.def Info: DETECTED_PEOPLE.jpeg  used on input line 374.
+(pdftex.def)             Requested size: 232.19843pt x 134.82098pt.
+<ablation_figure_5.png, id=94, 578.16pt x 433.62pt>
+File: ablation_figure_5.png Graphic file (type png)
+<use ablation_figure_5.png>
+Package pdftex.def Info: ablation_figure_5.png  used on input line 385.
+(pdftex.def)             Requested size: 252.0pt x 189.00032pt.
+
+Underfull \hbox (badness 2035) in paragraph at lines 409--410
 \OT1/ptm/m/n/10 camera per-son track-ing sys-tem de-signed for large-scale
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [5 <./VIDEO_FEED.jpeg>]
-Underfull \hbox (badness 1354) in paragraph at lines 404--405
+[5]
+Underfull \hbox (badness 1354) in paragraph at lines 430--431
 []\OT1/ptm/m/n/8 V. Gau-tam, S. Prasad, and S. Sinha, ``YOLORE-IDNet: An Ef-
  []
 
 
-Underfull \hbox (badness 1377) in paragraph at lines 404--405
+Underfull \hbox (badness 1377) in paragraph at lines 430--431
 \OT1/ptm/m/n/8 fi-cient Multi-Camera Sys-tem for Person-Tracking,'' arXiv prepr
 int
  []
 
 
-Underfull \hbox (badness 2689) in paragraph at lines 409--410
+Underfull \hbox (badness 2689) in paragraph at lines 435--436
 []\OT1/ptm/m/n/8 A. Mi-lan, L. Leal-Taix[]e, I. Reid, S. Roth, and K. Schindler
 ,
  []
@@ -406,36 +452,41 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[6] (./conference_101719.aux)
+[6 <./VIDEO_FEED.jpeg> <./DETECTED_PEOPLE.jpeg> <./ablation_figure_5.png>]
+(./conference_101719.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 4363 strings out of 474116
- 68781 string characters out of 5743683
- 1985187 words of memory out of 5000000
- 26679 multiletter control sequences out of 15000+600000
- 602170 words of font info for 127 fonts, out of 8000000 for 9000
+ 5837 strings out of 474116
+ 97225 string characters out of 5743683
+ 1976187 words of memory out of 5000000
+ 28144 multiletter control sequences out of 15000+600000
+ 601524 words of font info for 126 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,11n,65p,1820b,334s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 67i,11n,77p,1820b,468s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></
-usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></us
-r/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/l
-ocal/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/loca
-l/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local
-/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/t
-exlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/202
-4/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2024/texmf-d
-ist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-dist/fonts/
-type1/urw/times/utmri8a.pfb>
-Output written on conference_101719.pdf (6 pages, 2202313 bytes).
+usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></us
+r/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/
+local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/loc
+al/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/
+texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/te
+xlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmss9.pfb></usr/local/texl
+ive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/local/tex
+live/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texl
+ive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texliv
+e/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2024/tex
+mf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2024/texmf-dist/f
+onts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-dist/fonts/type1
+/urw/times/utmri8a.pfb>
+Output written on conference_101719.pdf (6 pages, 4708798 bytes).
 PDF statistics:
- 93 PDF objects out of 1000 (max. 8388607)
- 52 compressed objects within 1 object stream
+ 151 PDF objects out of 1000 (max. 8388607)
+ 78 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
