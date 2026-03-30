@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1774778098.01202 "conference_101719.tex" "conference_101719.pdf" "conference_101719" 1774778099.11973 0
+["pdflatex"] 1774845266.77812 "conference_101719.tex" "conference_101719.pdf" "conference_101719" 1774845267.69519 0
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
@@ -87,8 +87,8 @@
   "IEEEtran.cls" 1772333402 281957 5b2e4fa15b0f7eabb840ebf67df4c0f7 ""
   "VIDEO_FEED.jpeg" 1774079278.94197 805548 834cc73af5522751dac9d56f311dec5e ""
   "ablation_figure_5.png" 1774774456.40806 130058 c9f5e379f44b9d82787fbf497950a9f9 ""
-  "conference_101719.aux" 1774778099.01063 6332 4a1242082281177260b2c26f971ebd64 "pdflatex"
-  "conference_101719.tex" 1774777750.83141 39054 3ca4c4a9972e7b5017724a1ee47c3a39 ""
+  "conference_101719.aux" 1774845267.62559 6445 23f1501c9a2f365dd1cbba9f1f4f4bed "pdflatex"
+  "conference_101719.tex" 1774844720.15049 39358 5e537176d202d7ea43b16ea1c87d4f8d ""
   "ground_homography.png" 1774078941.70964 357347 d5dbaa94f9df44f1bc3fe54629644679 ""
   "spatial_matching.jpeg" 1774078941.70609 195940 6bc93d74381b22282e71a95b05c32f55 ""
   "spoton_architecture.pdf" 1774771296.25849 2497949 f9d3d1300935836f30770af6be842df5 ""
