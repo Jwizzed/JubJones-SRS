@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  30 MAR 2026 11:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  30 MAR 2026 14:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -390,7 +390,7 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 134
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 Underfull \hbox (badness 6758) in paragraph at lines 134--135
-[]\OT1/ptm/m/n/10 We use YOLOv26m [10] as the per-son de-tec-tor.
+[]\OT1/ptm/m/n/10 We use YOLOv26m [13] as the per-son de-tec-tor.
  []
 
 <ground_homography.png, id=62, 379.4175pt x 211.79124pt>
@@ -398,45 +398,49 @@ File: ground_homography.png Graphic file (type png)
 <use ground_homography.png>
 Package pdftex.def Info: ground_homography.png  used on input line 154.
 (pdftex.def)             Requested size: 226.79846pt x 126.60066pt.
-<spatial_matching.jpeg, id=64, 1660.2025pt x 437.635pt>
+<spatial_matching.jpeg, id=64, 1774.63pt x 638.385pt>
 File: spatial_matching.jpeg Graphic file (type jpg)
 <use spatial_matching.jpeg>
 Package pdftex.def Info: spatial_matching.jpeg  used on input line 162.
-(pdftex.def)             Requested size: 226.79846pt x 59.77933pt.
-[3 <./ground_homography.png> <./spatial_matching.jpeg>] [4]
+(pdftex.def)             Requested size: 438.60315pt x 157.77429pt.
+[3 <./ground_homography.png>]
+Underfull \vbox (badness 1107) has occurred while \output is active []
+
+ [4 <./spatial_matching.jpeg>]
 <VIDEO_FEED.jpeg, id=78, 2663.9525pt x 1555.8125pt>
 File: VIDEO_FEED.jpeg Graphic file (type jpg)
 <use VIDEO_FEED.jpeg>
-Package pdftex.def Info: VIDEO_FEED.jpeg  used on input line 345.
+Package pdftex.def Info: VIDEO_FEED.jpeg  used on input line 344.
 (pdftex.def)             Requested size: 232.19843pt x 135.60149pt.
 <DETECTED_PEOPLE.jpeg, id=79, 2661.945pt x 1545.775pt>
 File: DETECTED_PEOPLE.jpeg Graphic file (type jpg)
 <use DETECTED_PEOPLE.jpeg>
-Package pdftex.def Info: DETECTED_PEOPLE.jpeg  used on input line 351.
+Package pdftex.def Info: DETECTED_PEOPLE.jpeg  used on input line 350.
 (pdftex.def)             Requested size: 232.19843pt x 134.82098pt.
-<ablation_figure_5.png, id=80, 715.473pt x 390.0171pt>
+ [5 <./VIDEO_FEED.jpeg> <./DETECTED_PEOPLE.jpeg>]
+<ablation_figure_5.png, id=83, 715.473pt x 390.0171pt>
 File: ablation_figure_5.png Graphic file (type png)
 <use ablation_figure_5.png>
-Package pdftex.def Info: ablation_figure_5.png  used on input line 365.
+Package pdftex.def Info: ablation_figure_5.png  used on input line 364.
 (pdftex.def)             Requested size: 226.79846pt x 123.62968pt.
- [5 <./VIDEO_FEED.jpeg> <./DETECTED_PEOPLE.jpeg> <./ablation_figure_5.png>]
-Underfull \hbox (badness 2035) in paragraph at lines 388--389
+
+Underfull \hbox (badness 2035) in paragraph at lines 387--388
 \OT1/ptm/m/n/10 camera per-son track-ing sys-tem de-signed for large-scale
  []
 
-
-Underfull \hbox (badness 2689) in paragraph at lines 401--402
+[6 <./ablation_figure_5.png>]
+Underfull \hbox (badness 2689) in paragraph at lines 403--404
 []\OT1/ptm/m/n/8 A. Mi-lan, L. Leal-Taix[]e, I. Reid, S. Roth, and K. Schindler
 ,
  []
 
 
-Underfull \hbox (badness 1354) in paragraph at lines 402--403
+Underfull \hbox (badness 1354) in paragraph at lines 404--405
 []\OT1/ptm/m/n/8 V. Gau-tam, S. Prasad, and S. Sinha, ``YOLORE-IDNet: An Ef-
  []
 
 
-Underfull \hbox (badness 1377) in paragraph at lines 402--403
+Underfull \hbox (badness 1377) in paragraph at lines 404--405
 \OT1/ptm/m/n/8 fi-cient Multi-Camera Sys-tem for Person-Tracking,'' arXiv prepr
 int
  []
@@ -452,7 +456,9 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[6] (./conference_101719.aux)
+[7
+
+] (./conference_101719.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -461,7 +467,7 @@ L3 programming layer <2024-02-20>
 Here is how much of TeX's memory you used:
  5805 strings out of 474116
  96712 string characters out of 5743683
- 1974187 words of memory out of 5000000
+ 1966187 words of memory out of 5000000
  28113 multiletter control sequences out of 15000+600000
  597104 words of font info for 112 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -479,10 +485,10 @@ l/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/
 2024/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2024/texm
 f-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-dist/fon
 ts/type1/urw/times/utmri8a.pfb>
-Output written on conference_101719.pdf (6 pages, 4513082 bytes).
+Output written on conference_101719.pdf (7 pages, 4641629 bytes).
 PDF statistics:
- 133 PDF objects out of 1000 (max. 8388607)
- 67 compressed objects within 1 object stream
+ 138 PDF objects out of 1000 (max. 8388607)
+ 71 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
