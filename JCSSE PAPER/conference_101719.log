@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  30 MAR 2026 14:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.3.4)  30 MAR 2026 16:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -403,44 +403,52 @@ File: spatial_matching.jpeg Graphic file (type jpg)
 <use spatial_matching.jpeg>
 Package pdftex.def Info: spatial_matching.jpeg  used on input line 162.
 (pdftex.def)             Requested size: 438.60315pt x 157.77429pt.
-[3 <./ground_homography.png>]
-Underfull \vbox (badness 1107) has occurred while \output is active []
 
- [4 <./spatial_matching.jpeg>]
+Underfull \hbox (badness 1803) in paragraph at lines 177--178
+[]\OT1/ptm/m/n/10 For eval-u-a-tions, we com-pare the \OT1/ptm/m/it/10 Spo-tOn 
+(Op-ti-mized)
+ []
+
+
+Underfull \hbox (badness 1622) in paragraph at lines 177--178
+\OT1/ptm/m/n/10 in-fer-ence. The track-ing \OT1/ptm/m/it/10 base-line \OT1/ptm/
+m/n/10 ap-plies Byte-Track [15]
+ []
+
+[3 <./ground_homography.png>] [4 <./spatial_matching.jpeg>]
 <VIDEO_FEED.jpeg, id=78, 2663.9525pt x 1555.8125pt>
 File: VIDEO_FEED.jpeg Graphic file (type jpg)
 <use VIDEO_FEED.jpeg>
-Package pdftex.def Info: VIDEO_FEED.jpeg  used on input line 344.
+Package pdftex.def Info: VIDEO_FEED.jpeg  used on input line 346.
 (pdftex.def)             Requested size: 232.19843pt x 135.60149pt.
 <DETECTED_PEOPLE.jpeg, id=79, 2661.945pt x 1545.775pt>
 File: DETECTED_PEOPLE.jpeg Graphic file (type jpg)
 <use DETECTED_PEOPLE.jpeg>
-Package pdftex.def Info: DETECTED_PEOPLE.jpeg  used on input line 350.
+Package pdftex.def Info: DETECTED_PEOPLE.jpeg  used on input line 352.
 (pdftex.def)             Requested size: 232.19843pt x 134.82098pt.
- [5 <./VIDEO_FEED.jpeg> <./DETECTED_PEOPLE.jpeg>]
-<ablation_figure_5.png, id=83, 715.473pt x 390.0171pt>
+<ablation_figure_5.png, id=80, 715.473pt x 390.0171pt>
 File: ablation_figure_5.png Graphic file (type png)
 <use ablation_figure_5.png>
-Package pdftex.def Info: ablation_figure_5.png  used on input line 364.
+Package pdftex.def Info: ablation_figure_5.png  used on input line 366.
 (pdftex.def)             Requested size: 226.79846pt x 123.62968pt.
-
-Underfull \hbox (badness 2035) in paragraph at lines 387--388
+ [5 <./VIDEO_FEED.jpeg> <./DETECTED_PEOPLE.jpeg>]
+Underfull \hbox (badness 2035) in paragraph at lines 389--390
 \OT1/ptm/m/n/10 camera per-son track-ing sys-tem de-signed for large-scale
  []
 
-[6 <./ablation_figure_5.png>]
-Underfull \hbox (badness 2689) in paragraph at lines 403--404
+
+Underfull \hbox (badness 2689) in paragraph at lines 406--407
 []\OT1/ptm/m/n/8 A. Mi-lan, L. Leal-Taix[]e, I. Reid, S. Roth, and K. Schindler
 ,
  []
 
 
-Underfull \hbox (badness 1354) in paragraph at lines 404--405
+Underfull \hbox (badness 1354) in paragraph at lines 407--408
 []\OT1/ptm/m/n/8 V. Gau-tam, S. Prasad, and S. Sinha, ``YOLORE-IDNet: An Ef-
  []
 
 
-Underfull \hbox (badness 1377) in paragraph at lines 404--405
+Underfull \hbox (badness 1377) in paragraph at lines 407--408
 \OT1/ptm/m/n/8 fi-cient Multi-Camera Sys-tem for Person-Tracking,'' arXiv prepr
 int
  []
@@ -456,7 +464,7 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the appropriate paper size.
 
-[7
+[6 <./ablation_figure_5.png>] [7
 
 ] (./conference_101719.aux)
  ***********
@@ -465,13 +473,13 @@ L3 programming layer <2024-02-20>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 5805 strings out of 474116
- 96712 string characters out of 5743683
- 1966187 words of memory out of 5000000
- 28113 multiletter control sequences out of 15000+600000
+ 5806 strings out of 474116
+ 96724 string characters out of 5743683
+ 1965187 words of memory out of 5000000
+ 28114 multiletter control sequences out of 15000+600000
  597104 words of font info for 112 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 67i,11n,77p,1784b,463s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 67i,11n,77p,1662b,463s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
 </usr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
@@ -485,7 +493,7 @@ l/texlive/2024/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/
 2024/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2024/texm
 f-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-dist/fon
 ts/type1/urw/times/utmri8a.pfb>
-Output written on conference_101719.pdf (7 pages, 4641629 bytes).
+Output written on conference_101719.pdf (7 pages, 4641482 bytes).
 PDF statistics:
  138 PDF objects out of 1000 (max. 8388607)
  71 compressed objects within 1 object stream
