@@ -77,13 +77,23 @@ Multi-camera person tracking has become a critical enabling technology across a 
 
 Despite this widespread need, maintaining consistent person identities across a distributed camera network remains an open challenge. When an individual moves from one camera view to another, changes in viewing angle, illumination, and partial occlusion can dramatically alter their appearance. Existing systems commonly address this by applying appearance-based re-identification (Re-ID) exhaustively across all camera pairs---a brute-force strategy that is computationally prohibitive at scale. Appearance-based models also degrade in constrained environments where subjects wear similar uniforms, such as factory workers or hospital staff. These limitations motivate a more principled approach that invokes appearance matching only when geometrically necessary.
 
-In this paper, we propose SpotOn, a real-time multi-camera person tracking system that uses a two-tier matching strategy. For cameras with overlapping fields of view, identities are resolved geometrically using homography-based spatial matching, which is faster and more robust than appearance-based Re-ID in such zones. For non-overlapping blind spots, the Re-ID module is activated only when a person approaches the edge margin of a camera frame. This design reduces overall computational cost while maintaining tracking accuracy.
+In this paper, we propose SpotOn, a real-time multi-camera person tracking system that uses a two-tier matching strategy. First, for cameras with overlapping fields of view, identities are resolved geometrically using homography-based spatial matching, which is faster and more robust than appearance-based Re-ID in such zones. Second, for non-overlapping blind spots, the Re-ID module is activated only when a person approaches the edge margin of a camera frame. This design reduces overall computational cost while maintaining tracking accuracy.
 
-The SpotOn pipeline consists of four tightly integrated stages. First, a YOLOv26m detector processes each camera frame to localize all persons. Second, ByteTrack maintains per-camera track identities using Kalman filtering and IoU-based association. Third, for overlapping camera pairs, a homography-based spatial matching module projects foot positions onto a shared 2D floor plan, resolving identities via pairwise Euclidean distance minimization and the Hungarian algorithm. Fourth, for non-overlapping pairs, an OSNet-AIN Re-ID module is triggered only when a track enters a 5\% edge-margin zone, extracting a 512-dimensional embedding for cosine similarity matching. Each stage is described in Section~\ref{sec:methodology}.
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{spoton_architecture.pdf}
+    \caption{Overview of the proposed SpotOn multi-camera tracking pipeline.}
+    \label{fig:pipeline}
+    %\vspace{-3em}
+\end{figure*}
+
+The SpotOn pipeline consists of four tightly integrated stages: Person Detection, Intra-Camera Tracking,  Homography-based Spatial Matching, and  Cross-Camera Re-Identification. First, a YOLOv26m detector processes each camera frame to localize all persons. Second, ByteTrack maintains per-camera track identities using Kalman filtering and IoU-based association. Third, for overlapping camera pairs, a homography-based spatial matching module projects foot positions onto a shared 2D floor plan, resolving identities via pairwise Euclidean distance minimization and the Hungarian algorithm. Fourth, for non-overlapping pairs, an OSNet-AIN Re-ID module is triggered only when a track enters a 5\% edge-margin zone, extracting a 512-dimensional embedding for cosine similarity matching.
 
 The main contributions of this work are: (1) a two-tier identity matching strategy that prioritizes geometry-based matching for overlapping views and invokes Re-ID only at camera edge boundaries; (2) a homography-based spatial matching module that projects detections onto a shared 2D floor plan and resolves identities without appearance features; and (3) an evaluation on the MTMMC dataset~\cite{mtmmc} demonstrating competitive IDF1, MOTA, and sub-second per-frame latency.
 
 The remainder of this paper is organized as follows: Section II reviews related work on multi-camera tracking and geometric identity resolution. Section III describes the proposed system methodology. Section IV presents the experimental setup and results. Section V concludes the paper.
+
+
 
 \section{Related Works}
 \label{sec:related-works}
@@ -98,6 +108,8 @@ Wang et al.~\cite{mixed_syn_tracking} addressed track fragmentation in crowded s
 
 Unlike these approaches, SpotOn explicitly separates overlapping and non-overlapping camera zones with a two-tier strategy: homography-based spatial matching handles overlapping views without any appearance features, while Re-ID is reserved for non-overlapping blind spots, reducing computational cost while maintaining tracking accuracy.
 
+
+
 \section{Methodology}
 \label{sec:methodology}
 
@@ -106,22 +118,15 @@ This section describes the SpotOn pipeline and each of its constituent modules. 
 \subsection{System Overview}
 \label{subsec:system-overview}
 
-As shown in Fig.~\ref{fig:pipeline}, the pipeline consists of four stages: (1) Person Detection, (2) Intra-Camera Tracking, (3) Spatial Matching via Homography, and (4) Cross-Camera Re-Identification. To facilitate seamless deployment, we developed a centralized application built with FastAPI that runs as an asynchronous service, connecting all independent processes to measure systemic performance in real time. Each camera feed is processed by an independent worker, and a central coordinator aggregates the results and maintains the global identity registry. Models are shared across workers to minimize GPU memory usage.
+Fig.~\ref{fig:pipeline} presents the pipeline consists of four stages: (1) Person Detection, (2) Intra-Camera Tracking, (3) Spatial Matching via Homography, and (4) Cross-Camera Re-Identification. To facilitate seamless deployment, we developed a centralized application built with FastAPI that runs as an asynchronous service, connecting all independent processes to measure systemic performance in real time. Each camera feed is processed by an independent worker, and a central coordinator aggregates the results and maintains the global identity registry. Models are shared across workers to minimize GPU memory usage.
 
 Tracking results are delivered to operator clients through two synchronized channels. Raw video frames are streamed via MJPEG, while structured tracking data---bounding boxes, identity labels, and floor plan positions---is pushed through WebSocket connections. The frontend overlays WebSocket data onto the MJPEG stream in real time.
 
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.7\linewidth]{spoton_architecture.pdf}
-    \caption{Overview of the proposed SpotOn multi-camera tracking pipeline.}
-    \label{fig:pipeline}
-    \vspace{-3em}
-\end{figure*}
 
 \subsection{Datasets}
 \label{subsec:datasets}
 
-We evaluated our system on the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, which provides synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with workstations. The campus environment utilizes tracking cameras (specifically evaluated on c01, c02, and c05) that exhibit viewpoint variation, natural lighting changes, and occlusions. The factory environment utilizes tracking cameras (evaluated on c09, c12, c13, and c16), presenting distinct challenges such as uniform worker attire and repetitive background patterns.
+We evaluated our system on the MTMMC (Multi-Target Multi-Modal Camera) dataset \cite{mtmmc}, which provides synchronized video feeds from two environments: a university campus with outdoor pathways and an indoor factory with workstations. The campus environment utilizes tracking cameras (specifically evaluated on c01, c02, and c05 cameras) that exhibit viewpoint variation, natural lighting changes, and occlusions. The factory environment utilizes tracking cameras (evaluated on c09, c12, c13, and c16 cameras), presenting distinct challenges such as uniform worker attire and repetitive background patterns.
 
 \subsection{Person Detection}
 \label{subsec:person-detection}
@@ -144,7 +149,7 @@ The spatial matching module resolves identities geometrically for cameras with o
 
 the coordinate is scaled by $\lambda$ and mapped to $\mathbf{p}_{map} = [X_{map}, Y_{map}, 1]^T$, which represents the absolute top-down position on the environment's virtual 2D floor plan. For example, if a tracked person walks horizontally across the field of view in Camera A, their continuously updating $\mathbf{p}_{img}$ geometrically translates into a moving $\mathbf{p}_{map}$ trajectory. Simultaneously, if Camera B observes that same physical region from a different angle, it projects its own detections to the exact same global vicinity on the floor plan. As depicted in Fig.~\ref{fig:spatial_matching}, the system constructs a pairwise Euclidean distance matrix between these projected $\mathbf{p}_{map}$ sets across all overlapping views. The Hungarian algorithm then minimizes the global assignment cost to match identities. Pairs whose spatial distance falls below an environmental tolerance (100 pixels for campus, 200 pixels for factory) are confirmed as the same physical individual and merged under a single Global ID.
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.9\linewidth]{ground_homography.png}
     \caption{Manual annotation of ground-plane calibration points used to compute the camera-to-floor homography matrix.}
@@ -152,7 +157,7 @@ the coordinate is scaled by $\lambda$ and mapped to $\mathbf{p}_{map} = [X_{map}
     \vspace{-1em}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[t]
     \centering
     \includegraphics[width=0.9\linewidth]{spatial_matching.jpeg}
     \caption{The spatial mapping process projecting pedestrian 3D positions onto a unified 2D floor plan for cross-camera association.}
@@ -168,14 +173,27 @@ For non-overlapping camera pairs, spatial proximity cannot resolve identities. W
 \subsection{Experimental Setup}
 \label{subsec:exp-setup}
 
-All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector was accelerated using NVIDIA TensorRT with an input resolution of $480 \times 480$ pixels and a confidence threshold of 0.3. ByteTrack was configured with a 20-frame track buffer. For cross-camera matching, the Re-ID similarity threshold was set to 0.70, and the FAISS index utilized Inner Product search for 512-dimensional embeddings. To maintain real-time performance across all concurrent streams, the system was configured to process every third frame, yielding an effective processing rate of 7.67 FPS per camera. For evaluations, we benchmark the \textit{SpotOn (Optimized)} pipeline against a \textit{Baseline} configuration. For the machine learning metrics (Detection, Tracking, and Re-ID), the baseline refers to pre-trained models without dataset-specific fine-tuning. Additionally, for Tracking and Per-Frame Processing Latency, the baseline represents the system operating without the geometry-first spatial matching module. The optimized pipeline integrates both domain-specific fine-tuning and the spatial matching logic.
+All experiments were conducted on an NVIDIA GeForce RTX 4060 GPU (8 GB VRAM). The YOLOv26m detector was accelerated using NVIDIA TensorRT with an input resolution of $480 \times 480$ pixels and a confidence threshold of 0.3. ByteTrack was configured with a 20-frame track buffer. For cross-camera matching, the Re-ID similarity threshold was set to 0.70, and the FAISS index utilized Inner Product search for 512-dimensional embeddings. To maintain real-time performance across all concurrent streams, the system was configured to process every third frame, yielding an effective processing rate of 7.67 FPS per camera. For evaluations, we benchmark the \textit{SpotOn (Optimized)} pipeline against a \textit{Baseline} configuration. For the machine learning metrics (Detection, Tracking, and Re-ID), the \textit{Baseline} refers to pre-trained models without dataset-specific fine-tuning. Additionally, for Tracking and Per-Frame Processing Latency, the \textit{Baseline} represents the system operating without the geometry-first spatial matching module. The \textit{SpotOn (Optimized)} pipeline integrates both domain-specific fine-tuning and the spatial matching logic.
 
 \subsection{Evaluation Metrics}
 \label{subsec:metrics}
 
 To quantify the performance of the proposed pipeline, we employ standard metrics across three domains. For object detection, we report Mean Average Precision at IoU 50\% (mAP@50), Recall, and Precision. Multi-object tracking is evaluated using Multiple Object Tracking Accuracy (MOTA), which aggregates false positives, false negatives, and identity switches; the ID F1 Score (IDF1), which emphasizes identity consistency through track longevity; and Multiple Object Tracking Precision (MOTP) for bounding box localization error. Cross-camera Re-ID is assessed using Rank-1 cumulative matching accuracy and Re-ID mAP. Finally, system efficiency is evaluated through algorithmic end-to-end processing latency (ms).
 
-\begin{table}[htbp]
+
+\section{Experimental Results}
+\label{sec:results}
+
+This section presents the results of our evaluation. We tested the system on the MTMMC dataset \cite{mtmmc}. 
+
+To rigorously validate our system's efficacy across diverse scenarios, we report all evaluation metrics disaggregated by individual camera feeds (e.g., c09, c12, ..., c05) rather than relying exclusively on global averages. This granular, per-camera reporting exposes how the pipeline handles explicit environmental challenges unique to distinct viewpoints---for instance, overcoming the uniform visual appearance of subjects in factory sectors (c09, c16) versus coping with extreme outdoor illumination variances on campus pathways (c01, c05). Presenting the data per-camera thus proves the robustness of both the geometric spatial matching and specific Re-ID trigger logic across highly heterogeneous fields of view.
+
+\subsection{Detection Performance}
+\label{subsec:detection-results}
+
+Table~\ref{tab:detection} compares detection accuracy between the baseline (plain PyTorch) and the SpotOn optimized pipeline (TensorRT, frame-skip=2). The optimized YOLOv26m detector achieved a +23.2\% average mAP@50 gain in the factory environment and a +25.3\% gain in the campus environment. These improvements highlight the robustness of the updated decoupled head architecture against challenging factory backgrounds and extreme outdoor lighting variations. Furthermore, the substantial increase in recall (up to +36.7\% on campus camera c01) directly benefits downstream spatial association by preventing broken tracklets caused by missed bounding box detections.
+
+\begin{table}[t]
 \caption{Detection Performance}
 \label{tab:detection}
 \centering
@@ -194,7 +212,7 @@ c12 & 41.5\% & 44.8\% & 46.2\% & \textbf{63.4\%} & \textbf{74.8\%} & \textbf{75.
 c13 & 44.1\% & 47.3\% & 49.5\% & \textbf{67.2\%} & \textbf{78.6\%} & \textbf{78.3\%} \\ % & +23.1\% & +31.3\% & +28.8\% \\
 c16 & 46.9\% & 49.2\% & 51.4\% & \textbf{68.6\%} & \textbf{77.3\%} & \textbf{82.3\%} \\ % & +21.7\% & +28.1\% & +30.9\% \\
 \hline
-\textbf{Factory Avg.} & \textbf{45.2\%} & \textbf{48.2\%} & \textbf{50.2\%} & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} \\ % & \textbf{+23.2\%} & \textbf{+30.0\%} & \textbf{+29.5\%} \\
+\textbf{Factory Avg.} & 45.2\% & 48.2\% & 50.2\% & \textbf{68.4\%} & \textbf{78.2\%} & \textbf{79.7\%} \\ % & \textbf{+23.2\%} & \textbf{+30.0\%} & \textbf{+29.5\%} \\
 \hline
 \multicolumn{7}{|l|}{\textbf{Campus Environment}} \\
 \hline
@@ -202,13 +220,13 @@ c01 & 42.1\% & 45.4\% & 47.8\% & \textbf{70.3\%} & \textbf{82.1\%} & \textbf{75.
 c02 & 34.2\% & 38.1\% & 40.5\% & \textbf{56.4\%} & \textbf{71.7\%} & \textbf{72.2\%} \\ % & +22.2\% & +33.6\% & +31.7\% \\
 c05 & 39.4\% & 42.2\% & 44.6\% & \textbf{65.0\%} & \textbf{77.1\%} & \textbf{78.0\%} \\ % & +25.6\% & +34.9\% & +33.4\% \\
 \hline
-\textbf{Campus Avg.} & \textbf{38.6\%} & \textbf{41.9\%} & \textbf{44.3\%} & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%}\\ % & \textbf{+25.3\%} & \textbf{+35.1\%} & \textbf{+31.0\%} \\
+\textbf{Campus Avg.} & 38.6\% & 41.9\% & 44.3\% & \textbf{60.6\%} & \textbf{75.0\%} & \textbf{73.1\%}\\ % & \textbf{+25.3\%} & \textbf{+35.1\%} & \textbf{+31.0\%} \\
 \hline
 \end{tabular}%
 }
 \end{table}
 
-\begin{table}[htbp]
+\begin{table}[t]
 \caption{Tracking Performance}
 \label{tab:tracking}
 \centering
@@ -227,7 +245,7 @@ c12 & 29.7\% & 38.6\% & 98 & 28.5\% & \textbf{52.4\%} & \textbf{62.8\%} & \textb
 c13 & 33.2\% & 42.1\% & 112 & 25.1\% & \textbf{57.4\%} & \textbf{62.8\%} & \textbf{1} & \textbf{13.8\%} \\ % & +24.2\% & +20.7\% & $-$111 & $-$11.3\% \\
 c16 & 36.1\% & 44.3\% & 142 & 24.3\% & \textbf{59.7\%} & \textbf{58.9\%} & \textbf{42} & \textbf{11.5\%} \\ % & +23.6\% & +14.6\% & $-$100 & $-$12.8\% \\
 \hline
-\textbf{Factory Avg.} & \textbf{34.4\%} & \textbf{42.5\%} & \textbf{506} & \textbf{25.1\%} & \textbf{58.4\%} & \textbf{63.3\%} & \textbf{50} & \textbf{12.5\%} \\ % & \textbf{+24.0\%} & \textbf{+20.8\%} & \textbf{$-$456} & \textbf{$-$12.6\%} \\
+\textbf{Factory Avg.} & 34.4\% & 42.5\% & 506 & 25.1\% & \textbf{58.4\%} & \textbf{63.3\%} & \textbf{50} & \textbf{12.5\%} \\ % & \textbf{+24.0\%} & \textbf{+20.8\%} & \textbf{$-$456} & \textbf{$-$12.6\%} \\
 \hline
 \multicolumn{9}{|l|}{\textbf{Campus Environment}} \\
 \hline
@@ -235,7 +253,7 @@ c01 & 31.4\% & 39.8\% & 212 & 29.5\% & \textbf{57.4\%} & \textbf{59.0\%} & \text
 c02 & 22.8\% & 33.1\% & 154 & 35.1\% & \textbf{47.2\%} & \textbf{60.7\%} & \textbf{3} & \textbf{18.7\%} \\ % & +24.4\% & +27.6\% & $-$151 & $-$16.4\% \\
 c05 & 28.3\% & 37.4\% & 186 & 31.2\% & \textbf{56.1\%} & \textbf{65.7\%} & \textbf{0} & \textbf{17.0\%} \\ % & +27.8\% & +28.3\% & $-$186 & $-$14.2\% \\
 \hline
-\textbf{Campus Avg.} & \textbf{27.5\%} & \textbf{36.8\%} & \textbf{552} & \textbf{31.9\%} & \textbf{50.1\%} & \textbf{60.2\%} & \textbf{66} & \textbf{19.6\%} \\ % & \textbf{+26.1\%} & \textbf{+25.0\%} & \textbf{$-$501} & \textbf{$-$13.6\%} \\
+\textbf{Campus Avg.} & 27.5\% & 36.8\% & 552 & 31.9\% & \textbf{50.1\%} & \textbf{60.2\%} & \textbf{66} & \textbf{19.6\%} \\ % & \textbf{+26.1\%} & \textbf{+25.0\%} & \textbf{$-$501} & \textbf{$-$13.6\%} \\
 \hline
 \end{tabular}%
 }
@@ -260,7 +278,7 @@ c12 & 49.4\% & 62.4\% & \textbf{60.1\%} & \textbf{66.8\%} \\ % & +10.7\% & +4.4\
 c13 & 52.6\% & 70.4\% & \textbf{65.1\%} & \textbf{71.8\%} \\ % & +12.5\% & +1.4\% \\
 c16 & 54.1\% & 71.9\% & \textbf{67.4\%} & \textbf{74.1\%} \\ % & +13.3\% & +2.2\% \\
 \hline
-\textbf{Factory Avg.} & \textbf{53.8\%} & \textbf{69.4\%} & \textbf{66.1\%} & \textbf{72.8\%} \\ % & \textbf{+12.3\%} & \textbf{+3.4\%} \\
+\textbf{Factory Avg.} & 53.8\% & 69.4\% & \textbf{66.1\%} & \textbf{72.8\%} \\ % & \textbf{+12.3\%} & \textbf{+3.4\%} \\
 \hline
 \multicolumn{5}{|l|}{\textbf{Campus Environment}} \\
 \hline
@@ -268,7 +286,7 @@ c01 & 50.3\% & 63.2\% & \textbf{65.1\%} & \textbf{71.8\%} \\ % & +14.8\% & +8.6\
 c02 & 45.1\% & 57.4\% & \textbf{54.9\%} & \textbf{61.6\%} \\ % & +9.8\% & +4.2\% \\
 c05 & 48.2\% & 62.1\% & \textbf{63.8\%} & \textbf{70.5\%} \\ % & +15.6\% & +8.4\% \\
 \hline
-\textbf{Campus Avg.} & \textbf{47.9\%} & \textbf{60.9\%} & \textbf{57.8\%} & \textbf{64.5\%} \\ % & \textbf{+13.4\%} & \textbf{+7.1\%} \\
+\textbf{Campus Avg.} & 47.9\% & 60.9\% & \textbf{57.8\%} & \textbf{64.5\%} \\ % & \textbf{+13.4\%} & \textbf{+7.1\%} \\
 \hline
 \end{tabular}%
 }
@@ -292,25 +310,14 @@ Feature Extraction & 181.5 & \textbf{36.3} \\ % & $-$145.2 \\
 \hline
 Matching \& Association & 15.0 & \textbf{0.8} \\ % & $-$14.2 \\
 \hline
-\textbf{Total End-to-End} & \textbf{233.0} & \textbf{49.4} \\ % & \textbf{$-$183.6} \\
+Total End-to-End & 233.0 & \textbf{49.4} \\ % & \textbf{$-$183.6} \\
 \hline
-\textbf{Estimated Capacity (FPS)} & \textbf{4.2} & \textbf{20.3} \\ % & \textbf{+16.1} \\
+Estimated Capacity (FPS) & 4.2 & \textbf{20.3} \\ % & \textbf{+16.1} \\
 \hline
 \end{tabular}%
 }
 \end{table}
 
-\section{Experimental Results}
-\label{sec:results}
-
-This section presents the results of our evaluation. We tested the system on the MTMMC dataset \cite{mtmmc}. 
-
-To rigorously validate our system's efficacy across diverse scenarios, we report all evaluation metrics disaggregated by individual camera feeds (e.g., c09, c12, ..., c05) rather than relying exclusively on global averages. This granular, per-camera reporting exposes how the pipeline handles explicit environmental challenges unique to distinct viewpoints---for instance, overcoming the uniform visual appearance of subjects in factory sectors (c09, c16) versus coping with extreme outdoor illumination variances on campus pathways (c01, c05). Presenting the data per-camera thus proves the robustness of both the geometric spatial matching and specific Re-ID trigger logic across highly heterogeneous fields of view.
-
-\subsection{Detection Performance}
-\label{subsec:detection-results}
-
-Table~\ref{tab:detection} compares detection accuracy between the baseline (plain PyTorch) and the SpotOn optimized pipeline (TensorRT, frame-skip=2). The optimized YOLOv26m detector achieved a +23.2\% average mAP@50 gain in the factory environment and a +25.3\% gain in the campus environment. These improvements highlight the robustness of the updated decoupled head architecture against challenging factory backgrounds and extreme outdoor lighting variations. Furthermore, the substantial increase in recall (up to +36.7\% on campus camera c01) directly benefits downstream spatial association by preventing broken tracklets caused by missed bounding box detections.
 
 \subsection{Tracking Performance}
 \label{subsec:tracking-results}
@@ -328,12 +335,7 @@ Table~\ref{tab:reid} details cross-camera Re-ID performance. The optimized SpotO
 
 Table~\ref{tab:latency} compares per-frame processing latency stage-by-stage. Accelerated by TensorRT, the SpotOn configuration drastically reduces computational overhead across every component. The most profound improvement occurs in feature extraction, where the edge-triggered Re-ID strategy circumvents unnecessary embedding computations, reducing time from 181.5 ms to 36.3 ms. Overall, total end-to-end latency drops from 233.0 ms per frame to 49.4 ms. This 4.7$\times$ speedup guarantees an estimated system capacity of 20.3 FPS, cleanly surpassing the 15 FPS threshold required for real-time situational awareness.
 
-\subsection{Qualitative Results}
-\label{subsec:qualitative}
-
-Figures~\ref{fig:dashboard} and \ref{fig:qualitative} present a qualitative overview of the SpotOn system in deployment.  Fig.~\ref{fig:dashboard} shows the practical operator dashboard interface, which consolidates asynchronous video feeds and localized tracking vectors into a single robust perspective, drastically reducing the cognitive load required to monitor multi-camera networks manually, while Fig.~\ref{fig:qualitative} illustrates the system's ability to maintain and visualize unified global IDs for subjects directly on the raw camera feeds. Fig.~\ref{fig:comparison} provides an ablation visualization, confirming that full pipeline integration maximizes both MOTA and IDF1 compared to standalone module configurations.  
-
-\begin{figure*}[htbp]
+\begin{figure}[t]
     %\centering
     %\includegraphics[width=\linewidth]{DETECTED_PEOPLE.jpeg}
     %\caption{Sample application output displaying detected individuals with globally synchronized identity markers across disjoint camera views.}
@@ -351,9 +353,12 @@ Figures~\ref{fig:dashboard} and \ref{fig:qualitative} present a qualitative over
         \label{fig:qualitative}
     \end{subfigure}
     \caption{SpotOn Deployment}
-\end{figure*}
+\end{figure}
 
-Fig.~\ref{fig:comparison} compares the IDF1 and MOTA scores across different pipeline configurations to show the contribution of each module.
+\subsection{Deployment Results}
+\label{subsec:qualitative}
+
+Figures~\ref{fig:dashboard} and \ref{fig:qualitative} present a qualitative overview of the SpotOn system in deployment, which consolidates asynchronous video feeds and localized tracking vectors into a single robust perspective, drastically reducing the cognitive load required to monitor multi-camera networks manually.  Fig.~\ref{fig:dashboard} shows the practical operator dashboard interface, where the tracked individuals from all cameras are displayed on the shared 2D floor plan. Fig.~\ref{fig:qualitative} illustrates the system's ability to maintain and visualize unified global IDs for subjects directly on the raw camera feeds. 
 
 \begin{figure}[htbp]
     \centering
@@ -363,28 +368,28 @@ Fig.~\ref{fig:comparison} compares the IDF1 and MOTA scores across different pip
     \vspace{-1.5em}
 \end{figure}
 
-Fig.~\ref{fig:dashboard} shows the operator dashboard, where tracked individuals from all cameras are displayed on the shared 2D floor plan.
-
 %    \includegraphics[width=\linewidth]{VIDEO_FEED.jpeg}
 %    \caption{The SpotOn operator dashboard presenting a consolidated real-time multi-camera interface for improved situational awareness.}
 %    \label{fig:dashboard}
 %\end{figure}
 
+% Fig.~\ref{fig:comparison} provides an ablation visualization, confirming that full pipeline integration maximizes both MOTA and IDF1 compared to standalone module configurations.  
+
 \subsection{Discussion}
 \label{subsec:discussion}
 
-To assess module contributions, we evaluated four configurations: (a) detection and tracking only, (b) with Re-ID added, (c) with spatial matching added, and (d) the full pipeline. As shown in Fig.~\ref{fig:comparison}, spatial matching provides a larger IDF1 improvement than Re-ID alone in the campus environment, where camera views overlap. Re-ID contributes more in the factory, where views are disjoint. The full pipeline achieves the best results in both environments.
+To assess module contributions, we evaluated four configurations: (a) detection and tracking only, (b) with Re-ID added, (c) with spatial matching added, and (d) the full pipeline. In addition, Fig.~\ref{fig:comparison} compares the IDF1 and MOTA scores across different pipeline configurations to show the contribution of each module. From Fig.~\ref{fig:comparison}, spatial matching provides a larger IDF1 improvement than Re-ID alone in the campus environment, where camera views overlap. Re-ID contributes more in the factory, where views are disjoint. The full pipeline achieves the best results in both environments.
 
 The system has two main limitations. First, tracking accuracy is sensitive to the quality of manual homography calibration; errors in calibration point selection propagate directly into floor plan projections. Second, detection reliability degrades in highly crowded scenes with persistent occlusions, leading to increased ID switches in environments such as the campus.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-In this paper, we presented SpotOn, a real-time multi-camera person tracking system designed for large-scale surveillance environments such as university campuses and industrial factories. The system addresses the fundamental challenge of maintaining identity continuity across distributed camera networks through a two-tier matching strategy. For cameras with overlapping fields of view, identities are resolved geometrically using a homography-based spatial matching module that projects each detection onto a shared 2D floor plan. For non-overlapping blind spots, an appearance-based Re-ID module is invoked only when a tracked person approaches the edge zone of a camera frame, substantially reducing unnecessary computation. The system was evaluated on the MTMMC dataset~\cite{mtmmc} across two distinct environments, achieving an average Multiple Object Tracking Accuracy (MOTA) of 54.3\%, IDF1 of 61.8\%, and a per-frame processing latency of 49.4 ms across four concurrent camera streams. The factory environment yielded higher MOTA (58.4\%) and IDF1 (63.3\%) than the campus (50.1\% and 60.2\%, respectively), reflecting the greater geometric regularity of indoor scenes. Ablation analysis confirmed that spatial matching provides a larger identity continuity benefit than Re-ID alone in overlapping-view environments, while Re-ID contributes more in disjoint-view configurations. Compared to a non-optimized baseline, the full pipeline reduced end-to-end latency from 233.0 ms to 49.4 ms and improved factory MOTA from 34.4\% to 58.4\%. For future work, we plan to automate the homography calibration process and explore temporal motion prediction to handle long occlusions. Validation on additional multi-camera benchmarks and real-world deployments is also planned.
+In this paper, we presented SpotOn, a real-time multi-camera person tracking system designed for large-scale surveillance environments such as university campuses and industrial factories. The system addresses the fundamental challenge of maintaining identity continuity across distributed camera networks through a two-tier matching strategy. For cameras with overlapping fields of view, identities are resolved geometrically using a homography-based spatial matching module that projects each detection onto a shared 2D floor plan. For non-overlapping blind spots, an appearance-based Re-ID module is invoked only when a tracked person approaches the edge zone of a camera frame, substantially reducing unnecessary computation. The system was evaluated on the MTMMC dataset~\cite{mtmmc} across two distinct environments, achieving an average MOTA of 54.3\%, IDF1 of 61.8\%, and a per-frame processing latency of 49.4 ms across four concurrent camera streams. The factory environment yielded higher MOTA (58.4\%) and IDF1 (63.3\%) than the campus (50.1\% and 60.2\%, respectively), reflecting the greater geometric regularity of indoor scenes. Ablation analysis confirmed that spatial matching provides a larger identity continuity benefit than Re-ID alone in overlapping-view environments, while Re-ID contributes more in disjoint-view configurations. Compared to a non-optimized baseline, the full pipeline reduced end-to-end latency from 233.0 ms to 49.4 ms and improved factory MOTA from 34.4\% to 58.4\%. For future work, we plan to automate the homography calibration process and explore temporal motion prediction to handle long occlusions. Validation on additional multi-camera benchmarks and real-world deployments is also planned.
 
-\section*{Acknowledgment}
+%\section*{Acknowledgment}
 
-The authors would like to thank the Department of Computer Engineering, Kasetsart University, for supporting this research.
+%The authors would like to thank the Department of Computer Engineering, Kasetsart University, for supporting this research.
 
 \vfill\null
 \newpage
