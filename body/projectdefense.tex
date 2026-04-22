@@ -1,0 +1,135 @@
+\chapter{Project Defense and Project Expo}
+
+This chapter presents the project evaluation and dissemination processes conducted through two rounds of project defense and participation in the SKE Project Expo. It documents the feedback received from evaluators, the revisions made in response to that feedback, and the outcomes of those revisions. In addition, it discusses the team's experience in presenting the project to a broader audience, including poster design, audience interaction, and reflections on how the Expo contributed to the overall development of the project.
+
+\section{First Project Defense}
+
+\subsection{Comments and Feedback from the Evaluators}
+During the first project defense, the evaluators raised several practical concerns regarding the robustness of the system in real-world scenarios. The key comments focused on how the visual tracking algorithm handles changes in a person's appearance. Specifically:
+\begin{itemize}
+    \item \textbf{Clothing Changes:} A major question was how the system tracks someone if they change their clothes. Our appearance feature extractor relies heavily on vector embeddings of the subject's clothing. If a person takes off a coat, the system can generally still track them smoothly under continuous CCTV observation. However, if their outfit completely changes out of view, the generated feature vector fundamentally alters, and the system loses track of the identity.
+    \item \textbf{Low Visibility Scenarios:} Another evaluator questioned the system's performance on individuals wearing dark clothing, particularly black clothes, in low-light or nighttime environments where visual features are heavily obscured.
+\end{itemize}
+
+\subsection{Revisions Required, Actions Taken, and Outcomes}
+To address the feedback from the first defense, the team prioritized enhancing the resilience of the AI models:
+\begin{itemize}
+    \item \textbf{Clothing Change Resilience:} To mitigate tracking loss due to complete clothing changes, we incorporated a mechanism to weight the person's geometric trajectory equally with spatial appearance features. While the system may still decouple the ID if the visual vector dramatically changes, relying on temporal geometry over multiple camera frames limits the search radius, helping the tracker stitch identities back together more consistently when the context matches.
+    \item \textbf{Handling Dark Clothing in Low Light:} For the issue concerning dark clothing at night, we extensively utilized data augmentation during the training phase of our segmentation and Re-ID models. By synthetically darkening the dataset, adding noise, and lowering contrast, the model learned to extract more subtle textural and structural features rather than relying purely on color histograms, resulting in a marked improvement in low-light inference.
+\end{itemize}
+
+\section{Second Project Defense}
+
+\subsection{Comments and Feedback from the Evaluators}
+The second defense demonstrated the improved system. The evaluators recognized the progress made from the first round, shifting their focus toward system architecture and deployment scalability. A primary point of discussion was the architectural choices:
+\begin{itemize}
+    \item \textbf{Deployment Infrastructure:} Evaluators questioned why Kubernetes was not utilized in the deployment stack, as it had been vaguely referenced in earlier architectural drafts.
+\end{itemize}
+
+\subsection{Additional Revisions, Actions Taken, and Final Outcomes}
+Rather than making sweeping technical changes, the feedback from the second defense required us to clarify the system's operational scope:
+\begin{itemize}
+    \item \textbf{Architectural Justification:} The team provided a strong verbal justification during the defense. Since SpotOn is designed to operate primarily on edge devices (such as NVIDIA Jetson boards connected directly to camera streams) to guarantee real-time, low-latency processing, introducing Kubernetes would add unnecessary overhead. However, we acknowledged that Kubernetes remains a valid option should the system be scaled to a centralized server architecture processing hundreds of non-local streams. 
+\end{itemize}
+This clarification led to a refinement in our final documentation, clearly outlining the boundary between the localized edge-processing setup and future cloud-scalable iterations.
+
+\subsection{Suggestions on How Project Defense Can Better Support Software Development}
+The project defense sessions served as a rigorous stress-test for our system’s practical viability. These sessions forced the team to consider obscure edge cases (like low-light dark clothing and mid-tracking outfit swaps) that are often overlooked during standard development. Defense panels act as external stakeholders who prioritize real-world usability over pure theoretical accuracy. Moving forward, incorporating regular, informal peer-review checkpoints resembling these defenses could greatly tighten the requirement validation lifecycle and catch unhandled edge cases much earlier in the software architecture process.
+
+\section{Project Expo Participation}
+
+\subsection{Poster Presentation and Poster Components}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth, height=0.85\textheight, keepaspectratio]{jubjones/Poster/Introduction.pdf}
+    \caption{SpotOn Project Poster presented at the SKE Project Expo}
+    \label{fig:expo_poster}
+\end{figure}
+
+This poster presents \textbf{SpotOn}, a geometry-aware multi-camera person tracking system developed by Krittin Setdhavanich and Yanatchara Jeraja at Kasetsart University. The project aims to solve the high computational costs and reliability issues of traditional surveillance systems.
+
+\subsubsection*{Core Components of the Poster}
+
+\begin{itemize}
+    \item \textbf{Problem Statement and Objectives}: The authors identify that traditional multi-camera tracking methods are expensive and often fail in "uniform-heavy" environments (where people look similar, like in factories).
+    \begin{itemize}
+        \item \textbf{Objectives}: To deliver real-time tracking for large-scale areas, reduce costs, and maintain "identity continuity" by using spatial matching instead of relying solely on appearance.
+    \end{itemize}
+    
+    \item \textbf{Methodology and System Pipeline}: The methodology introduces a modular approach to tracking individuals across multiple cameras.
+    \begin{itemize}
+        \item \textbf{Detection \& Tracking}: Uses \textbf{YOLOv26m} for object detection and \textbf{ByteTrack} for local tracking within a single frame.
+        \item \textbf{Spatial Matching (Homography)}: Instead of constantly checking what someone looks like (Re-ID), the system maps their "foot proxy coordinates" onto a 2D floor plan using homography.
+        \item \textbf{Two-Tier Strategy}: If cameras have overlapping views, it uses geometry to match IDs; if they do not overlap, it triggers an \textbf{edge-triggered Re-ID} (OSNet-AIN) only when a person is near the frame's edge (5\% margin).
+    \end{itemize}
+    
+    \item \textbf{System Structure and Deployment}: The system is built with a modern, scalable tech stack:
+    \begin{itemize}
+        \item \textbf{ML/AI Core}: Processes frames using OpenCV and executes the detection and Re-ID models.
+        \item \textbf{Backend \& Frontend}: Powered by \textbf{FastAPI} (WebSockets) for real-time communication and \textbf{React} with WebRTC for the live dashboard.
+        \item \textbf{Storage}: Uses \textbf{Redis} for real-time caching and \textbf{TimescaleDB} for data storage.
+        \item \textbf{Deployment}: The entire system is containerized using \textbf{Docker} and managed with an \textbf{NGINX} reverse proxy for load balancing.
+    \end{itemize}
+
+    \item \textbf{Implementation Results and Key Findings}: The system was tested in both factory and campus environments, showing significant improvements over baseline models:
+    \begin{itemize}
+        \item \textbf{Speed}: The system is \textbf{4.7x faster} than the baseline, reducing average latency from 233ms to \textbf{49.4ms}.
+        \item \textbf{Accuracy}: Achieved an overall gain of \textbf{+21.7\% in MOTA} (Multi-Object Tracking Accuracy) and \textbf{+10.8\% in IDF1} (Identity F1 Score).
+        \item \textbf{Efficiency}: Dramatically reduced ID switches (from 1058 down to 116 in the overall average).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Event Photos and Awards Received}
+
+After a long but incredibly rewarding day at the SKE Project Expo 2026, we had the invaluable opportunity to present SpotOn to a wide audience of students, faculty, and industry professionals. Presenting our AI-powered multi-camera person tracking system sparked numerous engaging conversations, and it was exciting to witness so many attendees taking a genuine interest in our solution. By the end of the event, our hard work culminated in SpotOn being honored with two major prizes: \textbf{Popular Project Award} and \textbf{Excellence in AI Integration}.
+
+Building on this success, we also had the incredible chance to travel and present our work internationally in Japan, broadening our audience and bringing SpotOn to the global stage.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{jubjones/award/excellence_ai_integration_award.jpg}
+        \caption{Excellence in AI Integration}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{jubjones/award/popular_project_award.jpg}
+        \caption{Popular Project Award}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{jubjones/award/all_awards.JPG}
+    \caption{All award winners from SKE Project Expo 2026}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{jubjones/award/stand_with_poster.jpg}
+        \caption{Team SpotOn with our project poster}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{jubjones/award/expo_image.JPG}
+        \caption{Demonstrating SpotOn to attendees}
+    \end{minipage}
+\end{figure}
+
+\subsection{Questions Raised During the Expo and the Team’s Responses}
+During the Expo, our booth engaged a wide variety of attendees, from faculty to industry professionals. Some of the most frequently asked questions included:
+\begin{itemize}
+    \item \textbf{Q: What is the processing latency, and can it truly run in "real-time"?} \\
+    \textbf{A:} We explained that by pushing inference to the edge and optimizing our tracking models with TensorRT, the system processes streams at roughly 25-30 FPS, making the latency virtually unnoticeable for standard security monitoring purposes.
+    \item \textbf{Q: How does the system handle an environment where people are heavily occluded by crowds?} \\
+    \textbf{A:} We detailed how our geometry-aware tracking system essentially "predicts" the path of an individual. Even if someone is occluded by a large crowd for a few seconds, the timeline and spatial projection algorithms estimate their reappearance point, allowing the ID to be maintained.
+    \item \textbf{Q: Can this be integrated with existing analog CCTV infrastructure or only IP cameras?} \\
+    \textbf{A:} We responded that as long as the video feed can be digitized and routed through an RTSP stream to our edge device, the tracking pipeline functions effectively regardless of the original camera format.
+\end{itemize}
+
+\subsection{Recommendations for Improving the Expo}
+To enhance the impact of future Expo events, it would be beneficial to organize dedicated "demo-tours" where groups of industry representatives are guided to booths categorized by technology sectors (e.g., AI/CV, Web Apps). Additionally, having stronger, stabilized local Wi-Fi networks would massively aid projects like ours that rely on real-time streaming, as network congestion in crowded halls occasionally impacted our live demonstration.
