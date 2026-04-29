@@ -7,7 +7,18 @@ The first part focuses on comparing the program’s expected learning outcomes w
 
 \textbf{Executive Summary:} The JubJones multi-camera tracking project demonstrates strong technical proficiency, highly capable system design, and successful integration of geometric modeling and deep-learning re-identification approaches. Based on the AI evaluation, the student meets and in some areas exceeds the intended graduate outcomes of the software engineering program.
 
-\begin{table}[!ht]
+\subsection{Radar Chart Comparing Program Targets and AI Evaluation}
+This section includes a radar chart visually demonstrating the alignment or discrepancy between the intended outcomes of the curriculum and the performance assessed by AI.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/eval/radar_ai_target.png}
+    \caption{Radar Chart Comparing Program Targets and AI Evaluation}
+    \label{fig:radar_ai_target}
+\end{figure}
+The chart visually demonstrates the alignment between the intended outcomes of the curriculum and the performance assessed by the AI model. The AI evaluator assigned higher proficiency levels in SE, AI, and Critical Thinking due to the advanced technical optimizations demonstrated.
+
+\begin{table}[H]
     \centering
     \small
     \begin{tabularx}{\textwidth}{|p{2.8cm}|X|X|c|c|c|}
@@ -24,6 +35,8 @@ The first part focuses on comparing the program’s expected learning outcomes w
         \hline
         Collaboration \& Communication & Writes clear documentation, gathers feedback, and collaborates. & Thorough academic writing (IEEE format), systematic problem analysis, and robust experimental design. & 3 & 3 & 3 \\
         \hline
+        Lifelong Learning & Demonstrates continuous independent learning and adapts new technologies. & Rapidly assimilated and implemented advanced SOTA models (OSNet) and complex geometric algorithms independently. & 3 & 4 & 4 \\
+        \hline
     \end{tabularx}
     \caption{Detailed AI Evaluation of Knowledge and Skills based on Curriculum Rubric}
 \end{table}
@@ -35,18 +48,8 @@ The first part focuses on comparing the program’s expected learning outcomes w
     \item \textbf{Data Management \& Analytics (Level 3):} Managing the embeddings (512-dimensional arrays) via cosine-similarity dictionaries in real-time aligns with Level 3 real-time data pipelines.
     \item \textbf{Critical \& Creative Thinking (Level 4):} Proposing the "edge trigger" heuristic and homography tracking to bypass the high overhead of continuous Re-ID marks an innovative optimization logic.
     \item \textbf{Collaboration \& Communication (Level 3):} The IEEE structured reporting and systematic documentation confirm a well-structured technical communication capability.
+    \item \textbf{Lifelong Learning (Level 4):} Successfully researching, understanding, and integrating a complex mix of new computer vision algorithms (homography) and neural networks (OSNet, YOLO) demonstrates an exceptional capacity for independent and continuous learning.
 \end{itemize}
-
-\subsection{Radar Chart Comparing Program Targets and AI Evaluation}
-This section includes a radar chart visually demonstrating the alignment or discrepancy between the intended outcomes of the curriculum and the performance assessed by AI.
-
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/eval/radar_ai_target.png}
-    \caption{Radar Chart Comparing Program Targets and AI Evaluation}
-    \label{fig:radar_ai_target}
-\end{figure}
-The chart visually demonstrates the alignment between the intended outcomes of the curriculum and the performance assessed by the AI model. The AI evaluator assigned higher proficiency levels in SE, AI, and Critical Thinking due to the advanced technical optimizations demonstrated.
 
 \subsection{Reflection on the AI Evaluation}
 This section discusses the student’s opinions regarding the AI’s assessment. The AI evaluation provided a fair and insightful assessment of the technical competencies demonstrated in the project. It accurately identified strengths in software architecture and machine learning integration. The AI correctly highlighted the novelty of using homography for overlapping views combined with Re-ID only on camera edge-zones as a primary strength in "Critical \& Creative Thinking." I believe the assessment is highly reasonable, although I would argue my data management required heavier algorithmic lifting behind the scenes than a strict Level 3 suggests. Despite this, it was not overly strict nor too lenient, as it maintained focus on the provided source code.
@@ -54,7 +57,18 @@ This section discusses the student’s opinions regarding the AI’s assessment.
 \section{Self-Evaluation by the Student}
 The second part focuses on student self-evaluation. The student should assess their own knowledge and skills and compare that self-assessment with the AI-generated evaluation. The discussion below explains why the two evaluations may differ.
 
-\begin{table}[!ht]
+\subsection{Radar Chart Comparing Program Targets, AI Evaluation, and Self-Evaluation}
+This section includes a radar chart visually illustrating similarities and differences among the three perspectives: the program’s target levels, the AI-based evaluation, and the student’s self-evaluation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/eval/radar_ai_target_self.png}
+    \caption{Radar Chart Comparing Program Targets, AI Evaluation, and Self-Evaluation}
+    \label{fig:radar_ai_target_self}
+\end{figure}
+This figure illustrates the similarities and differences among the curriculum expectations, AI objective metrics, and the student's own perception of their capability.
+
+\begin{table}[H]
     \centering
     \small
     \begin{tabularx}{\textwidth}{|p{3.5cm}|c|c|X|}
@@ -71,32 +85,59 @@ The second part focuses on student self-evaluation. The student should assess th
         \hline
         Communication & 3 & 4 & Worked intimately with stakeholders, meticulously documented testing rounds across the campus and factory settings. \\
         \hline
+        Lifelong Learning & 4 & 4 & Continuously researched new tracking paradigms like OSNet-AIN and deployed unfamiliar geometric mappings to solve specific project constraints. \\
+        \hline
     \end{tabularx}
     \caption{Self-Evaluation vs AI-Evaluation Summary}
 \end{table}
-
-\subsection{Radar Chart Comparing Program Targets, AI Evaluation, and Self-Evaluation}
-This section includes a radar chart visually illustrating similarities and differences among the three perspectives: the program’s target levels, the AI-based evaluation, and the student’s self-evaluation.
-
-\begin{figure}[!ht]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/eval/radar_ai_target_self.png}
-    \caption{Radar Chart Comparing Program Targets, AI Evaluation, and Self-Evaluation}
-    \label{fig:radar_ai_target_self}
-\end{figure}
-This figure illustrates the similarities and differences among the curriculum expectations, AI objective metrics, and the student's own perception of their capability.
 
 \subsection{Reflection on Self-Evaluation Compared with AI Evaluation}
 This section presents the interpretation of the self-evaluation in comparison with the AI assessment. When comparing the self-evaluation to the AI, I agreed with the high marks across all technical aspects, scoring myself equal to the AI in Software Development, Machine Learning, Data Management, and Critical Thinking. However, I rated myself a level higher in Communication. This discrepancy stems from the fact that the AI only sees the final, polished code and documentation, completely missing the extensive on-site stakeholder communication required to evaluate the camera grids inside the actual factory logic and the countless offline team discussions held to iteratively debug our system.
 
 \section{Advisor Evaluation}
-The third part focuses on the evaluation conducted by the project advisor. The advisor should assess the student’s knowledge and skills and provide reasons for assigning each level.
+The section focuses on the evaluation conducted by the project advisor to assess the student’s knowledge and skills. %The advisor should assess the student’s knowledge and skills and provide reasons for assigning each level.
 
 \subsection{Radar Chart Comparing Program Targets, AI Evaluation, Self-Evaluation, and Advisor Evaluation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/eval/radar_comprehensive.png}
+    \caption{Radar Chart Comparing Program Targets, AI Evaluation, Self-Evaluation, and Advisor Evaluation}
+    \label{fig:radar_comprehensive}
+\end{figure}
+
 This section should be completed only after the first two parts are finalized. The advisor should read the previous sections and then conduct the third evaluation. A radar chart should be included with four lines in the same figure: the program’s target levels, the AI-based evaluation, the student’s self-evaluation, and the advisor’s evaluation. This figure should provide a comprehensive comparison across all perspectives.
 
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabularx}{\textwidth}{|p{2.6cm}|p{1.0cm}|p{1.0cm}|p{1.5cm}|X|}
+        \hline
+        \textbf{Skill Area} & \textbf{AI Score} & \textbf{Self Score} & \textbf{Advisor Score}& \textbf{Advisor Feedback} \\
+        \hline
+        Software Development & 4 & 4 & 3 & Develops a real-time system with a designed architecture, incorporating UX/UI design, testing, containerization, and a continuous user feedback loop. \\
+        \hline
+        Machine Learning \& AI & 4 & 4 & 4 & Constructs a machine learning system by integrating multiple algorithms: YOLOv26, ByteTrack, Geometric Spatial Matching, and OSNet-AIN ReID. The resulting model shows substantial performance improvements and significantly outperforms the baseline. \\
+        \hline
+        Data Management & 3 & 3 & 3 & Builds a robust system infrastructure using databases and caching technologies, including Redis, PostgreSQL, and TimescaleDB, alongside MLOps practices and load balancing. The system also incorporates a continuous user feedback loop. \\
+        \hline
+        Critical Thinking & 4 & 4 & 4 & Creates innovative solutions that elevate research lab standards and drive significant performance improvements. \\
+        \hline
+        Communication & 3 & 4 & 4 & Works closely with users to design systems that align with user requirements. Actively participates in research lab meetings to share knowledge and project progress. \\
+        \hline
+        Lifelong Learning & 4 & 4 & 3 & Demonstrates strong self-learning ability in developing both AI and software systems. Capable of learning new solutions, adapting them effectively, and optimizing performance. Maintains an open mindset and a willingness to continuously learn new technologies. \\
+        \hline
+    \end{tabularx}
+    \caption{Advisor Evaluation vs Self-Evaluation vs AI-Evaluation Summary}
+\end{table}
+
 \subsection{Advisor’s Comments on the Evaluation}
-This section should summarize the advisor’s opinions and explanations regarding the evaluation. The advisor should clarify why each level was assigned and may comment on the student’s strengths, progress, limitations, and future development directions.
+
+This work demonstrates end-to-end system design, advanced technical integration, and innovation with real-world impact. The project goes beyond building applications by architecting a scalable real-time system, containerization and MLOps, while incorporating continuous user feedback and performance optimization. It advances the state of the art by integrating multiple machine learning algorithms into a unified model that significantly outperforms baselines. In addition, the work contributes more by raising research lab standards and fostering knowledge-sharing. The demonstrated ability to independently learn, adapt, and optimize complex AI and software systems.  Lastly, this work has been validated through the best IUP project award and the publication acceptance at the 23rd International Joint Conference on Computer Science and Software Engineering (JCSSE 2026).
 
 \subsection{Student Reflection on the Advisor’s Evaluation}
-This section should present the student’s reflection on the advisor’s assessment. The student may discuss points of agreement or disagreement, lessons learned from the advisor’s perspective, and how the evaluation contributes to personal and professional development.
+Reviewing the advisor's evaluation provides a holistic and grounding perspective on the project's achievements. I strongly agree with the advisor’s high ratings in Machine Learning \& AI, Critical Thinking, and Communication (Level 4). The advisor’s acknowledgment of the significant performance improvements achieved by integrating YOLO, ByteTrack, and OSNet-AIN validates the core technical innovations of the system. Furthermore, matching my self-evaluation of 4 in Communication highlights the success of our continuous user feedback loop and active knowledge-sharing in research lab meetings, which the isolated AI-based assessment could not fully observe.
+
+However, there is a notable, yet highly constructive, divergence in the areas of Software Development and Lifelong Learning, where the advisor assigned a Level 3, compared to the Level 4 ratings from both the AI and my self-evaluation. For Software Development, while the AI focused on strict backend latency optimizations and algorithm complexity, the advisor correctly viewed the project through an enterprise lens---taking into account the broader requirements of UX/UI design, testing procedures, and containerization. This reveals a vital lesson: building a robust tracking pipeline is only one component of delivering a fully matured, production-ready software product. Similarly, for Lifelong Learning, the advisor's Level 3 rating serves as a realistic academic benchmark. While I successfully assimilated complex computer vision paradigms for this specific project, achieving true expert-level lifelong learning (Level 4) requires a sustained, career-long commitment to adapting technologies across diverse industry applications.
+
+Ultimately, the advisor's assessment acts as an invaluable bridge between academic research and industry expectations. It validates my technical and collaborative competencies while clarifying my long-term professional development goals: elevating my end-to-end software engineering practices (such as rigorous testing architectures and advanced MLOps) to the same high standards I apply to machine learning research.
